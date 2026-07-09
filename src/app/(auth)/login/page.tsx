@@ -8,12 +8,19 @@ import { Button, Card, Input, Label } from "@/components/ui";
 
 function LoginForm() {
   const [state, action, pending] = useActionState(login, null);
-  const next = useSearchParams().get("next") ?? "/dashboard";
+  const params = useSearchParams();
+  const next = params.get("next") ?? "/dashboard";
+  const callbackError = params.get("error");
 
   return (
     <Card className="w-full max-w-sm animate-rise p-6">
       <h1 className="text-lg font-semibold">Welcome back</h1>
       <p className="mt-1 text-sm text-ink-faint">Log in to see how AI sees you.</p>
+      {callbackError && (
+        <p className="mt-3 rounded-lg bg-poor-soft px-3 py-2 text-xs text-poor">
+          Sign-in link failed: {callbackError}. Please log in or sign up again.
+        </p>
+      )}
       <form action={action} className="mt-5 space-y-4">
         <input type="hidden" name="next" value={next} />
         <div>

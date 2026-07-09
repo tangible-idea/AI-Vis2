@@ -13,6 +13,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           </Link>
           <nav className="flex items-center gap-1 sm:gap-4">
             <Link
+              href="/preview"
+              className="rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
+            >
+              Free preview
+            </Link>
+            <Link
               href="/pricing"
               className="rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
             >

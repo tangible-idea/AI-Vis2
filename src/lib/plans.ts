@@ -7,6 +7,8 @@ export interface PlanLimits {
   maxPrompts: number;
   maxCompetitors: number;
   scansPerMonth: number;
+  /** Lifetime scan cap per user (free plan); null = monthly limit applies. */
+  totalScans: number | null;
   contentGenerations: number;
   trends: boolean;
   weeklyReports: boolean;
@@ -23,7 +25,8 @@ export const PLANS: Record<Plan, PlanLimits> = {
     priceNote: "forever",
     maxPrompts: 5,
     maxCompetitors: 2,
-    scansPerMonth: 2,
+    scansPerMonth: 5,
+    totalScans: 5,
     contentGenerations: 3,
     trends: false,
     weeklyReports: false,
@@ -39,6 +42,7 @@ export const PLANS: Record<Plan, PlanLimits> = {
     maxPrompts: 20,
     maxCompetitors: 5,
     scansPerMonth: 8,
+    totalScans: null,
     contentGenerations: 40,
     trends: true,
     weeklyReports: true,
@@ -54,6 +58,7 @@ export const PLANS: Record<Plan, PlanLimits> = {
     maxPrompts: 100,
     maxCompetitors: 20,
     scansPerMonth: 100,
+    totalScans: null,
     contentGenerations: 1000,
     trends: true,
     weeklyReports: true,
@@ -72,7 +77,7 @@ export function planLimits(plan: Plan | null | undefined): PlanLimits {
 export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; values?: [string, string, string] }[] = [
   { label: "Tracked prompts", key: null, values: ["5", "20", "100"] },
   { label: "Competitors", key: null, values: ["2", "5", "20"] },
-  { label: "Scans per month", key: null, values: ["2", "8", "Unlimited*"] },
+  { label: "Scans", key: null, values: ["5 total", "8 / month", "Unlimited*"] },
   { label: "AI content generations", key: null, values: ["3", "40", "Unlimited*"] },
   { label: "Trending topics", key: "trends" },
   { label: "Weekly email reports", key: "weeklyReports" },

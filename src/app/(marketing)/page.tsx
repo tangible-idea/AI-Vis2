@@ -25,13 +25,19 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/signup"
+                href="/preview"
                 className="inline-flex h-11 items-center gap-2 rounded-lg bg-[#35d07f] px-5 text-sm font-semibold text-night transition-colors hover:bg-[#4adf90]"
               >
-                Start free AI visibility scan <ArrowRight className="h-4 w-4" />
+                Run a free preview scan <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex h-11 items-center rounded-lg border border-night-line px-5 text-sm font-medium text-paper/80 transition-colors hover:bg-night-soft"
+              >
+                Start free
               </Link>
               <span className="text-xs text-paper/50">
-                Free forever plan · results in under 10 minutes
+                No signup needed · 5 free scans when you join
               </span>
             </div>
             <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-paper/50">

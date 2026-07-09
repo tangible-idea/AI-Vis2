@@ -11,7 +11,7 @@ import type { Plan } from "@/lib/types";
 const ORDER: Plan[] = ["free", "starter", "pro"];
 
 const HIGHLIGHTS: Record<Plan, string[]> = {
-  free: ["5 tracked prompts", "2 scans / month", "2 competitors", "Partial dashboard"],
+  free: ["5 tracked prompts", "5 scans total", "2 competitors", "Partial dashboard"],
   starter: [
     "20 prompts · 8 scans / month",
     "Trending topics",

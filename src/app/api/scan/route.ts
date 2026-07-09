@@ -23,27 +23,44 @@ export async function POST(request: Request) {
     .single();
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-  // plan gating: scans this calendar month
+  // plan gating
   const { data: profile } = await supabase
     .from("profiles")
     .select("plan")
     .eq("id", user.id)
     .single();
   const limits = planLimits(profile?.plan);
-  const monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
-  const { count } = await supabase
-    .from("scans")
-    .select("id", { count: "exact", head: true })
-    .eq("project_id", projectId)
-    .neq("trigger", "demo")
-    .gte("created_at", monthStart.toISOString());
-  if ((count ?? 0) >= limits.scansPerMonth) {
-    return NextResponse.json(
-      { error: `Your ${limits.label} plan includes ${limits.scansPerMonth} scans per month. Upgrade to run more.`, code: "limit" },
-      { status: 403 }
-    );
+
+  if (limits.totalScans != null) {
+    // free plan: lifetime cap across all of the user's projects
+    const { count } = await supabase
+      .from("scans")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .neq("trigger", "demo");
+    if ((count ?? 0) >= limits.totalScans) {
+      return NextResponse.json(
+        { error: `Your ${limits.label} plan includes ${limits.totalScans} scans total. Upgrade for weekly scans and trends.`, code: "limit" },
+        { status: 403 }
+      );
+    }
+  } else {
+    // paid plans: scans this calendar month
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    const { count } = await supabase
+      .from("scans")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", projectId)
+      .neq("trigger", "demo")
+      .gte("created_at", monthStart.toISOString());
+    if ((count ?? 0) >= limits.scansPerMonth) {
+      return NextResponse.json(
+        { error: `Your ${limits.label} plan includes ${limits.scansPerMonth} scans per month. Upgrade to run more.`, code: "limit" },
+        { status: 403 }
+      );
+    }
   }
 
   const { data: scan, error } = await supabase

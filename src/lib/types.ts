@@ -42,6 +42,7 @@ export interface Project {
   country: string;
   language: string;
   target_market: string | null;
+  description: string | null;
   is_demo: boolean;
   created_at: string;
 }
@@ -133,6 +134,32 @@ export interface ShareLink {
   expires_at: string | null;
   created_at: string;
 }
+
+/**
+ * Generic industry options for onboarding / preview. Phrased the way buyers
+ * describe a category, so they read naturally inside generated scan prompts
+ * ("best travel & hospitality options…").
+ */
+export const INDUSTRIES = [
+  "SaaS & software",
+  "e-commerce & retail",
+  "marketing & advertising",
+  "finance & fintech",
+  "healthcare & wellness",
+  "education & e-learning",
+  "travel & hospitality",
+  "food & beverage",
+  "real estate",
+  "legal & professional services",
+  "consulting & agencies",
+  "manufacturing & industrial",
+  "media & entertainment",
+  "beauty & fashion",
+  "fitness & sports",
+  "automotive",
+  "home & local services",
+  "other",
+] as const;
 
 export const CONTENT_LANGUAGES = [
   { code: "en", label: "English" },

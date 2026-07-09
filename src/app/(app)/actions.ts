@@ -31,11 +31,13 @@ export async function createProject(
   if (!user) redirect("/login");
 
   const name = String(formData.get("name") ?? "").trim();
-  const website = String(formData.get("website") ?? "").trim();
+  const rawWebsite = String(formData.get("website") ?? "").trim();
+  const website = rawWebsite && !/^https?:\/\//i.test(rawWebsite) ? `https://${rawWebsite}` : rawWebsite;
   const industry = String(formData.get("industry") ?? "").trim();
   const country = String(formData.get("country") ?? "US");
   const language = String(formData.get("language") ?? "en");
   const target_market = String(formData.get("target_market") ?? "").trim() || null;
+  const description = String(formData.get("description") ?? "").trim() || null;
   const competitorNames = [1, 2, 3]
     .map((i) => String(formData.get(`competitor${i}`) ?? "").trim())
     .filter(Boolean);
@@ -47,7 +49,7 @@ export async function createProject(
 
   const { data: project, error } = await supabase
     .from("projects")
-    .insert({ user_id: user.id, name, website, industry, country, language, target_market })
+    .insert({ user_id: user.id, name, website, industry, country, language, target_market, description })
     .select()
     .single();
   if (error || !project) return { error: error?.message ?? "Could not create project" };

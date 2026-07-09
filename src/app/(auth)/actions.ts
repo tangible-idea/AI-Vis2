@@ -1,9 +1,26 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function login(_prev: { error: string } | null, formData: FormData) {
+export interface AuthState {
+  error?: string;
+  /** Set when a confirmation email was sent and the user must verify. */
+  sent?: boolean;
+  email?: string;
+}
+
+async function siteOrigin(): Promise<string> {
+  const h = await headers();
+  return (
+    h.get("origin") ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    "http://localhost:3000"
+  );
+}
+
+export async function login(_prev: AuthState | null, formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email: String(formData.get("email")),
@@ -13,17 +30,29 @@ export async function login(_prev: { error: string } | null, formData: FormData)
   redirect(String(formData.get("next") || "/dashboard"));
 }
 
-export async function signup(_prev: { error: string } | null, formData: FormData) {
+export async function signup(
+  _prev: AuthState | null,
+  formData: FormData
+): Promise<AuthState> {
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email: String(formData.get("email")),
+  const email = String(formData.get("email"));
+  const origin = await siteOrigin();
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
     password: String(formData.get("password")),
     options: {
       data: { full_name: String(formData.get("name") ?? "") },
+      // Confirmation links land on /auth/callback, which exchanges the code
+      // and forwards the user into onboarding.
+      emailRedirectTo: `${origin}/auth/callback?next=/onboarding`,
     },
   });
   if (error) return { error: error.message };
-  // If email confirmation is disabled (default for dev), a session exists now.
+
+  // Email confirmation enabled → no session yet; tell the user to check mail.
+  if (!data.session) return { sent: true, email };
+
   redirect("/onboarding");
 }
 
