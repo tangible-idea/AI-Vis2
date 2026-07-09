@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  /* warm-paper minimal system */
+  --color-paper: #faf9f6;
+  --color-surface: #ffffff;
+  --color-ink: #1c1b16;
+  --color-ink-soft: #55524a;
+  --color-ink-faint: #8d897e;
+  --color-line: #e9e6df;
+  --color-line-strong: #d8d4ca;
+  --color-hover: #f3f1ec;
+
+  --color-accent: #0e7b43;
+  --color-accent-strong: #0a6236;
+  --color-accent-soft: #eaf5ee;
+
+  --color-good: #14803c;
+  --color-good-soft: #e8f4ec;
+  --color-mid: #b45309;
+  --color-mid-soft: #fbf1e2;
+  --color-poor: #b42318;
+  --color-poor-soft: #fbebe9;
+
+  --color-night: #14130f;
+  --color-night-soft: #23211a;
+  --color-night-line: #34322a;
+
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
+
+  --shadow-card: 0 1px 2px rgb(28 27 22 / 0.04);
+  --shadow-pop: 0 4px 24px rgb(28 27 22 / 0.08), 0 1px 3px rgb(28 27 22 / 0.06);
+
+  --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade: fade 0.4s ease both;
+  --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #d6ecdd;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* stagger helper: apply .stagger to a parent, children rise in sequence */
+.stagger > * {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.07s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.17s; }
+.stagger > *:nth-child(5) { animation-delay: 0.22s; }
+.stagger > *:nth-child(6) { animation-delay: 0.27s; }
+.stagger > *:nth-child(7) { animation-delay: 0.32s; }
+.stagger > *:nth-child(8) { animation-delay: 0.37s; }
+
+/* dotted grid texture for hero / empty states */
+.dot-grid {
+  background-image: radial-gradient(var(--color-line-strong) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.dot-grid-dark {
+  background-image: radial-gradient(#3a382f 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* print styles: reports print clean */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .print-block { break-inside: avoid; }
+}
