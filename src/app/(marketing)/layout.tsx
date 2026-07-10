@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalLinks } from "@/components/legal-links";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -44,13 +45,14 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-8 text-xs text-ink-faint">
           <span className="font-display text-sm text-ink-soft">Sightline</span>
           <span>AI Visibility Intelligence · © 2026</span>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link href="/pricing" className="hover:text-ink">
               Pricing
             </Link>
             <Link href="/signup" className="hover:text-ink">
               Start free
             </Link>
+            <LegalLinks />
           </div>
         </div>
       </footer>

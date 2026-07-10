@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, pct } from "@/lib/utils";
 import { Card, CardHeader, Badge } from "@/components/ui";
+import { LegalLinks } from "@/components/legal-links";
 import { ScoreHero, ScoreTrend, EngineBars, SovBars, StatTile } from "@/components/charts";
 import type { Snapshot } from "@/lib/types";
 
@@ -44,6 +45,16 @@ export default async function SharedReportPage({
   const latest = history.at(-1);
   const previous = history.at(-2);
 
+  const priorityRank = { high: 0, medium: 1, low: 2 } as const;
+  const topRec =
+    (recs ?? [])
+      .filter((r) => r.status !== "done")
+      .sort(
+        (a, b) =>
+          priorityRank[a.priority as keyof typeof priorityRank] -
+          priorityRank[b.priority as keyof typeof priorityRank]
+      )[0] ?? null;
+
   return (
     <div className="min-h-screen bg-paper">
       <div className="mx-auto max-w-3xl px-4 py-10">
@@ -64,13 +75,48 @@ export default async function SharedReportPage({
           <Card className="p-8 text-center text-sm text-ink-faint">No scan data yet.</Card>
         ) : (
           <div className="space-y-4">
+            {/* executive summary — readable in under two minutes */}
             <Card className="print-block p-6">
-              <ScoreHero
-                score={latest.overall_score}
-                delta={previous ? latest.overall_score - previous.overall_score : null}
-              />
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <ScoreHero
+                  score={latest.overall_score}
+                  delta={previous ? latest.overall_score - previous.overall_score : null}
+                  label="AI Visibility Score"
+                />
+                <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-right">
+                  <ExecStat
+                    label="Competitor position"
+                    value={competitorPosition(latest.share_of_voice, project.name)}
+                  />
+                  <ExecStat
+                    label="Platforms improved"
+                    value={
+                      previous
+                        ? `${
+                            Object.keys(latest.engine_scores).filter(
+                              (e) => (latest.engine_scores[e as keyof typeof latest.engine_scores] ?? 0) > (previous.engine_scores?.[e as keyof typeof previous.engine_scores] ?? 0)
+                            ).length
+                          } of ${Object.keys(latest.engine_scores).length}`
+                        : "—"
+                    }
+                  />
+                  <ExecStat label="Mention rate" value={pct(latest.mention_rate)} />
+                  <ExecStat label="Recommended" value={pct(latest.recommendation_rate)} />
+                </div>
+              </div>
+              {topRec && (
+                <div className="mt-5 rounded-lg bg-accent-soft px-4 py-3">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-accent-strong">
+                    Top recommendation
+                  </p>
+                  <p className="mt-0.5 text-sm text-ink">{topRec.title}</p>
+                </div>
+              )}
               {history.length > 1 && (
                 <div className="mt-4">
+                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-ink-faint">
+                    Recent progress
+                  </p>
                   <ScoreTrend snapshots={history} />
                 </div>
               )}
@@ -130,13 +176,33 @@ export default async function SharedReportPage({
           </div>
         )}
 
-        <footer className="mt-10 text-center text-xs text-ink-faint">
-          Generated with Sightline ·{" "}
-          <Link href="/" className="text-accent-strong hover:underline">
-            Run your free AI Visibility Scan
-          </Link>
+        <footer className="mt-10 space-y-2 text-center text-xs text-ink-faint">
+          <p>
+            Generated with Sightline ·{" "}
+            <Link href="/" className="text-accent-strong hover:underline">
+              Run your free AI Visibility Scan
+            </Link>
+          </p>
+          <LegalLinks className="justify-center" />
         </footer>
       </div>
     </div>
   );
+}
+
+function ExecStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[11px] uppercase tracking-wider text-ink-faint">{label}</p>
+      <p className="tabular mt-0.5 text-sm font-semibold text-ink">{value}</p>
+    </div>
+  );
+}
+
+/** "#2 of 4" — the brand's rank by mentions among everyone tracked. */
+function competitorPosition(shareOfVoice: Record<string, number>, brand: string): string {
+  const sorted = Object.entries(shareOfVoice ?? {}).sort((a, b) => b[1] - a[1]);
+  if (!sorted.length) return "—";
+  const rank = sorted.findIndex(([name]) => name === brand) + 1;
+  return rank ? `#${rank} of ${sorted.length}` : "—";
 }

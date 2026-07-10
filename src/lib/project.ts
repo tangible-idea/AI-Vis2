@@ -20,6 +20,16 @@ export async function getAppContext(): Promise<AppContext> {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // claim any pending workspace invites for this email so shared projects
+  // appear in the switcher (RLS lets invitees update their own invite rows)
+  if (user.email) {
+    await supabase
+      .from("project_members")
+      .update({ user_id: user.id, accepted_at: new Date().toISOString() })
+      .eq("email", user.email.toLowerCase())
+      .is("user_id", null);
+  }
+
   const [{ data: profile }, { data: projects }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("projects").select("*").order("created_at"),

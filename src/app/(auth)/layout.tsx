@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalLinks } from "@/components/legal-links";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <span className="font-display text-xl">Sightline</span>
       </Link>
       {children}
+      <LegalLinks className="mt-8 justify-center text-xs text-ink-faint" />
     </div>
   );
 }

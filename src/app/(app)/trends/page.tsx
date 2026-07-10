@@ -48,7 +48,7 @@ export default async function TrendsPage() {
     <>
       <PageHeader
         title="Trends"
-        subtitle={`Search demand in ${project.country} · ${langLabel} — turn rising topics into content in one click`}
+        subtitle={`What should I write about? Search demand in ${project.country} · ${langLabel}, turned into content in one click`}
       />
       <TrendsExplorer
         projectId={project.id}

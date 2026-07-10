@@ -1,5 +1,5 @@
 import { NextResponse, after } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { runScan } from "@/lib/scan/runner";
 import { planLimits } from "@/lib/plans";
 
@@ -18,25 +18,26 @@ export async function POST(request: Request) {
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id")
+    .select("id, user_id")
     .eq("id", projectId)
     .single();
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-  // plan gating
-  const { data: profile } = await supabase
+  // plan gating uses the workspace owner's plan (members share the quota)
+  const admin = createAdminClient();
+  const { data: ownerProfile } = await admin
     .from("profiles")
     .select("plan")
-    .eq("id", user.id)
+    .eq("id", project.user_id)
     .single();
-  const limits = planLimits(profile?.plan);
+  const limits = planLimits(ownerProfile?.plan);
 
   if (limits.totalScans != null) {
-    // free plan: lifetime cap across all of the user's projects
-    const { count } = await supabase
+    // free plan: lifetime cap across all of the owner's projects
+    const { count } = await admin
       .from("scans")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
+      .eq("user_id", project.user_id)
       .neq("trigger", "demo");
     if ((count ?? 0) >= limits.totalScans) {
       return NextResponse.json(
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
     const monthStart = new Date();
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
-    const { count } = await supabase
+    const { count } = await admin
       .from("scans")
       .select("id", { count: "exact", head: true })
       .eq("project_id", projectId)
@@ -94,7 +95,7 @@ export async function GET(request: Request) {
 
   const { data: scan } = await supabase
     .from("scans")
-    .select("id, status, error, started_at, completed_at")
+    .select("id, status, error, progress, started_at, completed_at")
     .eq("id", id)
     .single();
   if (!scan) return NextResponse.json({ error: "Not found" }, { status: 404 });

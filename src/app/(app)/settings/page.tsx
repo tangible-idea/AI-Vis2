@@ -4,21 +4,24 @@ import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
 import { CONTENT_LANGUAGES, type Competitor, type Prompt } from "@/lib/types";
-import { updateProject, addCompetitor, addPrompt } from "./actions";
+import { updateProject, addCompetitor, addPrompt, inviteMember } from "./actions";
 import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
+import { MemberList } from "./member-list";
 import { DeleteProjectButton } from "./danger";
+import type { ProjectMember } from "@/lib/types";
 
 export const metadata = { title: "Settings" };
 
 const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", "VN", "ID", "MY"];
 
 export default async function SettingsPage() {
-  const { project, profile } = await requireProject();
+  const { project, profile, userId } = await requireProject();
   const supabase = await createClient();
   const limits = planLimits(profile.plan);
+  const isOwner = project.user_id === userId;
 
-  const [{ data: competitors }, { data: prompts }] = await Promise.all([
+  const [{ data: competitors }, { data: prompts }, { data: members }] = await Promise.all([
     supabase
       .from("competitors")
       .select("*")
@@ -26,7 +29,13 @@ export default async function SettingsPage() {
       .order("position")
       .order("created_at"),
     supabase.from("prompts").select("*").eq("project_id", project.id).order("created_at"),
+    supabase
+      .from("project_members")
+      .select("*")
+      .eq("project_id", project.id)
+      .order("created_at"),
   ]);
+  const memberList = (members ?? []) as ProjectMember[];
 
   const competitorList = (competitors ?? []) as Competitor[];
   const promptList = (prompts ?? []) as Prompt[];
@@ -142,6 +151,56 @@ export default async function SettingsPage() {
         </Card>
 
         <Card>
+          <CardHeader
+            title="Team"
+            hint={
+              limits.team
+                ? `${memberList.length} of ${limits.maxTeamMembers} seats on your ${limits.label} plan — members can run scans and generate content, viewers see reports only`
+                : "Invite teammates on Starter and Pro — members can run scans, generate content and comment"
+            }
+          />
+          <div className="space-y-4 px-5 pb-5">
+            {limits.team ? (
+              <>
+                <MemberList members={memberList} canManage={isOwner} />
+                {isOwner && memberList.length < limits.maxTeamMembers && (
+                  <form action={inviteMember} className="flex flex-wrap gap-2">
+                    <input type="hidden" name="projectId" value={project.id} />
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="teammate@company.com"
+                      className="max-w-xs"
+                      required
+                    />
+                    <Select name="role" defaultValue="member" className="w-28">
+                      <option value="member">Member</option>
+                      <option value="viewer">Viewer</option>
+                    </Select>
+                    <Button type="submit" variant="secondary" size="sm" className="h-9.5">
+                      Invite
+                    </Button>
+                  </form>
+                )}
+                {memberList.some((m) => !m.accepted_at) && (
+                  <p className="text-xs text-ink-faint">
+                    Pending invites activate automatically when the teammate signs in with that email.
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-mid">
+                Team seats are available on Starter and Pro —{" "}
+                <Link href="/billing" className="underline">
+                  upgrade
+                </Link>{" "}
+                to collaborate.
+              </p>
+            )}
+          </div>
+        </Card>
+
+        <Card>
           <CardHeader title="Account" />
           <div className="px-5 pb-5 text-sm text-ink-soft">
             <p>
@@ -156,12 +215,14 @@ export default async function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="border-poor/20">
-          <CardHeader title="Danger zone" hint="Deletes the project with all scans and content" />
-          <div className="px-5 pb-5">
-            <DeleteProjectButton projectId={project.id} name={project.name} />
-          </div>
-        </Card>
+        {isOwner && (
+          <Card className="border-poor/20">
+            <CardHeader title="Danger zone" hint="Deletes the workspace with all scans and content" />
+            <div className="px-5 pb-5">
+              <DeleteProjectButton projectId={project.id} name={project.name} />
+            </div>
+          </Card>
+        )}
       </div>
     </>
   );

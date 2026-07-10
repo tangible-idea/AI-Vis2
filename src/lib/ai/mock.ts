@@ -97,7 +97,24 @@ function scanAnswer(model: string, prompt: string, ctx: MockContext): string {
     return `${i + 1}. **${name}** — ${b}.${rec}`;
   });
 
-  const cite = rand() < 0.3 && mentioned ? `\n\nSources: ${ctx.brand.toLowerCase().replace(/\s+/g, "")}.com, g2.com, industry reports.` : "";
+  // realistic citation block so source extraction has data to work with
+  const brandDomain = `${ctx.brand.toLowerCase().replace(/\s+/g, "")}.com`;
+  const sourcePool = [
+    `https://${brandDomain}`,
+    `https://${brandDomain}/blog/choosing-the-right-solution`,
+    `https://${brandDomain}/docs/getting-started`,
+    ...(ctx.competitors[0] ? [`https://${ctx.competitors[0].toLowerCase().replace(/\s+/g, "")}.com`] : []),
+    "https://g2.com/categories/comparison",
+    "https://capterra.com/reviews",
+    "https://techcrunch.com/industry-roundup",
+    "https://reddit.com/r/software/comments/best-tools",
+  ];
+  let cite = "";
+  if (rand() < 0.55 && mentioned) {
+    shuffle(sourcePool, rand);
+    const picks = sourcePool.slice(0, 2 + Math.floor(rand() * 3));
+    cite = `\n\nSources: ${picks.join(", ")}`;
+  }
 
   return `Here are the options most often recommended:\n\n${lines.join("\n")}\n\nThe right choice depends on your team size, budget, and integration needs.${cite}`;
 }

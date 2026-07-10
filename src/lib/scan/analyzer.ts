@@ -1,3 +1,5 @@
+import type { CitationSource, SourceType } from "../types";
+
 export interface AnalyzedResponse {
   brand_mentioned: boolean;
   /** 1-based rank of the brand among all named entities/list items, if listed. */
@@ -5,6 +7,14 @@ export interface AnalyzedResponse {
   recommended: boolean;
   cited: boolean;
   competitors_mentioned: string[];
+  sources: CitationSource[];
+}
+
+export interface AnalyzerContext {
+  /** Brand website, for classifying official sources. */
+  brandWebsite?: string | null;
+  /** Competitor websites, for classifying competitor sources. */
+  competitorWebsites?: (string | null)[];
 }
 
 const RECOMMEND_PATTERNS = [
@@ -25,7 +35,8 @@ const RECOMMEND_PATTERNS = [
 export function analyzeResponse(
   text: string,
   brand: string,
-  competitors: string[]
+  competitors: string[],
+  ctx: AnalyzerContext = {}
 ): AnalyzedResponse {
   const lower = text.toLowerCase();
   const brandRe = nameRegex(brand);
@@ -51,15 +62,95 @@ export function analyzeResponse(
     if (!recommended && listRank(text, brand) === 1) recommended = true;
   }
 
+  const sources = extractSources(text, brand, ctx);
+
   const cited =
-    brand_mentioned &&
-    (lower.includes("source") ||
-      lower.includes("according to") ||
-      new RegExp(`${escapeRe(domainish(brand))}\\.[a-z]{2,}`, "i").test(text));
+    sources.some((s) => s.type === "official") ||
+    (brand_mentioned &&
+      (lower.includes("source") ||
+        lower.includes("according to") ||
+        new RegExp(`${escapeRe(domainish(brand))}\\.[a-z]{2,}`, "i").test(text)));
 
   const competitors_mentioned = competitors.filter((c) => nameRegex(c).test(text));
 
-  return { brand_mentioned, brand_position, recommended, cited, competitors_mentioned };
+  return { brand_mentioned, brand_position, recommended, cited, competitors_mentioned, sources };
+}
+
+// ── citation source extraction ───────────────────────────────
+
+const REVIEW_SITES = ["g2.com", "capterra.com", "trustpilot.com", "gartner.com", "getapp.com", "softwareadvice.com", "clutch.co", "yelp.com", "tripadvisor.com", "producthunt.com", "trustradius.com"];
+const NEWS_SITES = ["techcrunch.com", "forbes.com", "reuters.com", "bloomberg.com", "nytimes.com", "theverge.com", "wired.com", "businessinsider.com", "cnbc.com", "wsj.com", "zdnet.com", "venturebeat.com"];
+
+/**
+ * Pulls cited URLs/domains out of an engine answer: markdown links, bare
+ * URLs, and "Sources: a.com, b.com" style lists. Deduped by domain+path.
+ */
+export function extractSources(text: string, brand: string, ctx: AnalyzerContext): CitationSource[] {
+  const found = new Map<string, CitationSource>();
+
+  const add = (raw: string) => {
+    const url = raw.replace(/[).,;\]]+$/, "");
+    const withProto = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    try {
+      const u = new URL(withProto);
+      const domain = u.hostname.replace(/^www\./, "").toLowerCase();
+      if (!domain.includes(".") || domain.length < 4) return;
+      const key = `${domain}${u.pathname === "/" ? "" : u.pathname}`;
+      if (!found.has(key)) {
+        found.set(key, {
+          url: withProto,
+          domain,
+          type: classifySource(domain, u.pathname, brand, ctx),
+        });
+      }
+    } catch {
+      /* not a URL */
+    }
+  };
+
+  // markdown links + bare URLs
+  for (const m of text.matchAll(/\]\((https?:\/\/[^\s)]+)\)/g)) add(m[1]);
+  for (const m of text.matchAll(/(?<!\()https?:\/\/[^\s)\]"'<>]+/g)) add(m[0]);
+  // "Sources: acme.com, g2.com" style bare-domain lists
+  for (const line of text.split("\n")) {
+    if (/^\s*(sources?|references?|citations?)\s*:/i.test(line)) {
+      for (const m of line.matchAll(/\b([a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,})(\/[^\s,;]*)?/gi)) {
+        add(m[0]);
+      }
+    }
+  }
+
+  return [...found.values()].slice(0, 12);
+}
+
+function hostOf(website: string | null | undefined): string | null {
+  if (!website) return null;
+  try {
+    return new URL(website).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+function classifySource(domain: string, path: string, brand: string, ctx: AnalyzerContext): SourceType {
+  const brandHost = hostOf(ctx.brandWebsite);
+  if ((brandHost && (domain === brandHost || domain.endsWith(`.${brandHost}`))) || domain.startsWith(`${domainish(brand)}.`)) {
+    // brand-owned domain: still distinguish its content sections
+    if (/\/docs|documentation|developer/i.test(path)) return "docs";
+    if (/^help\.|^support\.|\/help|\/support|\/kb/i.test(domain + path)) return "knowledge_base";
+    if (/^blog\.|\/blog/i.test(domain + path)) return "blog";
+    return "official";
+  }
+  for (const w of ctx.competitorWebsites ?? []) {
+    const h = hostOf(w);
+    if (h && (domain === h || domain.endsWith(`.${h}`))) return "competitor";
+  }
+  if (REVIEW_SITES.some((s) => domain === s || domain.endsWith(`.${s}`))) return "review";
+  if (NEWS_SITES.some((s) => domain === s || domain.endsWith(`.${s}`))) return "news";
+  if (/\/docs|documentation|developer/i.test(path)) return "docs";
+  if (/^help\.|^support\.|\/help|\/support|\/kb/i.test(domain + path)) return "knowledge_base";
+  if (/^blog\.|\/blog/i.test(domain + path)) return "blog";
+  return "third_party";
 }
 
 /** Rank in an explicit numbered list ("3. **Brand** — …"), if the brand is in one. */

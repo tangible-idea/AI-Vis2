@@ -35,7 +35,7 @@ export default async function OptimizePage({
     <>
       <PageHeader
         title="Optimize"
-        subtitle="Ready-to-publish assets, not generic advice"
+        subtitle="What should I do next? Ready-to-publish assets, not generic advice"
       />
 
       <OptimizeClient

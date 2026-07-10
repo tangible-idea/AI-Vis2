@@ -10,7 +10,7 @@ import type { Plan } from "@/lib/types";
 
 const ORDER: Plan[] = ["free", "starter", "pro"];
 
-const HIGHLIGHTS: Record<Plan, string[]> = {
+const HIGHLIGHTS: Partial<Record<Plan, string[]>> = {
   free: ["5 tracked prompts", "5 scans total", "2 competitors", "Partial dashboard"],
   starter: [
     "20 prompts · 8 scans / month",
@@ -53,6 +53,12 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
 
   return (
     <>
+      {currentPlan === "lifetime" && (
+        <div className="mb-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-ink">
+          You&apos;re on the <strong>Lifetime</strong> plan (AppSumo) — weekly scans, trends and
+          sharing included forever. Upgrade below only if you need more capacity.
+        </div>
+      )}
       {error && <p className="mb-3 text-sm text-poor">{error}</p>}
       <div className="grid gap-4 md:grid-cols-3">
         {ORDER.map((plan) => {
@@ -75,7 +81,7 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
                 <span className="text-xs text-ink-faint">{p.priceNote}</span>
               </p>
               <ul className="mt-4 flex-1 space-y-2">
-                {HIGHLIGHTS[plan].map((h) => (
+                {(HIGHLIGHTS[plan] ?? []).map((h) => (
                   <li key={h} className="flex items-start gap-2 text-[13px] text-ink-soft">
                     <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
                     {h}

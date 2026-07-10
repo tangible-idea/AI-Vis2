@@ -48,6 +48,17 @@ export async function createProject(
   const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
   const limits = planLimits(profile?.plan);
 
+  const { count: projectCount } = await supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("is_demo", false);
+  if ((projectCount ?? 0) >= limits.maxProjects) {
+    return {
+      error: `Your ${limits.label} plan includes ${limits.maxProjects} workspace${limits.maxProjects > 1 ? "s" : ""}. Upgrade to add more brands.`,
+    };
+  }
+
   const { data: project, error } = await supabase
     .from("projects")
     .insert({ user_id: user.id, name, website, industry, country, language, target_market, description })
@@ -92,6 +103,29 @@ export async function createProject(
 
   // the onboarding page kicks off the first scan via POST /api/scan
   return { projectId: project.id };
+}
+
+export async function addComment(projectId: string, body: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const text = body.trim();
+  if (!text) return;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, email")
+    .eq("id", user.id)
+    .single();
+  await supabase.from("project_comments").insert({
+    project_id: projectId,
+    user_id: user.id,
+    author_name: profile?.full_name || profile?.email || "Teammate",
+    body: text.slice(0, 1000),
+  });
+  revalidatePath("/timeline");
 }
 
 export async function updateRecommendationStatus(id: string, status: "todo" | "in_progress" | "done") {

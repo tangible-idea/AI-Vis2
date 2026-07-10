@@ -117,6 +117,8 @@ rendered server-side with the service-role key, so no public policies exist.
 Apply new migrations with `supabase db push` (or paste into the SQL editor).
 `0003_prompt_categories_competitor_order.sql` is required for the seven
 buyer-intent prompt categories and competitor drag-and-drop ordering.
+`0004_sources_teams_lifetime.sql` adds citation sources, live scan progress,
+the AppSumo lifetime plan, and workspace members/comments with membership RLS.
 
 ## Billing (Polar.sh)
 

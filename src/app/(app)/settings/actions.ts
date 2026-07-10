@@ -108,6 +108,39 @@ export async function removePrompt(id: string) {
   revalidatePath("/settings");
 }
 
+export async function inviteMember(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const projectId = String(formData.get("projectId"));
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const role = String(formData.get("role")) === "viewer" ? "viewer" : "member";
+  if (!email || !email.includes("@")) return;
+
+  const [{ data: profile }, { count }] = await Promise.all([
+    supabase.from("profiles").select("plan").eq("id", user.id).single(),
+    supabase
+      .from("project_members")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", projectId),
+  ]);
+  const limits = planLimits(profile?.plan);
+  if (!limits.team || (count ?? 0) >= limits.maxTeamMembers) return;
+
+  // RLS restricts inserts to the workspace owner
+  await supabase.from("project_members").insert({
+    project_id: projectId,
+    email,
+    role,
+    invited_by: user.id,
+  });
+  revalidatePath("/settings");
+}
+
+export async function removeMember(id: string) {
+  const { supabase } = await requireUser();
+  await supabase.from("project_members").delete().eq("id", id);
+  revalidatePath("/settings");
+}
+
 export async function deleteProject(projectId: string) {
   const { supabase } = await requireUser();
   await supabase.from("projects").delete().eq("id", projectId);

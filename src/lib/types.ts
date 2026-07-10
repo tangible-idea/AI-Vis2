@@ -1,4 +1,4 @@
-export type Plan = "free" | "starter" | "pro";
+export type Plan = "free" | "starter" | "pro" | "lifetime";
 
 export type Engine = "chatgpt" | "claude" | "gemini" | "perplexity" | "google_ai";
 
@@ -85,9 +85,49 @@ export interface Scan {
   status: ScanStatus;
   trigger: "onboarding" | "manual" | "scheduled" | "demo";
   error: string | null;
+  /** Live progress while running: { done, total, engine }. */
+  progress: { done?: number; total?: number; engine?: string };
   started_at: string | null;
   completed_at: string | null;
   created_at: string;
+}
+
+export type MemberRole = "owner" | "member" | "viewer";
+
+export interface ProjectMember {
+  id: string;
+  project_id: string;
+  user_id: string | null;
+  email: string;
+  role: "member" | "viewer";
+  invited_by: string;
+  created_at: string;
+  accepted_at: string | null;
+}
+
+export interface ProjectComment {
+  id: string;
+  project_id: string;
+  user_id: string;
+  author_name: string;
+  body: string;
+  created_at: string;
+}
+
+export type SourceType =
+  | "official"
+  | "competitor"
+  | "review"
+  | "news"
+  | "docs"
+  | "knowledge_base"
+  | "blog"
+  | "third_party";
+
+export interface CitationSource {
+  url: string;
+  domain: string;
+  type: SourceType;
 }
 
 export interface ScanResult {
@@ -101,6 +141,7 @@ export interface ScanResult {
   recommended: boolean;
   cited: boolean;
   competitors_mentioned: string[];
+  sources: CitationSource[];
   created_at: string;
 }
 

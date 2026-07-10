@@ -56,7 +56,7 @@ export default async function ReportsPage() {
     <>
       <PageHeader
         title="Reports"
-        subtitle="Export, share and present your AI visibility"
+        subtitle="Am I improving? Share the proof with clients, execs and your team"
       />
 
       <div className="stagger space-y-4">

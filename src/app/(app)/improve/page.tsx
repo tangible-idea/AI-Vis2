@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
+import { historyCutoffIso, planLimits } from "@/lib/plans";
 import { formatDate, pct } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import { ScoreTrend, EngineTrend, SovBars, StatTile } from "@/components/charts";
@@ -9,14 +10,16 @@ import type { Recommendation, Snapshot } from "@/lib/types";
 export const metadata = { title: "Improve" };
 
 export default async function ImprovePage() {
-  const { project } = await requireProject();
+  const { project, profile } = await requireProject();
   const supabase = await createClient();
+  const limits = planLimits(profile.plan);
 
   const [{ data: snapshots }, { data: doneRecs }] = await Promise.all([
     supabase
       .from("snapshots")
       .select("*")
       .eq("project_id", project.id)
+      .gte("created_at", historyCutoffIso(limits) ?? "1970-01-01")
       .order("created_at", { ascending: true }),
     supabase
       .from("recommendations")
@@ -50,7 +53,7 @@ export default async function ImprovePage() {
     <>
       <PageHeader
         title="Improve"
-        subtitle={`Tracking ${history.length} scans since ${formatDate(first.created_at)}`}
+        subtitle={`Am I improving? Tracking ${history.length} scans since ${formatDate(first.created_at)}`}
       />
 
       <div className="stagger space-y-4">

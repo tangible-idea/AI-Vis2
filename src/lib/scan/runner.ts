@@ -43,6 +43,7 @@ export async function runScan(scanId: string): Promise<void> {
     if (!prompts?.length) throw new Error("No active prompts to scan");
 
     const competitorNames = (competitors ?? []).map((c) => c.name);
+    const competitorWebsites = (competitors ?? []).map((c) => c.website);
     const provider = getProvider();
 
     const jobs: { engine: Engine; model: string; prompt: Prompt }[] = [];
@@ -53,6 +54,19 @@ export async function runScan(scanId: string): Promise<void> {
     }
 
     const rows: (ResultRow & { prompt_id: string; response_text: string })[] = [];
+
+    // live progress for the scan-transparency UI (throttled writes)
+    let done = 0;
+    let lastReported = 0;
+    const reportProgress = async (engine: Engine, force = false) => {
+      if (!force && done - lastReported < 4) return;
+      lastReported = done;
+      await db
+        .from("scans")
+        .update({ progress: { done, total: jobs.length, engine } })
+        .eq("id", scanId);
+    };
+    await reportProgress(jobs[0].engine, true);
 
     await mapLimit(jobs, CONCURRENCY, async (job) => {
       const messages: ChatMessage[] = [
@@ -66,16 +80,22 @@ export async function runScan(scanId: string): Promise<void> {
         text = await provider.complete(job.model, messages);
       } catch (err) {
         console.error(`[scan] ${job.engine} failed for "${job.prompt.text}":`, err);
+        done++;
         return; // one failed call shouldn't sink the scan
       }
 
-      const analyzed = analyzeResponse(text, project.name, competitorNames);
+      const analyzed = analyzeResponse(text, project.name, competitorNames, {
+        brandWebsite: project.website,
+        competitorWebsites,
+      });
       rows.push({
         engine: job.engine,
         prompt_id: job.prompt.id,
         response_text: text,
         ...analyzed,
       });
+      done++;
+      await reportProgress(job.engine);
     });
 
     if (!rows.length) throw new Error("All engine calls failed");
@@ -92,6 +112,7 @@ export async function runScan(scanId: string): Promise<void> {
         recommended: r.recommended,
         cited: r.cited,
         competitors_mentioned: r.competitors_mentioned,
+        sources: r.sources,
       }))
     );
 

@@ -4,7 +4,7 @@ import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { ENGINES } from "@/lib/ai/engines";
 import { getTrendsSource } from "@/lib/trends";
-import { planLimits } from "@/lib/plans";
+import { historyCutoffIso, planLimits } from "@/lib/plans";
 import { pct, timeAgo, formatDate, cn } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader, Badge, ButtonLink } from "@/components/ui";
 import { ScoreHero, ScoreTrend, SovBars, StatTile } from "@/components/charts";
@@ -28,6 +28,7 @@ export default async function DashboardPage() {
         .from("snapshots")
         .select("*")
         .eq("project_id", project.id)
+        .gte("created_at", historyCutoffIso(limits) ?? "1970-01-01")
         .order("created_at", { ascending: true }),
       supabase
         .from("recommendations")

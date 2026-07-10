@@ -116,6 +116,16 @@ export async function seedDemoProject(userId: string): Promise<string> {
         const mentioned = (i * 7) % 10 < (engine === "chatgpt" ? 7 : engine === "claude" ? 6 : engine === "gemini" ? 4 : 3);
         const position = mentioned ? 1 + ((i * 3) % 5) : null;
         const rivals = competitorNames.filter((_, ci) => (i + ci) % 2 === 0);
+        const sourcePool = [
+          { url: "https://acmebookings.example", domain: "acmebookings.example", type: "official" },
+          { url: "https://acmebookings.example/blog/table-management-guide", domain: "acmebookings.example", type: "blog" },
+          { url: "https://acmebookings.example/docs", domain: "acmebookings.example", type: "docs" },
+          { url: "https://g2.com/categories/reservation", domain: "g2.com", type: "review" },
+          { url: "https://capterra.com/restaurant-software", domain: "capterra.com", type: "review" },
+          { url: "https://techcrunch.com/restaurant-tech", domain: "techcrunch.com", type: "news" },
+          { url: "https://reservahub.example", domain: "reservahub.example", type: "competitor" },
+        ];
+        const sources = mentioned && i % 4 === 0 ? [sourcePool[i % 3], sourcePool[3 + (i % 4)]] : [];
         rows.push({
           user_id: userId,
           scan_id: scan.id,
@@ -129,6 +139,7 @@ export async function seedDemoProject(userId: string): Promise<string> {
           recommended: mentioned && position === 1,
           cited: mentioned && i % 4 === 0,
           competitors_mentioned: rivals,
+          sources,
         });
       }
     }

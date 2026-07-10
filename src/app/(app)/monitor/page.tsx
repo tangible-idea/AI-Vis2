@@ -63,8 +63,8 @@ export default async function MonitorPage() {
         title="Monitor"
         subtitle={
           lastDone
-            ? `Latest scan ${timeAgo(lastDone.completed_at)} · ${promptList.length} prompts × ${ENGINE_IDS.length} engines`
-            : "Run a scan to start monitoring"
+            ? `What AI actually says about you — scan ${timeAgo(lastDone.completed_at)} · ${promptList.length} prompts × ${ENGINE_IDS.length} platforms`
+            : "What does AI say about you? Run a scan to find out"
         }
         action={<ScanButton projectId={project.id} />}
       />
@@ -88,10 +88,13 @@ export default async function MonitorPage() {
           </div>
         </Card>
 
-        {/* per-prompt detail */}
+        {/* prompt explorer: what did the AI actually say? */}
         {resultList.length > 0 && (
           <Card>
-            <CardHeader title="Answers" hint="What each engine actually said" />
+            <CardHeader
+              title="Prompt explorer"
+              hint="What each engine actually said — mentions, competitors and sources per answer"
+            />
             <div className="divide-y divide-line px-5 pb-4">
               {promptList.map((p) => {
                 const rows = resultList.filter((r) => r.prompt_id === p.id);
@@ -123,24 +126,53 @@ export default async function MonitorPage() {
                     <div className="mt-3 grid gap-3 md:grid-cols-2">
                       {rows.map((r) => (
                         <div key={r.id} className="rounded-lg border border-line bg-paper p-3">
-                          <div className="mb-2 flex items-center justify-between">
+                          <div className="mb-2 flex items-center justify-between gap-2">
                             <span
                               className="text-xs font-semibold"
                               style={{ color: engineInfo(r.engine).color }}
                             >
                               {engineInfo(r.engine).label}
                             </span>
-                            <span className="flex gap-1">
+                            <span className="flex items-center gap-1">
                               {r.recommended && <Badge tone="good">recommended</Badge>}
                               {r.brand_mentioned && r.brand_position && (
                                 <Badge tone="neutral">#{r.brand_position}</Badge>
                               )}
                               {!r.brand_mentioned && <Badge tone="poor">not mentioned</Badge>}
+                              <span className="text-[10px] text-ink-faint">{timeAgo(r.created_at)}</span>
                             </span>
                           </div>
                           <p className="max-h-40 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-ink-soft">
                             {r.response_text}
                           </p>
+                          {(r.competitors_mentioned.length > 0 || (r.sources ?? []).length > 0) && (
+                            <div className="mt-2 space-y-1 border-t border-line pt-2">
+                              {r.competitors_mentioned.length > 0 && (
+                                <p className="text-[11px] text-ink-faint">
+                                  <span className="font-medium text-ink-soft">Competitors:</span>{" "}
+                                  {r.competitors_mentioned.join(", ")}
+                                </p>
+                              )}
+                              {(r.sources ?? []).length > 0 && (
+                                <p className="truncate text-[11px] text-ink-faint">
+                                  <span className="font-medium text-ink-soft">Sources:</span>{" "}
+                                  {(r.sources ?? []).map((s, i) => (
+                                    <span key={s.url}>
+                                      {i > 0 && ", "}
+                                      <a
+                                        href={s.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-accent-strong hover:underline"
+                                      >
+                                        {s.domain}
+                                      </a>
+                                    </span>
+                                  ))}
+                                </p>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

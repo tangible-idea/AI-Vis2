@@ -13,22 +13,53 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Link2,
+  History,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Plan, Project } from "@/lib/types";
 import { switchProject } from "@/app/(app)/actions";
 import { logout } from "@/app/(auth)/actions";
+import { LegalLinks } from "@/components/legal-links";
 
-const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/monitor", label: "Monitor", icon: Radar },
-  { href: "/trends", label: "Trends", icon: Flame },
-  { href: "/optimize", label: "Optimize", icon: Wand2 },
-  { href: "/improve", label: "Improve", icon: TrendingUp },
-  { href: "/reports", label: "Reports", icon: FileText },
-  { href: "/billing", label: "Billing", icon: CreditCard },
-  { href: "/settings", label: "Settings", icon: Settings },
+/** Navigation mirrors the product journey: Measure → Optimize → Improve → Share. */
+const NAV_GROUPS: { label: string | null; items: { href: string; label: string; icon: typeof Radar }[] }[] = [
+  {
+    label: "Measure",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/monitor", label: "Monitor", icon: Radar },
+      { href: "/sources", label: "Sources", icon: Link2 },
+    ],
+  },
+  {
+    label: "Optimize",
+    items: [
+      { href: "/trends", label: "Trends", icon: Flame },
+      { href: "/optimize", label: "Optimize", icon: Wand2 },
+    ],
+  },
+  {
+    label: "Improve",
+    items: [
+      { href: "/timeline", label: "Timeline", icon: History },
+      { href: "/improve", label: "Improve", icon: TrendingUp },
+    ],
+  },
+  {
+    label: "Share",
+    items: [{ href: "/reports", label: "Reports", icon: FileText }],
+  },
+  {
+    label: null,
+    items: [
+      { href: "/billing", label: "Billing", icon: CreditCard },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ],
+  },
 ];
+
+const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
 export function Sidebar({
   projects,
@@ -74,25 +105,36 @@ export function Sidebar({
           </div>
         )}
 
-        <nav className="flex-1 space-y-0.5 px-3">
-          {NAV.map(({ href, label, icon: Icon }) => {
-            const isActive = pathname.startsWith(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors",
-                  isActive
-                    ? "bg-accent-soft text-accent-strong"
-                    : "text-ink-soft hover:bg-hover hover:text-ink"
-                )}
-              >
-                <Icon className="h-4 w-4" strokeWidth={1.8} />
-                {label}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 space-y-3 overflow-y-auto px-3">
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.label ?? gi}>
+              {group.label && (
+                <p className="mb-0.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
+                  {group.label}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {group.items.map(({ href, label, icon: Icon }) => {
+                  const isActive = pathname.startsWith(href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors",
+                        isActive
+                          ? "bg-accent-soft text-accent-strong"
+                          : "text-ink-soft hover:bg-hover hover:text-ink"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" strokeWidth={1.8} />
+                      {label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="space-y-2 border-t border-line px-3 py-3">
@@ -118,6 +160,7 @@ export function Sidebar({
             {active.website}
           </p>
         )}
+        <LegalLinks className="border-t border-line px-4 py-2 text-[10px] text-ink-faint" />
       </aside>
 
       {/* mobile top bar */}
