@@ -7,9 +7,14 @@ import { OptimizeClient } from "./optimize-client";
 
 export const metadata = { title: "Optimize" };
 
-export default async function OptimizePage() {
+export default async function OptimizePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string; topic?: string }>;
+}) {
   const { project } = await requireProject();
   const supabase = await createClient();
+  const { type: prefillType, topic: prefillTopic } = await searchParams;
 
   const [{ data: recs }, { data: library }] = await Promise.all([
     supabase
@@ -36,6 +41,8 @@ export default async function OptimizePage() {
       <OptimizeClient
         projectId={project.id}
         recommendations={(recs ?? []) as Recommendation[]}
+        prefillType={prefillType}
+        prefillTopic={prefillTopic}
       />
 
       {(library ?? []).length > 0 && (

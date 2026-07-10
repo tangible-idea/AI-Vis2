@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
+import { resolveCompetitorInput } from "@/lib/competitors";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -34,8 +35,8 @@ export async function updateProject(formData: FormData) {
 export async function addCompetitor(formData: FormData) {
   const { supabase, user } = await requireUser();
   const projectId = String(formData.get("projectId"));
-  const name = String(formData.get("name") ?? "").trim();
-  if (!name) return;
+  const input = String(formData.get("domain") ?? formData.get("name") ?? "").trim();
+  if (!input) return;
 
   const [{ data: profile }, { count }] = await Promise.all([
     supabase.from("profiles").select("plan").eq("id", user.id).single(),
@@ -46,9 +47,24 @@ export async function addCompetitor(formData: FormData) {
   ]);
   if ((count ?? 0) >= planLimits(profile?.plan).maxCompetitors) return;
 
-  await supabase
-    .from("competitors")
-    .insert({ user_id: user.id, project_id: projectId, name });
+  const resolved = await resolveCompetitorInput(input);
+  await supabase.from("competitors").insert({
+    user_id: user.id,
+    project_id: projectId,
+    name: resolved.name,
+    website: resolved.website,
+    position: count ?? 0,
+  });
+  revalidatePath("/settings");
+}
+
+export async function reorderCompetitors(projectId: string, orderedIds: string[]) {
+  const { supabase } = await requireUser();
+  await Promise.all(
+    orderedIds.map((id, position) =>
+      supabase.from("competitors").update({ position }).eq("id", id).eq("project_id", projectId)
+    )
+  );
   revalidatePath("/settings");
 }
 

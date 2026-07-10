@@ -4,22 +4,24 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Copy, Save, Wand2 } from "lucide-react";
 import { Button, Card, Input, Label, Select } from "@/components/ui";
-import { CONTENT_TYPES } from "@/lib/content/templates";
-import { CONTENT_LANGUAGES, type RecommendationType } from "@/lib/types";
+import { CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
+import { CONTENT_LANGUAGES } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export function ContentGenerator({
   projectId,
   initialType,
   recommendationId,
+  initialInstructions,
 }: {
   projectId: string;
-  initialType?: RecommendationType;
+  initialType?: ContentType;
   recommendationId?: string;
+  initialInstructions?: string;
 }) {
-  const [type, setType] = useState<RecommendationType>(initialType ?? "faq_page");
+  const [type, setType] = useState<ContentType>(initialType ?? "faq_page");
   const [language, setLanguage] = useState("en");
-  const [instructions, setInstructions] = useState("");
+  const [instructions, setInstructions] = useState(initialInstructions ?? "");
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -101,7 +103,7 @@ export function ContentGenerator({
           <Select
             id="gen-type"
             value={type}
-            onChange={(e) => setType(e.target.value as RecommendationType)}
+            onChange={(e) => setType(e.target.value as ContentType)}
           >
             {CONTENT_TYPES.map((t) => (
               <option key={t.id} value={t.id}>

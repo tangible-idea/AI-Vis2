@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProvider } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL } from "@/lib/ai/engines";
-import { buildContentMessages } from "@/lib/content/templates";
+import { buildContentMessages, CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
 import { planLimits } from "@/lib/plans";
-import type { RecommendationType } from "@/lib/types";
 
 export const maxDuration = 120;
 
@@ -23,10 +22,13 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { projectId, type, language = "en", instructions } = body as {
     projectId: string;
-    type: RecommendationType;
+    type: ContentType;
     language?: string;
     instructions?: string;
   };
+  if (!CONTENT_TYPES.some((t) => t.id === type)) {
+    return NextResponse.json({ error: "Unknown content type" }, { status: 400 });
+  }
 
   const [{ data: project }, { data: competitors }, { data: profile }] = await Promise.all([
     supabase.from("projects").select("*").eq("id", projectId).single(),

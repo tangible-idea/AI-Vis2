@@ -5,7 +5,8 @@ import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
 import { CONTENT_LANGUAGES, type Competitor, type Prompt } from "@/lib/types";
 import { updateProject, addCompetitor, addPrompt } from "./actions";
-import { PromptRows, CompetitorRows } from "./prompt-list";
+import { PromptRows } from "./prompt-list";
+import { CompetitorList } from "./competitor-list";
 import { DeleteProjectButton } from "./danger";
 
 export const metadata = { title: "Settings" };
@@ -18,7 +19,12 @@ export default async function SettingsPage() {
   const limits = planLimits(profile.plan);
 
   const [{ data: competitors }, { data: prompts }] = await Promise.all([
-    supabase.from("competitors").select("*").eq("project_id", project.id).order("created_at"),
+    supabase
+      .from("competitors")
+      .select("*")
+      .eq("project_id", project.id)
+      .order("position")
+      .order("created_at"),
     supabase.from("prompts").select("*").eq("project_id", project.id).order("created_at"),
   ]);
 
@@ -84,14 +90,14 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader
             title="Competitors"
-            hint={`${competitorList.length} of ${limits.maxCompetitors} on your ${limits.label} plan`}
+            hint={`${competitorList.length} of ${limits.maxCompetitors} on your ${limits.label} plan — enter a domain, we fetch the name and logo. Drag to reorder.`}
           />
           <div className="space-y-4 px-5 pb-5">
-            <CompetitorRows competitors={competitorList} />
+            <CompetitorList projectId={project.id} competitors={competitorList} />
             {competitorList.length < limits.maxCompetitors ? (
               <form action={addCompetitor} className="flex gap-2">
                 <input type="hidden" name="projectId" value={project.id} />
-                <Input name="name" placeholder="Add competitor…" className="max-w-xs" />
+                <Input name="domain" placeholder="competitor.com" className="max-w-xs" />
                 <Button type="submit" variant="secondary" size="sm" className="h-9.5">
                   Add
                 </Button>

@@ -192,11 +192,11 @@ export default function OnboardingPage() {
                 </div>
               </div>
               <div>
-                <Label>Competitors (up to 3)</Label>
+                <Label>Competitors (up to 3) — enter their domains</Label>
                 <div className="grid gap-2 sm:grid-cols-3">
-                  <Input name="competitor1" placeholder="Competitor 1" />
-                  <Input name="competitor2" placeholder="Competitor 2" />
-                  <Input name="competitor3" placeholder="Competitor 3" />
+                  <Input name="competitor1" placeholder="competitor.com" />
+                  <Input name="competitor2" placeholder="rival.io" />
+                  <Input name="competitor3" placeholder="challenger.co" />
                 </div>
               </div>
             </div>

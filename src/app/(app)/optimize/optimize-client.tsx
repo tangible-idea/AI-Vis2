@@ -4,17 +4,26 @@ import { useRef, useState } from "react";
 import { Card, CardHeader } from "@/components/ui";
 import { ContentGenerator } from "./generator";
 import { RecommendationList } from "./rec-list";
-import type { Recommendation, RecommendationType } from "@/lib/types";
+import { CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
+import type { Recommendation } from "@/lib/types";
 
 export function OptimizeClient({
   projectId,
   recommendations,
+  prefillType,
+  prefillTopic,
 }: {
   projectId: string;
   recommendations: Recommendation[];
+  /** Deep-link prefill, e.g. from Trends: /optimize?type=blog_post&topic=… */
+  prefillType?: string;
+  prefillTopic?: string;
 }) {
-  const [selected, setSelected] = useState<{ type: RecommendationType; recId?: string } | null>(
-    null
+  const validPrefill = CONTENT_TYPES.some((t) => t.id === prefillType)
+    ? (prefillType as ContentType)
+    : undefined;
+  const [selected, setSelected] = useState<{ type: ContentType; recId?: string } | null>(
+    validPrefill ? { type: validPrefill } : null
   );
   const generatorRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +51,9 @@ export function OptimizeClient({
           projectId={projectId}
           initialType={selected?.type}
           recommendationId={selected?.recId}
+          initialInstructions={
+            prefillTopic ? `Focus on the trending topic: "${prefillTopic}"` : undefined
+          }
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   Radar,
   Wand2,
   TrendingUp,
+  Flame,
   FileText,
   CreditCard,
   Settings,
@@ -21,6 +22,7 @@ import { logout } from "@/app/(auth)/actions";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/monitor", label: "Monitor", icon: Radar },
+  { href: "/trends", label: "Trends", icon: Flame },
   { href: "/optimize", label: "Optimize", icon: Wand2 },
   { href: "/improve", label: "Improve", icon: TrendingUp },
   { href: "/reports", label: "Reports", icon: FileText },

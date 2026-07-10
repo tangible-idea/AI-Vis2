@@ -59,6 +59,7 @@ const ENGINE_BIAS: Record<string, number> = {
   "Claude-Sonnet-4.5": 0.55,
   "Gemini-2.5-Pro": 0.42,
   "Perplexity-Sonar": 0.34,
+  "Gemini-2.5-Flash": 0.28,
 };
 
 const FILLER_VENDORS = [

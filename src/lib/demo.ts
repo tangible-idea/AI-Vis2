@@ -66,7 +66,7 @@ export async function seedDemoProject(userId: string): Promise<string> {
 
   // 6 weeks of snapshots with a believable upward trend
   const weeklyScores = [31, 34, 33, 41, 47, 54];
-  const engineBase: Record<string, number> = { chatgpt: 8, claude: 4, gemini: -4, perplexity: -10 };
+  const engineBase: Record<string, number> = { chatgpt: 8, claude: 4, gemini: -4, perplexity: -10, google_ai: -14 };
   const snapshots = weeklyScores.map((score, i) => {
     const at = new Date(Date.now() - (weeklyScores.length - 1 - i) * 7 * 86400_000);
     const engine_scores = Object.fromEntries(

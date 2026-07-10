@@ -2,9 +2,9 @@
 
 import { useTransition } from "react";
 import { Trash2 } from "lucide-react";
-import { togglePrompt, removePrompt, removeCompetitor } from "./actions";
+import { togglePrompt, removePrompt } from "./actions";
 import { Badge } from "@/components/ui";
-import type { Competitor, Prompt } from "@/lib/types";
+import { PROMPT_CATEGORIES, type Prompt } from "@/lib/types";
 
 export function PromptRows({ prompts }: { prompts: Prompt[] }) {
   const [, start] = useTransition();
@@ -22,7 +22,9 @@ export function PromptRows({ prompts }: { prompts: Prompt[] }) {
           <span className={`flex-1 text-sm ${p.is_active ? "text-ink" : "text-ink-faint line-through"}`}>
             {p.text}
           </span>
-          <Badge tone="neutral">{p.category}</Badge>
+          <Badge tone="neutral">
+            {PROMPT_CATEGORIES.find((c) => c.id === p.category)?.label ?? p.category}
+          </Badge>
           <button
             onClick={() => start(() => removePrompt(p.id))}
             className="cursor-pointer rounded p-1 text-ink-faint hover:bg-poor-soft hover:text-poor"
@@ -31,29 +33,6 @@ export function PromptRows({ prompts }: { prompts: Prompt[] }) {
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
-      ))}
-    </div>
-  );
-}
-
-export function CompetitorRows({ competitors }: { competitors: Competitor[] }) {
-  const [, start] = useTransition();
-  return (
-    <div className="flex flex-wrap gap-2">
-      {competitors.map((c) => (
-        <span
-          key={c.id}
-          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper py-1 pl-3 pr-1.5 text-sm text-ink"
-        >
-          {c.name}
-          <button
-            onClick={() => start(() => removeCompetitor(c.id))}
-            className="cursor-pointer rounded-full p-0.5 text-ink-faint hover:bg-poor-soft hover:text-poor"
-            aria-label={`Remove ${c.name}`}
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
-        </span>
       ))}
     </div>
   );

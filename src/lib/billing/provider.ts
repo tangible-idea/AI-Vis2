@@ -1,9 +1,11 @@
 import type { Plan } from "../types";
+import { PolarBillingProvider, isPolarConfigured } from "./polar";
 
 /**
- * Billing abstraction. The MVP ships with a stub that flips the plan
- * immediately ("demo checkout"). To integrate a real PG (Stripe, PortOne),
- * implement BillingProvider and return it from getBillingProvider().
+ * Billing abstraction. Polar.sh is the production provider (lib/billing/
+ * polar.ts + /api/webhooks/polar); until its env vars are set, the stub
+ * flips plans immediately ("demo checkout") so the product stays fully
+ * usable in development.
  */
 export interface BillingProvider {
   name: string;
@@ -19,5 +21,5 @@ class StubBillingProvider implements BillingProvider {
 }
 
 export function getBillingProvider(): BillingProvider {
-  return new StubBillingProvider();
+  return isPolarConfigured() ? new PolarBillingProvider() : new StubBillingProvider();
 }

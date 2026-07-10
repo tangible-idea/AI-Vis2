@@ -1,14 +1,30 @@
 export type Plan = "free" | "starter" | "pro";
 
-export type Engine = "chatgpt" | "claude" | "gemini" | "perplexity";
+export type Engine = "chatgpt" | "claude" | "gemini" | "perplexity" | "google_ai";
 
 export type PromptCategory =
-  | "best"
+  | "branded"
+  | "category"
+  | "informational"
   | "comparison"
-  | "recommendation"
+  | "purchase"
   | "local"
+  | "problem"
+  // legacy values still present in existing rows
+  | "best"
+  | "recommendation"
   | "alternative"
   | "custom";
+
+export const PROMPT_CATEGORIES: { id: PromptCategory; label: string }[] = [
+  { id: "branded", label: "Branded" },
+  { id: "category", label: "Category" },
+  { id: "informational", label: "Informational" },
+  { id: "comparison", label: "Comparison" },
+  { id: "purchase", label: "Purchase intent" },
+  { id: "local", label: "Local intent" },
+  { id: "problem", label: "Problem-solving" },
+];
 
 export type ScanStatus = "pending" | "running" | "done" | "failed";
 
@@ -52,6 +68,7 @@ export interface Competitor {
   project_id: string;
   name: string;
   website: string | null;
+  position: number;
 }
 
 export interface Prompt {

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { getTrendsSource } from "@/lib/trends";
@@ -49,7 +50,12 @@ export default async function MonitorPage() {
     }),
   }));
 
-  const trends = await getTrendsSource().topicsFor(project.industry, project.country);
+  const trends = await getTrendsSource().trendingSearches({
+    industry: project.industry,
+    country: project.country,
+    language: project.language,
+    timeframe: "30d",
+  });
 
   return (
     <>
@@ -149,30 +155,43 @@ export default async function MonitorPage() {
         {limits.trends ? (
           <Card>
             <CardHeader
-              title="Trending topics"
-              hint={`Rising searches in ${project.industry} — turn them into content on Optimize`}
+              title="Trending searches"
+              hint={`Rising searches in ${project.industry} — explore more on Trends`}
+              action={
+                <Link href="/trends" className="text-xs text-accent-strong hover:underline">
+                  Explore
+                </Link>
+              }
             />
             <div className="divide-y divide-line px-5 pb-3">
-              {trends.map((t) => (
-                <div key={t.topic} className="flex items-center gap-3 py-2.5">
-                  <TrendingUp className="h-3.5 w-3.5 shrink-0 text-good" />
+              {trends.slice(0, 5).map((t) => (
+                <div key={t.keyword} className="flex items-center gap-3 py-2.5">
+                  <TrendingUp
+                    className={cn(
+                      "h-3.5 w-3.5 shrink-0",
+                      t.direction === "rising" ? "text-good" : t.direction === "declining" ? "text-poor" : "text-ink-faint"
+                    )}
+                  />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-ink">{t.topic}</p>
+                    <p className="truncate text-sm text-ink">{t.keyword}</p>
                     <p className="truncate text-[11px] text-ink-faint">{t.contentAngle}</p>
                   </div>
-                  <span className="tabular text-xs text-good">+{t.change}%</span>
+                  <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
+                    {t.growth >= 0 ? "+" : ""}
+                    {t.growth}%
+                  </span>
                   <span className="tabular hidden text-xs text-ink-faint sm:block">{t.volume}</span>
                 </div>
               ))}
             </div>
           </Card>
         ) : (
-          <LockedOverlay message="Trending topics are available on Starter and Pro">
+          <LockedOverlay message="Trending searches are available on Starter and Pro">
             <Card>
-              <CardHeader title="Trending topics" hint="Rising searches in your category" />
+              <CardHeader title="Trending searches" hint="Rising searches in your category" />
               <div className="space-y-3 px-5 pb-5">
                 {trends.slice(0, 3).map((t) => (
-                  <div key={t.topic} className="h-8 rounded bg-hover" />
+                  <div key={t.keyword} className="h-8 rounded bg-hover" />
                 ))}
               </div>
             </Card>

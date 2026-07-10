@@ -39,9 +39,12 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ plan }),
     });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
       setError(data.error ?? "Could not change plan");
+    } else if (data.checkoutUrl) {
+      window.location.href = data.checkoutUrl; // Polar hosted checkout / portal
+      return;
     } else {
       router.refresh();
     }
@@ -92,8 +95,8 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
         })}
       </div>
       <p className="mt-4 text-center text-xs text-ink-faint">
-        Demo checkout — plans switch instantly without payment. Wire a PG in{" "}
-        <code className="tabular">lib/billing/provider.ts</code>.
+        Billing runs on Polar.sh once configured (see <code className="tabular">.env.example</code>);
+        until then plans switch instantly as a demo.
       </p>
     </>
   );

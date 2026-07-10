@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PROJECT_COOKIE } from "@/lib/project";
 import { generateDefaultPrompts } from "@/lib/scan/prompts";
 import { planLimits } from "@/lib/plans";
+import { resolveCompetitorInput } from "@/lib/competitors";
 
 export async function switchProject(projectId: string) {
   const cookieStore = await cookies();
@@ -54,12 +55,19 @@ export async function createProject(
     .single();
   if (error || !project) return { error: error?.message ?? "Could not create project" };
 
+  let resolvedNames = competitorNames;
   if (competitorNames.length) {
+    const resolved = await Promise.all(
+      competitorNames.slice(0, limits.maxCompetitors).map(resolveCompetitorInput)
+    );
+    resolvedNames = resolved.map((r) => r.name);
     await supabase.from("competitors").insert(
-      competitorNames.slice(0, limits.maxCompetitors).map((n) => ({
+      resolved.map((r, i) => ({
         user_id: user.id,
         project_id: project.id,
-        name: n,
+        name: r.name,
+        website: r.website,
+        position: i,
       }))
     );
   }
@@ -68,7 +76,7 @@ export async function createProject(
     brand: name,
     industry,
     country,
-    competitors: competitorNames,
+    competitors: resolvedNames,
   });
   await supabase.from("prompts").insert(
     prompts.slice(0, limits.maxPrompts).map((p) => ({

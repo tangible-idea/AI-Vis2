@@ -92,7 +92,7 @@ src/
 **Swap points** (adapter pattern, one file each):
 - AI provider → `lib/ai/provider.ts` (`getProvider()`)
 - Trends source → `lib/trends/index.ts` (mock → SerpAPI/Glimpse/DataForSEO)
-- Billing → `lib/billing/provider.ts` (stub → Stripe/PortOne)
+- Billing → `lib/billing/provider.ts` (dev stub → Polar.sh, already implemented)
 - Email → `lib/email/index.ts` (Resend ↔ console)
 
 **Scoring** (`lib/scan/scoring.ts`): Visibility Score 0–100 =
@@ -114,9 +114,19 @@ Schema: `supabase/migrations/0001_init.sql` — 10 tables, every row carries
 `user_id` so RLS is uniform (`auth.uid() = user_id`). Public share pages are
 rendered server-side with the service-role key, so no public policies exist.
 
+Apply new migrations with `supabase db push` (or paste into the SQL editor).
+`0003_prompt_categories_competitor_order.sql` is required for the seven
+buyer-intent prompt categories and competitor drag-and-drop ordering.
+
+## Billing (Polar.sh)
+
+Billing runs on Polar.sh — `lib/billing/polar.ts` creates hosted checkouts
+and `/api/webhooks/polar` maps subscription events to plan entitlements.
+Until the `POLAR_*` env vars are set (see `.env.example`), the stub provider
+flips plans instantly so development stays friction-free.
+
 ## Roadmap hooks (intentionally stubbed)
 
-- Google AI Overviews engine (adapter slot ready, shown as "soon")
-- Real Google Trends source
+- Consumer-surface collectors per engine (`collection` field in `lib/ai/engines.ts`)
+- Real Google Trends source (`lib/trends/index.ts` → SerpAPI/Glimpse/DataForSEO)
 - Team collaboration / comments (Pro plan UI flag exists)
-- Real PG checkout (interface in `lib/billing/provider.ts`)

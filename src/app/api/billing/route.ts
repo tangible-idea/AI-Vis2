@@ -4,9 +4,9 @@ import { getBillingProvider } from "@/lib/billing/provider";
 import type { Plan } from "@/lib/types";
 
 /**
- * POST { plan } → change plan.
- * Currently wired to the stub billing provider (no real charge); swap the
- * provider in lib/billing/provider.ts to integrate Stripe/PortOne later.
+ * POST { plan } → change plan. With Polar configured this returns a
+ * checkoutUrl to redirect to — the plan only flips once Polar's webhook
+ * confirms the subscription. The dev stub flips instantly.
  */
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -24,6 +24,12 @@ export async function POST(request: Request) {
   const result = await billing.changePlan(user.id, plan);
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 500 });
 
+  // real checkout: redirect, entitlement lands via webhook
+  if (result.checkoutUrl) {
+    return NextResponse.json({ ok: true, checkoutUrl: result.checkoutUrl });
+  }
+
+  // stub path: flip immediately
   const { error } = await supabase.from("profiles").update({ plan }).eq("id", user.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
