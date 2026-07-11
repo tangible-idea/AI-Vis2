@@ -185,9 +185,11 @@ export function EmptyState({
 /** Blur-locked premium card for free-plan gating. */
 export function LockedOverlay({
   message,
+  cta = "Upgrade",
   children,
 }: {
   message: string;
+  cta?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -198,7 +200,7 @@ export function LockedOverlay({
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-paper/40">
         <p className="text-sm font-medium text-ink">{message}</p>
         <ButtonLink href="/billing" size="sm">
-          Upgrade
+          {cta}
         </ButtonLink>
       </div>
     </div>

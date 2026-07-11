@@ -4,17 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 interface Msg {
   role: "user" | "assistant";
   content: string;
 }
 
-const SUGGESTIONS = [
-  "Explain my visibility score",
-  "Where am I losing to competitors?",
-  "What should I do first?",
-];
+const SUGGESTION_KEYS = ["assistant.sug1", "assistant.sug2", "assistant.sug3"];
 
 export function AssistantWidget({
   projectId,
@@ -29,6 +26,7 @@ export function AssistantWidget({
   const [busy, setBusy] = useState(false);
   const pathname = usePathname();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const t = useT();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -59,10 +57,7 @@ export function AssistantWidget({
         setMessages([...history, { role: "assistant", content: acc }]);
       }
     } catch {
-      setMessages([
-        ...history,
-        { role: "assistant", content: "Sorry, something went wrong. Please try again." },
-      ]);
+      setMessages([...history, { role: "assistant", content: t("assistant.error") }]);
     } finally {
       setBusy(false);
     }
@@ -74,9 +69,9 @@ export function AssistantWidget({
         <div className="fixed bottom-20 right-4 z-50 flex h-[28rem] w-[calc(100vw-2rem)] max-w-sm animate-rise flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-pop">
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <div>
-              <p className="text-sm font-semibold">AI Copilot</p>
+              <p className="text-sm font-semibold">{t("assistant.title")}</p>
               <p className="text-[11px] text-ink-faint">
-                {projectName ? `Grounded in ${projectName}'s latest scan` : "Ask me anything"}
+                {projectName ? t("assistant.grounded", { name: projectName }) : t("assistant.askAnything")}
               </p>
             </div>
             <button
@@ -91,8 +86,8 @@ export function AssistantWidget({
           <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
             {messages.length === 0 && (
               <div className="space-y-2 pt-2">
-                <p className="text-xs text-ink-faint">Try asking:</p>
-                {SUGGESTIONS.map((s) => (
+                <p className="text-xs text-ink-faint">{t("assistant.tryAsking")}</p>
+                {SUGGESTION_KEYS.map((key) => t(key)).map((s) => (
                   <button
                     key={s}
                     onClick={() => send(s)}
@@ -128,7 +123,7 @@ export function AssistantWidget({
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about your visibility…"
+              placeholder={t("assistant.placeholder")}
               className="h-9 flex-1 rounded-lg border border-line bg-paper px-3 text-[13px] focus:border-accent focus:outline-none"
             />
             <button

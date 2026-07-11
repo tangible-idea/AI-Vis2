@@ -7,6 +7,7 @@ import { Button, Card, Input, Label, Select } from "@/components/ui";
 import { CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
 import { CONTENT_LANGUAGES } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export function ContentGenerator({
   projectId,
@@ -29,6 +30,7 @@ export function ContentGenerator({
   const [error, setError] = useState<string | null>(null);
   const outRef = useRef<HTMLPreElement>(null);
   const router = useRouter();
+  const t = useT();
 
   // follow "Generate X" clicks from the recommendation list
   useEffect(() => {
@@ -49,7 +51,7 @@ export function ContentGenerator({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Generation failed");
+        setError(data.error ?? t("generator.generationFailed"));
         return;
       }
       const reader = res.body!.getReader();
@@ -63,7 +65,7 @@ export function ContentGenerator({
         outRef.current?.scrollTo({ top: outRef.current.scrollHeight });
       }
     } catch {
-      setError("Network error");
+      setError(t("generator.networkError"));
     } finally {
       setBusy(false);
     }
@@ -99,7 +101,7 @@ export function ContentGenerator({
     <Card className="p-5">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
         <div>
-          <Label htmlFor="gen-type">What to generate</Label>
+          <Label htmlFor="gen-type">{t("generator.whatToGenerate")}</Label>
           <Select
             id="gen-type"
             value={type}
@@ -113,7 +115,7 @@ export function ContentGenerator({
           </Select>
         </div>
         <div>
-          <Label htmlFor="gen-lang">Language</Label>
+          <Label htmlFor="gen-lang">{t("common.language")}</Label>
           <Select
             id="gen-lang"
             value={language}
@@ -130,7 +132,7 @@ export function ContentGenerator({
         <div className="flex items-end">
           <Button onClick={generate} disabled={busy}>
             <Wand2 className={cn("h-4 w-4", busy && "animate-pulse")} />
-            {busy ? "Generating…" : "Generate"}
+            {busy ? t("generator.generating") : t("common.generate")}
           </Button>
         </div>
       </div>
@@ -138,7 +140,7 @@ export function ContentGenerator({
         <Input
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
-          placeholder="Optional instructions — tone, focus keywords, specific pages…"
+          placeholder={t("generator.instructionsPlaceholder")}
         />
       </div>
 
@@ -156,11 +158,11 @@ export function ContentGenerator({
             <div className="mt-3 flex gap-2">
               <Button variant="secondary" size="sm" onClick={copy}>
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? "Copied" : "Copy"}
+                {copied ? t("common.copied") : t("common.copy")}
               </Button>
               <Button variant="secondary" size="sm" onClick={save} disabled={saved}>
                 {saved ? <Check className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
-                {saved ? "Saved to library" : "Save to library"}
+                {saved ? t("generator.savedToLibrary") : t("generator.saveToLibrary")}
               </Button>
             </div>
           )}

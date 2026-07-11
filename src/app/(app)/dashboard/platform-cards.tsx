@@ -1,5 +1,7 @@
 import { Card, Badge } from "@/components/ui";
 import { timeAgo, cn } from "@/lib/utils";
+import { getT } from "@/lib/i18n/server";
+import type { TFunction } from "@/lib/i18n/translate";
 
 export interface PlatformCardData {
   id: string;
@@ -30,9 +32,13 @@ function EngineLogo({ label, color }: { label: string; color: string }) {
   );
 }
 
-function statusBadge(delta: number | null) {
-  if (delta === null || delta === 0) return <Badge tone="mid">No change</Badge>;
-  return delta > 0 ? <Badge tone="good">Improved</Badge> : <Badge tone="poor">Declined</Badge>;
+function statusBadge(delta: number | null, t: TFunction) {
+  if (delta === null || delta === 0) return <Badge tone="mid">{t("summary.steady")}</Badge>;
+  return delta > 0 ? (
+    <Badge tone="good">{t("summary.improved")}</Badge>
+  ) : (
+    <Badge tone="poor">{t("summary.declined")}</Badge>
+  );
 }
 
 /**
@@ -40,7 +46,8 @@ function statusBadge(delta: number | null) {
  * status at a glance; expand for prompts, competitor pressure and the next
  * improvement.
  */
-export function PlatformCards({ platforms }: { platforms: PlatformCardData[] }) {
+export async function PlatformCards({ platforms }: { platforms: PlatformCardData[] }) {
+  const t = await getT();
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {platforms.map((p) => (
@@ -51,9 +58,11 @@ export function PlatformCards({ platforms }: { platforms: PlatformCardData[] }) 
                 <EngineLogo label={p.label} color={p.color} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[13px] font-semibold text-ink">{p.label}</p>
-                  <p className="text-[11px] text-ink-faint">Last scan {timeAgo(p.lastScanAt)}</p>
+                  <p className="text-[11px] text-ink-faint">
+                    {t("platform.lastScan", { time: timeAgo(p.lastScanAt) })}
+                  </p>
                 </div>
-                {statusBadge(p.delta)}
+                {statusBadge(p.delta, t)}
               </div>
               <div className="mt-3 flex items-end justify-between">
                 <div className="flex items-baseline gap-2">
@@ -65,45 +74,47 @@ export function PlatformCards({ platforms }: { platforms: PlatformCardData[] }) 
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="tabular text-xs text-ink-soft">{p.citations} citations</p>
+                  <p className="tabular text-xs text-ink-soft">
+                    {t("platform.citations", { count: p.citations })}
+                  </p>
                   <p className="tabular text-[11px] text-ink-faint">
-                    {p.mentions}/{p.totalPrompts} prompts
+                    {t("platform.prompts", { mentions: p.mentions, total: p.totalPrompts })}
                   </p>
                 </div>
               </div>
               <p className="mt-2 text-center text-[10px] text-ink-faint transition-transform group-open:hidden">
-                Click for details
+                {t("platform.clickForDetails")}
               </p>
             </summary>
 
             <div className="space-y-3 border-t border-line bg-paper/60 p-4">
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-ink-faint">
-                  Where you appear
+                  {t("platform.whereYouAppear")}
                 </p>
                 {p.topPrompts.length ? (
                   <ul className="mt-1.5 space-y-1">
-                    {p.topPrompts.slice(0, 3).map((t) => (
-                      <li key={t.text} className="flex items-center gap-2 text-xs text-ink-soft">
+                    {p.topPrompts.slice(0, 3).map((tp) => (
+                      <li key={tp.text} className="flex items-center gap-2 text-xs text-ink-soft">
                         <span
                           className={cn(
                             "h-1.5 w-1.5 shrink-0 rounded-full",
-                            t.level === "recommended" ? "bg-accent" : "bg-[#9dd4b4]"
+                            tp.level === "recommended" ? "bg-accent" : "bg-[#9dd4b4]"
                           )}
                         />
-                        <span className="truncate">{t.text}</span>
+                        <span className="truncate">{tp.text}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-1.5 text-xs text-ink-faint">Not mentioned in any answer yet.</p>
+                  <p className="mt-1.5 text-xs text-ink-faint">{t("platform.notMentionedYet")}</p>
                 )}
               </div>
 
               {p.rivalMentions.length > 0 && (
                 <div>
                   <p className="text-[10px] font-medium uppercase tracking-wider text-ink-faint">
-                    Competitors here
+                    {t("platform.competitorsHere")}
                   </p>
                   <p className="mt-1 text-xs text-ink-soft">
                     {p.rivalMentions
@@ -116,7 +127,7 @@ export function PlatformCards({ platforms }: { platforms: PlatformCardData[] }) 
 
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-ink-faint">
-                  Recommended improvement
+                  {t("platform.recommendedImprovement")}
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-ink-soft">{p.improvement}</p>
               </div>

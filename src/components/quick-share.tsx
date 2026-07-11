@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, Copy, Download, Mail, Share2 } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 /**
  * One-click sharing row for the Last Scan Summary. Copy uses the newest
@@ -21,6 +22,7 @@ export function QuickShare({
   delta: number | null;
 }) {
   const [copied, setCopied] = useState(false);
+  const t = useT();
 
   const summary = `${brand} AI Visibility Score: ${score}/100${
     delta && delta > 0 ? ` (▲ +${delta} since last scan)` : ""
@@ -44,21 +46,21 @@ export function QuickShare({
       {shareUrl ? (
         <button onClick={copy} className={btn}>
           {copied ? <Check className="h-3 w-3 text-good" /> : <Copy className="h-3 w-3" />}
-          {copied ? "Copied" : "Copy public link"}
+          {copied ? t("common.copied") : t("share.copyPublicLink")}
         </button>
       ) : (
         <Link href="/reports" className={btn}>
-          <Copy className="h-3 w-3" /> Copy public link
+          <Copy className="h-3 w-3" /> {t("share.copyPublicLink")}
         </Link>
       )}
       <a href={mailto} className={btn}>
-        <Mail className="h-3 w-3" /> Email report
+        <Mail className="h-3 w-3" /> {t("share.emailReport")}
       </a>
       <button onClick={() => window.print()} className={btn}>
-        <Download className="h-3 w-3" /> Download PDF
+        <Download className="h-3 w-3" /> {t("share.downloadPdf")}
       </button>
       <Link href="/reports" className={btn}>
-        <Share2 className="h-3 w-3" /> Share
+        <Share2 className="h-3 w-3" /> {t("share.share")}
       </Link>
     </div>
   );

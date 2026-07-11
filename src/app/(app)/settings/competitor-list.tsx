@@ -5,6 +5,7 @@ import { GripVertical, Trash2 } from "lucide-react";
 import { removeCompetitor, reorderCompetitors } from "./actions";
 import { faviconUrl } from "@/lib/competitors";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import type { Competitor } from "@/lib/types";
 
 /** Favicon with letter-placeholder fallback for sites without a public icon. */
@@ -45,6 +46,7 @@ export function CompetitorList({
   const [items, setItems] = useState(competitors);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [, start] = useTransition();
+  const t = useT();
 
   useEffect(() => setItems(competitors), [competitors]);
 
@@ -70,7 +72,7 @@ export function CompetitorList({
   }
 
   if (!items.length) {
-    return <p className="text-sm text-ink-faint">No competitors yet — add one below.</p>;
+    return <p className="text-sm text-ink-faint">{t("settings.noCompetitors")}</p>;
   }
 
   return (

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, Copy, Link2, Trash2 } from "lucide-react";
 import { Button, Select } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import type { ShareLink } from "@/lib/types";
 
 export function ShareManager({
@@ -21,6 +22,7 @@ export function ShareManager({
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const router = useRouter();
+  const t = useT();
 
   async function create() {
     setBusy(true);
@@ -63,20 +65,16 @@ export function ShareManager({
           className="w-40"
           aria-label="Link expiry"
         >
-          <option value="7">Expires in 7 days</option>
-          <option value="30">Expires in 30 days</option>
-          <option value="90">Expires in 90 days</option>
-          <option value="never">Never expires</option>
+          <option value="7">{t("share.expires7")}</option>
+          <option value="30">{t("share.expires30")}</option>
+          <option value="90">{t("share.expires90")}</option>
+          <option value="never">{t("share.neverExpires")}</option>
         </Select>
         <Button onClick={create} disabled={busy || locked} size="sm">
-          <Link2 className="h-3.5 w-3.5" /> Create share link
+          <Link2 className="h-3.5 w-3.5" /> {t("share.createLink")}
         </Button>
       </div>
-      {locked && (
-        <p className="mt-2 text-xs text-mid">
-          Share links are available on Starter and Pro — upgrade on the Billing page.
-        </p>
-      )}
+      {locked && <p className="mt-2 text-xs text-mid">{t("share.locked")}</p>}
       {error && <p className="mt-2 text-xs text-poor">{error}</p>}
 
       {links.length > 0 && (
@@ -87,7 +85,7 @@ export function ShareManager({
                 /share/{link.token}
               </code>
               <span className="hidden text-xs text-ink-faint sm:block">
-                {link.expires_at ? `expires ${formatDate(link.expires_at)}` : "no expiry"}
+                {link.expires_at ? t("share.expiresOn", { date: formatDate(link.expires_at) }) : t("share.noExpiry")}
               </span>
               <button
                 onClick={() => copy(link)}

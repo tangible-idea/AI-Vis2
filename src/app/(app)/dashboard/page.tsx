@@ -168,12 +168,12 @@ export default async function DashboardPage() {
   // recent activity feed
   const activity: ActivityItem[] = [];
   if (lastDone?.completed_at) {
-    activity.push({ label: "Scan completed across all platforms", at: lastDone.completed_at });
-    activity.push({ label: "Competitor benchmark updated", at: lastDone.completed_at });
+    activity.push({ label: t("dashboard.activityScan"), at: lastDone.completed_at });
+    activity.push({ label: t("dashboard.activityBenchmark"), at: lastDone.completed_at });
   }
-  if (openRecs[0]) activity.push({ label: "Recommendations refreshed", at: openRecs[0].created_at });
+  if (openRecs[0]) activity.push({ label: t("dashboard.activityRecs"), at: openRecs[0].created_at });
   for (const c of contentRows ?? []) {
-    activity.push({ label: `Generated: ${c.title || c.type}`, at: c.created_at });
+    activity.push({ label: t("dashboard.activityGenerated", { title: c.title || c.type }), at: c.created_at });
   }
   activity.sort((a, b) => +new Date(b.at) - +new Date(a.at));
 

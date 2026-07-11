@@ -4,6 +4,7 @@ import { Card, Badge } from "@/components/ui";
 import { QuickShare } from "@/components/quick-share";
 import { ScanButton } from "@/components/scan-button";
 import { timeAgo, cn } from "@/lib/utils";
+import { getT } from "@/lib/i18n/server";
 import type { Recommendation } from "@/lib/types";
 
 export interface EngineSummary {
@@ -24,13 +25,12 @@ const statusOf = (delta: number | null) =>
   delta === null || delta === 0 ? "steady" : delta > 0 ? "improved" : "declined";
 
 const STATUS_DOT = { improved: "bg-good", steady: "bg-mid", declined: "bg-poor" } as const;
-const STATUS_LABEL = { improved: "Improved", steady: "No change", declined: "Declined" } as const;
 
 /**
  * Executive briefing card: where you stand, what changed, what to do next —
  * readable in under ten seconds.
  */
-export function LastScanSummary({
+export async function LastScanSummary({
   projectId,
   brand,
   score,
@@ -53,6 +53,14 @@ export function LastScanSummary({
   nextScanAt: Date | null;
   shareUrl: string | null;
 }) {
+  const t = await getT();
+  const statusLabel = { improved: t("summary.improved"), steady: t("summary.steady"), declined: t("summary.declined") } as const;
+  const priorityLabel = {
+    high: t("common.priorityHigh"),
+    medium: t("common.priorityMedium"),
+    low: t("common.priorityLow"),
+  } as const;
+
   const best = engines.reduce<EngineSummary | null>(
     (a, e) => (e.delta !== null && e.delta > 0 && (!a || e.delta > (a.delta ?? 0)) ? e : a),
     null
@@ -67,14 +75,14 @@ export function LastScanSummary({
         {/* where you stand */}
         <div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">
-            Last scan summary
+            {t("summary.title")}
           </p>
           <div className="mt-1.5 flex items-baseline gap-2">
             <span className="tabular text-2xl font-medium text-ink">{score}</span>
             <span className="text-xs text-ink-faint">/100</span>
             {delta !== null && delta !== 0 && (
               <span className={cn("tabular text-xs font-medium", delta > 0 ? "text-good" : "text-poor")}>
-                {delta > 0 ? "▲" : "▼"} {Math.abs(delta)} since last scan
+                {delta > 0 ? "▲" : "▼"} {Math.abs(delta)} {t("summary.sinceLastScan")}
               </span>
             )}
           </div>
@@ -91,25 +99,25 @@ export function LastScanSummary({
                   </span>
                   <span className="pointer-events-none absolute left-0 top-full z-20 mt-1.5 hidden w-44 rounded-lg border border-line bg-surface p-3 shadow-pop group-hover:block">
                     <span className="block text-xs font-semibold" style={{ color: e.color }}>
-                      {e.label} — {STATUS_LABEL[status]}
+                      {e.label} — {statusLabel[status]}
                     </span>
                     <span className="mt-1.5 block space-y-0.5 text-[11px] text-ink-soft">
                       <span className="flex justify-between">
-                        <span>Visibility score</span>
+                        <span>{t("summary.visibilityScore")}</span>
                         <span className="tabular">{e.score}</span>
                       </span>
                       <span className="flex justify-between">
-                        <span>Weekly change</span>
+                        <span>{t("summary.weeklyChange")}</span>
                         <span className={cn("tabular", (e.delta ?? 0) > 0 ? "text-good" : (e.delta ?? 0) < 0 ? "text-poor" : "")}>
                           {e.delta === null ? "—" : `${e.delta > 0 ? "+" : ""}${e.delta}`}
                         </span>
                       </span>
                       <span className="flex justify-between">
-                        <span>Citations</span>
+                        <span>{t("summary.citations")}</span>
                         <span className="tabular">{e.citations}</span>
                       </span>
                       <span className="flex justify-between">
-                        <span>Last scan</span>
+                        <span>{t("summary.lastScan")}</span>
                         <span>{timeAgo(lastScanAt)}</span>
                       </span>
                     </span>
@@ -123,8 +131,8 @@ export function LastScanSummary({
             <div className="mt-4 flex items-center gap-2 rounded-lg bg-good-soft px-3 py-2">
               <Trophy className="h-3.5 w-3.5 shrink-0 text-good" />
               <p className="text-xs text-ink">
-                <span className="font-semibold">Biggest improvement:</span> {best.label}{" "}
-                <span className="tabular text-good">+{best.delta} points</span>
+                <span className="font-semibold">{t("summary.biggestImprovement")}</span> {best.label}{" "}
+                <span className="tabular text-good">+{best.delta} {t("summary.points")}</span>
               </p>
             </div>
           )}
@@ -133,14 +141,14 @@ export function LastScanSummary({
         {/* what to do next */}
         <div className="border-line lg:border-l lg:pl-6">
           <p className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">
-            Top recommended action
+            {t("summary.topAction")}
           </p>
           {topAction ? (
             <div className="mt-2">
               <p className="text-sm font-medium leading-snug text-ink">{topAction.title}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Badge tone={topAction.priority === "high" ? "poor" : "mid"}>
-                  {topAction.priority} priority
+                  {priorityLabel[topAction.priority]}
                 </Badge>
                 <span className="text-[11px] text-ink-faint">{topAction.impact}</span>
                 <span className="text-[11px] text-ink-faint">· {topAction.effort}</span>
@@ -149,20 +157,18 @@ export function LastScanSummary({
                 href="/optimize"
                 className="mt-3 inline-flex h-8 items-center gap-1.5 rounded-lg bg-ink px-3 text-xs font-medium text-paper hover:bg-ink/85"
               >
-                Generate <ArrowUpRight className="h-3.5 w-3.5" />
+                {t("common.generate")} <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-ink-faint">
-              Nothing open — your next scan will refresh recommendations.
-            </p>
+            <p className="mt-2 text-sm text-ink-faint">{t("summary.noOpenAction")}</p>
           )}
         </div>
 
         {/* rhythm: activity, next scan, share */}
         <div className="border-line lg:border-l lg:pl-6">
           <p className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">
-            Recent activity
+            {t("summary.recentActivity")}
           </p>
           <ul className="mt-2 space-y-1.5">
             {activity.slice(0, 4).map((a) => (
@@ -172,17 +178,21 @@ export function LastScanSummary({
                 <span className="shrink-0 text-[10px] text-ink-faint">{timeAgo(a.at)}</span>
               </li>
             ))}
-            {!activity.length && <li className="text-xs text-ink-faint">No activity yet.</li>}
+            {!activity.length && <li className="text-xs text-ink-faint">{t("summary.noActivity")}</li>}
           </ul>
 
           <div className="mt-4 flex items-center justify-between gap-2 rounded-lg border border-line bg-paper px-3 py-2">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-ink-faint">Next scan</p>
+              <p className="text-[10px] uppercase tracking-wider text-ink-faint">{t("summary.nextScan")}</p>
               <p className="text-xs font-medium text-ink">
-                {daysToNext === null ? "Not scheduled" : daysToNext === 0 ? "Due now" : `In ${daysToNext} day${daysToNext > 1 ? "s" : ""}`}
+                {daysToNext === null
+                  ? t("summary.notScheduled")
+                  : daysToNext === 0
+                    ? t("summary.dueNow")
+                    : t("summary.inDays", { count: daysToNext })}
               </p>
             </div>
-            <ScanButton projectId={projectId} label="Run scan now" />
+            <ScanButton projectId={projectId} label={t("summary.runScanNow")} />
           </div>
 
           <div className="mt-3">

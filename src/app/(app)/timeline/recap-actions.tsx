@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Check, Copy, Download, Mail } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 /** Export/share row for the monthly recap card. */
 export function RecapActions({ brand, summary }: { brand: string; summary: string }) {
   const [copied, setCopied] = useState(false);
+  const t = useT();
 
   const mailto = `mailto:?subject=${encodeURIComponent(`Monthly AI visibility recap — ${brand}`)}&body=${encodeURIComponent(summary)}`;
 
@@ -21,14 +23,14 @@ export function RecapActions({ brand, summary }: { brand: string; summary: strin
   return (
     <div className="flex flex-wrap gap-1.5">
       <button onClick={() => window.print()} className={btn}>
-        <Download className="h-3 w-3" /> Export PDF
+        <Download className="h-3 w-3" /> {t("share.exportPdf")}
       </button>
       <a href={mailto} className={btn}>
-        <Mail className="h-3 w-3" /> Email summary
+        <Mail className="h-3 w-3" /> {t("share.emailSummary")}
       </a>
       <button onClick={copy} className={btn}>
         {copied ? <Check className="h-3 w-3 text-good" /> : <Copy className="h-3 w-3" />}
-        {copied ? "Copied" : "Share with team"}
+        {copied ? t("common.copied") : t("share.shareWithTeam")}
       </button>
     </div>
   );

@@ -17,18 +17,19 @@ import {
 import { addComment } from "../actions";
 import { engineInfo } from "@/lib/ai/engines";
 import { timeAgo, cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import type { TimelineCategory, TimelineEvent } from "@/lib/timeline";
 
-const CATEGORY_META: Record<TimelineCategory, { label: string; icon: typeof TrendingUp }> = {
-  visibility: { label: "Visibility", icon: TrendingUp },
-  citation: { label: "Citations", icon: Link2 },
-  competitor: { label: "Competitors", icon: Swords },
-  content: { label: "Content", icon: FileText },
-  trends: { label: "Trends", icon: Flame },
-  recommendation: { label: "Recommendations", icon: Wand2 },
-  scan: { label: "Scans", icon: Radar },
-  reports: { label: "Reports", icon: Share2 },
-  team: { label: "Team", icon: Users },
+const CATEGORY_META: Record<TimelineCategory, { labelKey: string; icon: typeof TrendingUp }> = {
+  visibility: { labelKey: "timeline.catVisibility", icon: TrendingUp },
+  citation: { labelKey: "timeline.catCitations", icon: Link2 },
+  competitor: { labelKey: "timeline.catCompetitors", icon: Swords },
+  content: { labelKey: "timeline.catContent", icon: FileText },
+  trends: { labelKey: "timeline.catTrends", icon: Flame },
+  recommendation: { labelKey: "timeline.catRecommendations", icon: Wand2 },
+  scan: { labelKey: "timeline.catScans", icon: Radar },
+  reports: { labelKey: "timeline.catReports", icon: Share2 },
+  team: { labelKey: "timeline.catTeam", icon: Users },
 };
 
 export function TimelineFeed({
@@ -43,6 +44,7 @@ export function TimelineFeed({
   const [filter, setFilter] = useState<TimelineCategory | "all">("all");
   const [note, setNote] = useState("");
   const [pending, start] = useTransition();
+  const t = useT();
 
   const present = useMemo(
     () => [...new Set(events.map((e) => e.category))],
@@ -63,11 +65,11 @@ export function TimelineFeed({
       {/* category filter */}
       <div className="mb-4 flex flex-wrap gap-1.5">
         <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
-          All
+          {t("common.all")}
         </FilterChip>
         {present.map((c) => (
           <FilterChip key={c} active={filter === c} onClick={() => setFilter(c)}>
-            {CATEGORY_META[c].label}
+            {t(CATEGORY_META[c].labelKey)}
           </FilterChip>
         ))}
       </div>
@@ -78,25 +80,23 @@ export function TimelineFeed({
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Leave a note for your team…"
+            placeholder={t("timeline.notePlaceholder")}
             className="h-9 flex-1 rounded-lg border border-line-strong bg-surface px-3 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
-            aria-label="Team note"
+            aria-label={t("timeline.notePlaceholder")}
           />
           <button
             type="submit"
             disabled={pending || !note.trim()}
             className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-ink px-3 text-xs font-medium text-paper hover:bg-ink/85 disabled:pointer-events-none disabled:opacity-50"
           >
-            <Send className="h-3.5 w-3.5" /> Post
+            <Send className="h-3.5 w-3.5" /> {t("timeline.post")}
           </button>
         </form>
       )}
 
       {/* feed */}
       {visible.length === 0 ? (
-        <p className="py-8 text-center text-sm text-ink-faint">
-          Nothing here yet — events appear as you scan, optimize and share.
-        </p>
+        <p className="py-8 text-center text-sm text-ink-faint">{t("timeline.emptyFeed")}</p>
       ) : (
         <ol className="relative space-y-0 border-l border-line pl-5">
           {visible.map((ev) => {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Copy, FileText } from "lucide-react";
 import { Button } from "@/components/ui";
+import { useT } from "@/lib/i18n";
 
 /** Streams a stakeholder-ready executive summary from the latest scan metrics. */
 export function ExecSummary({ projectId, metrics }: { projectId: string; metrics: string }) {
@@ -10,6 +11,7 @@ export function ExecSummary({ projectId, metrics }: { projectId: string; metrics
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   async function generate() {
     setBusy(true);
@@ -28,7 +30,7 @@ export function ExecSummary({ projectId, metrics }: { projectId: string; metrics
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Generation failed");
+        setError(data.error ?? t("generator.generationFailed"));
         return;
       }
       const reader = res.body!.getReader();
@@ -41,7 +43,7 @@ export function ExecSummary({ projectId, metrics }: { projectId: string; metrics
         setOutput(acc);
       }
     } catch {
-      setError("Network error");
+      setError(t("generator.networkError"));
     } finally {
       setBusy(false);
     }
@@ -57,7 +59,7 @@ export function ExecSummary({ projectId, metrics }: { projectId: string; metrics
     <div>
       <Button variant="secondary" size="sm" onClick={generate} disabled={busy}>
         <FileText className="h-3.5 w-3.5" />
-        {busy ? "Writing…" : output ? "Regenerate" : "Generate executive summary"}
+        {busy ? t("generator.writing") : output ? t("generator.regenerate") : t("generator.generateExecSummary")}
       </Button>
       {error && <p className="mt-2 text-xs text-poor">{error}</p>}
       {(output || busy) && (
@@ -68,7 +70,7 @@ export function ExecSummary({ projectId, metrics }: { projectId: string; metrics
           {!busy && output && (
             <Button variant="secondary" size="sm" className="mt-2" onClick={copy}>
               {copied ? <Check className="h-3.5 w-3.5 text-good" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy"}
+              {copied ? t("common.copied") : t("common.copy")}
             </Button>
           )}
         </div>

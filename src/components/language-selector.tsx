@@ -7,7 +7,7 @@ import { isLocale, localeLabel, LOCALES, type Locale } from "@/lib/i18n/config";
 
 /** 🌐 language dropdown — shown top-right across marketing, auth and app. */
 export function LanguageSelector({ className }: { className?: string }) {
-  const { locale, setLocale } = useLocale();
+  const { locale, setLocale, pending } = useLocale();
 
   return (
     <span className={`relative inline-flex items-center ${className ?? ""}`}>
@@ -18,7 +18,7 @@ export function LanguageSelector({ className }: { className?: string }) {
         value={locale}
         onChange={(e) => isLocale(e.target.value) && setLocale(e.target.value)}
         aria-label="Language"
-        className="cursor-pointer appearance-none rounded-lg border border-line bg-surface py-1.5 pl-8 pr-7 text-xs font-medium text-ink-soft hover:bg-hover hover:text-ink focus:outline-none"
+        className={`cursor-pointer appearance-none rounded-lg border border-line bg-surface py-1.5 pl-8 pr-7 text-xs font-medium text-ink-soft hover:bg-hover hover:text-ink focus:outline-none ${pending ? "animate-pulse opacity-60" : ""}`}
       >
         {LOCALES.map((l) => (
           <option key={l.code} value={l.code}>

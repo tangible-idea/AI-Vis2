@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -75,7 +76,9 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const t = useT();
+  const [switching, startSwitch] = useTransition();
   const active = projects.find((p) => p.id === activeProjectId);
+  const onSwitch = (id: string) => startSwitch(() => switchProject(id));
 
   // brands with several market views show their country to stay distinguishable
   const nameCounts = new Map<string, number>();
@@ -98,8 +101,12 @@ export function Sidebar({
           <div className="relative mx-3 mb-3">
             <select
               value={activeProjectId ?? ""}
-              onChange={(e) => switchProject(e.target.value)}
-              className="w-full cursor-pointer appearance-none truncate rounded-lg border border-line bg-paper py-1.5 pl-2.5 pr-7 text-xs font-medium text-ink hover:bg-hover focus:outline-none"
+              onChange={(e) => onSwitch(e.target.value)}
+              disabled={switching}
+              className={cn(
+                "w-full cursor-pointer appearance-none truncate rounded-lg border border-line bg-paper py-1.5 pl-2.5 pr-7 text-xs font-medium text-ink hover:bg-hover focus:outline-none",
+                switching && "animate-pulse opacity-60"
+              )}
               aria-label={t("nav.switchProject")}
             >
               {projects.map((p) => (
@@ -182,8 +189,12 @@ export function Sidebar({
           {projects.length > 0 && (
             <select
               value={activeProjectId ?? ""}
-              onChange={(e) => switchProject(e.target.value)}
-              className="max-w-[45%] truncate rounded-md border border-line bg-paper px-2 py-1 text-xs"
+              onChange={(e) => onSwitch(e.target.value)}
+              disabled={switching}
+              className={cn(
+                "max-w-[45%] truncate rounded-md border border-line bg-paper px-2 py-1 text-xs",
+                switching && "animate-pulse opacity-60"
+              )}
               aria-label={t("nav.switchProject")}
             >
               {projects.map((p) => (

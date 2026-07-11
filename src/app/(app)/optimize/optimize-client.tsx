@@ -5,6 +5,7 @@ import { Card, CardHeader } from "@/components/ui";
 import { ContentGenerator } from "./generator";
 import { RecommendationList } from "./rec-list";
 import { CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
+import { useT } from "@/lib/i18n";
 import type { Recommendation } from "@/lib/types";
 
 export function OptimizeClient({
@@ -26,14 +27,12 @@ export function OptimizeClient({
     validPrefill ? { type: validPrefill } : null
   );
   const generatorRef = useRef<HTMLDivElement>(null);
+  const t = useT();
 
   return (
     <div className="stagger space-y-4">
       <Card>
-        <CardHeader
-          title="Recommended actions"
-          hint="Prioritized from your latest scan — click the circle to track progress"
-        />
+        <CardHeader title={t("dashboard.recommendedActions")} hint={t("generator.recHint")} />
         <div className="px-5 pb-2">
           <RecommendationList
             recommendations={recommendations}
@@ -46,7 +45,7 @@ export function OptimizeClient({
       </Card>
 
       <div ref={generatorRef} className="scroll-mt-20">
-        <h2 className="mb-2 px-1 text-sm font-semibold">Content generator</h2>
+        <h2 className="mb-2 px-1 text-sm font-semibold">{t("generator.contentGenerator")}</h2>
         <ContentGenerator
           projectId={projectId}
           initialType={selected?.type}

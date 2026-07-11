@@ -34,7 +34,7 @@ export default async function TrendsPage() {
           title={t("trends.title")}
           subtitle={t("trends.subtitleLocked", { country: project.country, language: langLabel })}
         />
-        <LockedOverlay message={t("trends.locked")}>
+        <LockedOverlay message={t("trends.locked")} cta={t("common.upgrade")}>
           <Card>
             <CardHeader
               title={t("trends.trendingSearches")}

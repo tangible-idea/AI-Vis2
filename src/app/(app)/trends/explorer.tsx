@@ -6,6 +6,7 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, Search, Wand2 } from "lucide-
 import { Button, Card, CardHeader, Input, Select } from "@/components/ui";
 import { TIMEFRAMES, type TrendResult, type Timeframe } from "@/lib/trends";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 function DirectionIcon({ direction }: { direction: TrendResult["direction"] }) {
   if (direction === "rising") return <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-good" />;
@@ -15,38 +16,39 @@ function DirectionIcon({ direction }: { direction: TrendResult["direction"] }) {
 
 /** One trend per row: keyword, growth, direction, one-click generate. */
 export function TrendRows({ results, related }: { results: TrendResult[]; related?: (kw: string) => void }) {
+  const t = useT();
   if (!results.length) {
-    return <p className="py-4 text-sm text-ink-faint">No results — try different keywords.</p>;
+    return <p className="py-4 text-sm text-ink-faint">{t("trends.noResults")}</p>;
   }
   return (
     <div className="divide-y divide-line">
-      {results.map((t) => (
-        <div key={t.keyword} className="flex items-center gap-3 py-2.5">
-          <DirectionIcon direction={t.direction} />
+      {results.map((row) => (
+        <div key={row.keyword} className="flex items-center gap-3 py-2.5">
+          <DirectionIcon direction={row.direction} />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-ink">{t.keyword}</p>
-            <p className="truncate text-[11px] text-ink-faint">{t.contentAngle}</p>
+            <p className="truncate text-sm text-ink">{row.keyword}</p>
+            <p className="truncate text-[11px] text-ink-faint">{row.contentAngle}</p>
           </div>
-          <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
-            {t.growth >= 0 ? "+" : ""}
-            {t.growth}%
+          <span className={cn("tabular text-xs", row.growth >= 0 ? "text-good" : "text-poor")}>
+            {row.growth >= 0 ? "+" : ""}
+            {row.growth}%
           </span>
-          <span className="tabular hidden w-16 text-right text-xs text-ink-faint sm:block">{t.volume}</span>
+          <span className="tabular hidden w-16 text-right text-xs text-ink-faint sm:block">{row.volume}</span>
           {related && (
             <button
-              onClick={() => related(t.keyword)}
+              onClick={() => related(row.keyword)}
               className="hidden cursor-pointer text-xs text-ink-faint hover:text-accent-strong sm:block"
-              title="Show related searches"
+              title={t("trends.related")}
             >
-              Related
+              {t("trends.related")}
             </button>
           )}
           <Link
-            href={`/optimize?type=${t.suggestion.type}&topic=${encodeURIComponent(t.keyword)}`}
+            href={`/optimize?type=${row.suggestion.type}&topic=${encodeURIComponent(row.keyword)}`}
             className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-line-strong px-2.5 py-1 text-xs font-medium text-ink hover:bg-hover"
           >
             <Wand2 className="h-3 w-3" />
-            {t.suggestion.label}
+            {row.suggestion.label}
           </Link>
         </div>
       ))}
@@ -68,8 +70,9 @@ export function TrendsExplorer({
   const [topics, setTopics] = useState(initialTopics);
   const [query, setQuery] = useState("");
   const [keywordResults, setKeywordResults] = useState<TrendResult[] | null>(null);
-  const [keywordHeading, setKeywordHeading] = useState("Keyword results");
+  const [keywordHeading, setKeywordHeading] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const t = useT();
 
   async function api(mode: string, q = "", tf = timeframe): Promise<TrendResult[]> {
     const params = new URLSearchParams({ projectId, mode, q, timeframe: tf });
@@ -93,7 +96,9 @@ export function TrendsExplorer({
     if (!query.trim()) return;
     setBusy(true);
     const kws = query.split(",").map((s) => s.trim()).filter(Boolean);
-    setKeywordHeading(kws.length > 1 ? `Comparing ${kws.length} keywords` : `Interest in "${kws[0]}"`);
+    setKeywordHeading(
+      kws.length > 1 ? t("trends.comparing", { count: kws.length }) : t("trends.interestIn", { kw: kws[0] })
+    );
     setKeywordResults(await api("search", query));
     setBusy(false);
   }
@@ -101,7 +106,7 @@ export function TrendsExplorer({
   async function related(keyword: string) {
     setBusy(true);
     setQuery(keyword);
-    setKeywordHeading(`Related to "${keyword}"`);
+    setKeywordHeading(t("trends.relatedTo", { kw: keyword }));
     setKeywordResults(await api("related", keyword));
     setBusy(false);
   }
@@ -122,9 +127,9 @@ export function TrendsExplorer({
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search a keyword — or several, comma-separated, to compare"
+              placeholder={t("trends.searchPlaceholder")}
               className="pl-8"
-              aria-label="Search keywords"
+              aria-label={t("common.search")}
             />
           </div>
           <Select
@@ -140,14 +145,17 @@ export function TrendsExplorer({
             ))}
           </Select>
           <Button type="submit" size="md" disabled={busy}>
-            {busy ? "Loading…" : "Search"}
+            {busy ? t("common.loading") : t("common.search")}
           </Button>
         </form>
       </Card>
 
       {keywordResults && (
         <Card>
-          <CardHeader title={keywordHeading} hint="Interest change over the selected timeframe" />
+          <CardHeader
+            title={keywordHeading ?? t("trends.keywordResults")}
+            hint={t("trends.interestHint")}
+          />
           <div className="px-5 pb-4">
             <TrendRows results={keywordResults} related={related} />
           </div>
@@ -155,14 +163,14 @@ export function TrendsExplorer({
       )}
 
       <Card>
-        <CardHeader title="Trending searches" hint="Rising queries in your category and market" />
+        <CardHeader title={t("trends.trendingSearches")} hint={t("trends.risingQueries")} />
         <div className="px-5 pb-4">
           <TrendRows results={searches} related={related} />
         </div>
       </Card>
 
       <Card>
-        <CardHeader title="Trending topics" hint="Broader themes gaining attention" />
+        <CardHeader title={t("trends.trendingTopics")} hint={t("trends.topicsHint")} />
         <div className="px-5 pb-4">
           <TrendRows results={topics} related={related} />
         </div>

@@ -218,7 +218,7 @@ export default async function MonitorPage() {
             </div>
           </Card>
         ) : (
-          <LockedOverlay message={t("monitor.trendsLocked")}>
+          <LockedOverlay message={t("monitor.trendsLocked")} cta={t("common.upgrade")}>
             <Card>
               <CardHeader
                 title={t("monitor.trendingSearches")}

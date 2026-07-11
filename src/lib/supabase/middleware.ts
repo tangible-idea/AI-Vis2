@@ -27,9 +27,13 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims verifies the JWT locally (cached JWKS) on asymmetric-key
+  // projects — no auth-server round trip per request, unlike getUser().
+  // Symmetric-key projects fall back to getUser() internally, and expired
+  // sessions still refresh via the cookie handlers above. Middleware only
+  // gates redirects; data access stays protected by RLS + per-route getUser.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const { pathname } = request.nextUrl;
   const isPublic =

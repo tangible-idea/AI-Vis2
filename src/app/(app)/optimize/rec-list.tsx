@@ -6,6 +6,7 @@ import { updateRecommendationStatus } from "../actions";
 import { Badge } from "@/components/ui";
 import { CONTENT_TYPES } from "@/lib/content/templates";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import type { Recommendation, RecommendationStatus } from "@/lib/types";
 
 const NEXT_STATUS: Record<RecommendationStatus, RecommendationStatus> = {
@@ -28,13 +29,15 @@ export function RecommendationList({
   onGenerate: (rec: Recommendation) => void;
 }) {
   const [, startTransition] = useTransition();
+  const t = useT();
+  const priorityLabel = {
+    high: t("common.priorityHigh"),
+    medium: t("common.priorityMedium"),
+    low: t("common.priorityLow"),
+  } as const;
 
   if (!recommendations.length) {
-    return (
-      <p className="py-4 text-sm text-ink-faint">
-        No recommendations yet — run a scan on Monitor to generate them.
-      </p>
-    );
+    return <p className="py-4 text-sm text-ink-faint">{t("generator.noRecommendations")}</p>;
   }
 
   return (
@@ -75,7 +78,7 @@ export function RecommendationList({
                       rec.priority === "high" ? "poor" : rec.priority === "medium" ? "mid" : "neutral"
                     }
                   >
-                    {rec.priority} priority
+                    {priorityLabel[rec.priority]}
                   </Badge>
                   <span className="text-[11px] text-ink-faint">{rec.impact}</span>
                   <span className="text-[11px] text-ink-faint">·</span>
@@ -86,7 +89,7 @@ export function RecommendationList({
                 onClick={() => onGenerate(rec)}
                 className="shrink-0 cursor-pointer rounded-lg border border-line-strong px-2.5 py-1 text-xs font-medium text-ink hover:bg-hover"
               >
-                Generate {typeLabel}
+                {t("generator.generateType", { type: typeLabel })}
               </button>
             </div>
           </div>
