@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Card, CardHeader, PageHeader, Badge } from "@/components/ui";
 import { CONTENT_LANGUAGES, type GeneratedContent, type Recommendation } from "@/lib/types";
+import { getT } from "@/lib/i18n/server";
 import { OptimizeClient } from "./optimize-client";
 
 export const metadata = { title: "Optimize" };
@@ -15,6 +16,7 @@ export default async function OptimizePage({
   const { project } = await requireProject();
   const supabase = await createClient();
   const { type: prefillType, topic: prefillTopic } = await searchParams;
+  const t = await getT();
 
   const [{ data: recs }, { data: library }] = await Promise.all([
     supabase
@@ -33,10 +35,7 @@ export default async function OptimizePage({
 
   return (
     <>
-      <PageHeader
-        title="Optimize"
-        subtitle="What should I do next? Ready-to-publish assets, not generic advice"
-      />
+      <PageHeader title={t("optimize.title")} subtitle={t("optimize.subtitle")} />
 
       <OptimizeClient
         projectId={project.id}
@@ -47,7 +46,7 @@ export default async function OptimizePage({
 
       {(library ?? []).length > 0 && (
         <Card className="mt-4">
-          <CardHeader title="Content library" hint="Everything you've generated and saved" />
+          <CardHeader title={t("optimize.library")} hint={t("optimize.libraryHint")} />
           <div className="divide-y divide-line px-5 pb-4">
             {(library as GeneratedContent[]).map((c) => (
               <details key={c.id} className="group py-3">

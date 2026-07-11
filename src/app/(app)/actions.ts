@@ -105,6 +105,96 @@ export async function createProject(
   return { projectId: project.id };
 }
 
+/**
+ * Adds a market view for an existing brand: clones the project for another
+ * country so it gets its own prompts, scans, history and reports. Markets
+ * reuse the project infrastructure end-to-end — no parallel data model.
+ */
+export async function addMarket(projectId: string, country: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: source } = await supabase.from("projects").select("*").eq("id", projectId).single();
+  if (!source) return { error: "Project not found" };
+  if (source.user_id !== user.id) return { error: "Only the workspace owner can add markets." };
+
+  // already tracking this country for the brand? just switch to it
+  const { data: siblings } = await supabase
+    .from("projects")
+    .select("id, website, country")
+    .eq("user_id", user.id)
+    .eq("website", source.website);
+  const existing = (siblings ?? []).find((p) => p.country === country);
+  if (existing) {
+    await switchProject(existing.id);
+    return {};
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
+  const limits = planLimits(profile?.plan);
+  const { count: projectCount } = await supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("is_demo", false);
+  if ((projectCount ?? 0) >= limits.maxProjects) {
+    return {
+      error: `Your ${limits.label} plan includes ${limits.maxProjects} workspace${limits.maxProjects > 1 ? "s" : ""} (markets count as workspaces). Upgrade to monitor more countries.`,
+    };
+  }
+
+  const { data: project, error } = await supabase
+    .from("projects")
+    .insert({
+      user_id: user.id,
+      name: source.name,
+      website: source.website,
+      industry: source.industry,
+      country,
+      language: source.language,
+      target_market: source.target_market,
+      description: source.description,
+    })
+    .select()
+    .single();
+  if (error || !project) return { error: error?.message ?? "Could not create market" };
+
+  // carry competitors over; prompts are regenerated for the new country
+  const { data: competitors } = await supabase
+    .from("competitors")
+    .select("name, website, position")
+    .eq("project_id", source.id)
+    .order("position");
+  if (competitors?.length) {
+    await supabase.from("competitors").insert(
+      competitors.map((c) => ({ ...c, user_id: user.id, project_id: project.id }))
+    );
+  }
+
+  const prompts = generateDefaultPrompts({
+    brand: source.name,
+    industry: source.industry,
+    country,
+    competitors: (competitors ?? []).map((c) => c.name),
+  });
+  await supabase.from("prompts").insert(
+    prompts.slice(0, limits.maxPrompts).map((p) => ({
+      user_id: user.id,
+      project_id: project.id,
+      text: p.text,
+      category: p.category,
+    }))
+  );
+
+  const cookieStore = await cookies();
+  cookieStore.set(PROJECT_COOKIE, project.id, { path: "/", maxAge: 60 * 60 * 24 * 365 });
+  revalidatePath("/", "layout");
+  return {};
+}
+
 export async function addComment(projectId: string, body: string) {
   const supabase = await createClient();
   const {

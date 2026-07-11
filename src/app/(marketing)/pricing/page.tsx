@@ -8,6 +8,12 @@ export const metadata = { title: "Pricing" };
 
 const ORDER: ("free" | "starter" | "pro")[] = ["free", "starter", "pro"];
 
+const TAGLINES: Record<(typeof ORDER)[number], string> = {
+  free: "See where you stand",
+  starter: "Measure, improve and report — weekly",
+  pro: "Everything in Starter, at agency scale",
+};
+
 export default function PricingPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -15,7 +21,8 @@ export default function PricingPage() {
         Pricing that scales <span className="font-display italic">with your visibility</span>
       </h1>
       <p className="mx-auto mt-3 max-w-md text-center text-sm text-ink-soft">
-        Start free, upgrade when the score starts moving. No credit card required.
+        Start free, upgrade when the score starts moving. Most teams pick Starter — weekly scans,
+        trends and content generation for one focused price. No credit card required.
       </p>
 
       <div className="mt-12 overflow-x-auto">
@@ -26,14 +33,22 @@ export default function PricingPage() {
               {ORDER.map((plan) => (
                 <th
                   key={plan}
-                  className={`rounded-t-xl px-4 pb-4 pt-5 text-center ${plan === "starter" ? "bg-accent-soft" : ""}`}
+                  className={`rounded-t-xl px-4 pb-4 pt-5 text-center align-top ${plan === "starter" ? "bg-accent-soft" : ""}`}
                 >
+                  {plan === "starter" && (
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-accent-strong">
+                      Most popular
+                    </p>
+                  )}
                   <p className="text-sm font-semibold">{PLANS[plan].label}</p>
                   <p className="mt-1">
                     <span className="tabular text-2xl font-medium">{PLANS[plan].price}</span>
                     <span className="ml-1 text-xs font-normal text-ink-faint">
                       {PLANS[plan].priceNote}
                     </span>
+                  </p>
+                  <p className="mt-1 text-[11px] font-normal leading-snug text-ink-faint">
+                    {TAGLINES[plan]}
                   </p>
                 </th>
               ))}
@@ -43,6 +58,11 @@ export default function PricingPage() {
             {PLAN_FEATURES.map((row, i) => (
               <tr key={row.label}>
                 <td className="border-t border-line py-2.5 pr-4 text-[13px] text-ink-soft">
+                  {row.group && (
+                    <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-widest text-ink-faint">
+                      {row.group}
+                    </span>
+                  )}
                   {row.label}
                 </td>
                 {ORDER.map((plan) => {
@@ -89,8 +109,10 @@ export default function PricingPage() {
         </table>
       </div>
 
-      <p className="mt-8 text-center text-xs text-ink-faint">
-        * Fair-use limits apply. Annual billing (2 months free) coming soon.
+      <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink-faint">
+        Pro includes everything in Starter, plus more capacity, API access and white label reports.
+        Cancel anytime — your plan stays active until the end of the billing period.
+        <br />* Fair-use limits apply. Annual billing (2 months free) coming soon.
       </p>
     </main>
   );

@@ -3,23 +3,23 @@ import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
-import { CONTENT_LANGUAGES, type Competitor, type Prompt } from "@/lib/types";
+import { CONTENT_LANGUAGES, COUNTRIES, type Competitor, type Prompt } from "@/lib/types";
 import { updateProject, addCompetitor, addPrompt, inviteMember } from "./actions";
 import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
 import { MemberList } from "./member-list";
 import { DeleteProjectButton } from "./danger";
+import { getT } from "@/lib/i18n/server";
 import type { ProjectMember } from "@/lib/types";
 
 export const metadata = { title: "Settings" };
-
-const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", "VN", "ID", "MY"];
 
 export default async function SettingsPage() {
   const { project, profile, userId } = await requireProject();
   const supabase = await createClient();
   const limits = planLimits(profile.plan);
   const isOwner = project.user_id === userId;
+  const t = await getT();
 
   const [{ data: competitors }, { data: prompts }, { data: members }] = await Promise.all([
     supabase
@@ -43,36 +43,36 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" subtitle="Project, prompts and competitors" />
+      <PageHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
 
       <div className="stagger space-y-4">
         <Card>
-          <CardHeader title="Project" />
+          <CardHeader title={t("settings.project")} />
           <form action={updateProject} className="space-y-4 px-5 pb-5">
             <input type="hidden" name="projectId" value={project.id} />
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="s-name">Company / brand</Label>
+                <Label htmlFor="s-name">{t("settings.companyBrand")}</Label>
                 <Input id="s-name" name="name" defaultValue={project.name} required />
               </div>
               <div>
-                <Label htmlFor="s-website">Website</Label>
+                <Label htmlFor="s-website">{t("settings.website")}</Label>
                 <Input id="s-website" name="website" type="url" defaultValue={project.website} required />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="s-industry">Industry</Label>
+                <Label htmlFor="s-industry">{t("settings.industry")}</Label>
                 <Input id="s-industry" name="industry" defaultValue={project.industry} required />
               </div>
               <div>
-                <Label htmlFor="s-target">Target market</Label>
+                <Label htmlFor="s-target">{t("settings.targetMarket")}</Label>
                 <Input id="s-target" name="target_market" defaultValue={project.target_market ?? ""} />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="s-country">Country</Label>
+                <Label htmlFor="s-country">{t("common.country")}</Label>
                 <Select id="s-country" name="country" defaultValue={project.country}>
                   {COUNTRIES.map((c) => (
                     <option key={c}>{c}</option>
@@ -80,7 +80,7 @@ export default async function SettingsPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="s-language">Language</Label>
+                <Label htmlFor="s-language">{t("common.language")}</Label>
                 <Select id="s-language" name="language" defaultValue={project.language}>
                   {CONTENT_LANGUAGES.map((l) => (
                     <option key={l.code} value={l.code}>
@@ -91,15 +91,19 @@ export default async function SettingsPage() {
               </div>
             </div>
             <Button type="submit" variant="secondary" size="sm">
-              Save changes
+              {t("common.saveChanges")}
             </Button>
           </form>
         </Card>
 
         <Card>
           <CardHeader
-            title="Competitors"
-            hint={`${competitorList.length} of ${limits.maxCompetitors} on your ${limits.label} plan — enter a domain, we fetch the name and logo. Drag to reorder.`}
+            title={t("settings.competitors")}
+            hint={t("settings.competitorsHint", {
+              count: competitorList.length,
+              max: limits.maxCompetitors,
+              plan: limits.label,
+            })}
           />
           <div className="space-y-4 px-5 pb-5">
             <CompetitorList projectId={project.id} competitors={competitorList} />
@@ -108,16 +112,15 @@ export default async function SettingsPage() {
                 <input type="hidden" name="projectId" value={project.id} />
                 <Input name="domain" placeholder="competitor.com" className="max-w-xs" />
                 <Button type="submit" variant="secondary" size="sm" className="h-9.5">
-                  Add
+                  {t("common.add")}
                 </Button>
               </form>
             ) : (
               <p className="text-xs text-mid">
-                Competitor limit reached —{" "}
+                {t("settings.competitorLimit")}{" "}
                 <Link href="/billing" className="underline">
-                  upgrade
-                </Link>{" "}
-                to track more.
+                  {t("settings.upgradeToTrackMore")}
+                </Link>
               </p>
             )}
           </div>
@@ -125,8 +128,12 @@ export default async function SettingsPage() {
 
         <Card>
           <CardHeader
-            title="Scan prompts"
-            hint={`${activePrompts} active of ${limits.maxPrompts} on your ${limits.label} plan — these are the questions we ask every engine`}
+            title={t("settings.prompts")}
+            hint={t("settings.promptsHint", {
+              count: activePrompts,
+              max: limits.maxPrompts,
+              plan: limits.label,
+            })}
           />
           <div className="space-y-4 px-5 pb-5">
             <PromptRows prompts={promptList} />
@@ -135,16 +142,15 @@ export default async function SettingsPage() {
                 <input type="hidden" name="projectId" value={project.id} />
                 <Input name="text" placeholder='Add a prompt, e.g. "best CRM for startups"' />
                 <Button type="submit" variant="secondary" size="sm" className="h-9.5">
-                  Add
+                  {t("common.add")}
                 </Button>
               </form>
             ) : (
               <p className="text-xs text-mid">
-                Prompt limit reached —{" "}
+                {t("settings.promptLimit")}{" "}
                 <Link href="/billing" className="underline">
-                  upgrade
-                </Link>{" "}
-                to track more.
+                  {t("settings.upgradeToTrackMore")}
+                </Link>
               </p>
             )}
           </div>
@@ -152,11 +158,15 @@ export default async function SettingsPage() {
 
         <Card>
           <CardHeader
-            title="Team"
+            title={t("settings.team")}
             hint={
               limits.team
-                ? `${memberList.length} of ${limits.maxTeamMembers} seats on your ${limits.label} plan — members can run scans and generate content, viewers see reports only`
-                : "Invite teammates on Starter and Pro — members can run scans, generate content and comment"
+                ? t("settings.teamHint", {
+                    count: memberList.length,
+                    max: limits.maxTeamMembers,
+                    plan: limits.label,
+                  })
+                : t("settings.teamLockedHint")
             }
           />
           <div className="space-y-4 px-5 pb-5">
@@ -174,42 +184,40 @@ export default async function SettingsPage() {
                       required
                     />
                     <Select name="role" defaultValue="member" className="w-28">
-                      <option value="member">Member</option>
-                      <option value="viewer">Viewer</option>
+                      <option value="member">{t("common.member")}</option>
+                      <option value="viewer">{t("common.viewer")}</option>
                     </Select>
                     <Button type="submit" variant="secondary" size="sm" className="h-9.5">
-                      Invite
+                      {t("common.invite")}
                     </Button>
                   </form>
                 )}
                 {memberList.some((m) => !m.accepted_at) && (
-                  <p className="text-xs text-ink-faint">
-                    Pending invites activate automatically when the teammate signs in with that email.
-                  </p>
+                  <p className="text-xs text-ink-faint">{t("settings.pendingInvites")}</p>
                 )}
               </>
             ) : (
               <p className="text-xs text-mid">
-                Team seats are available on Starter and Pro —{" "}
+                {t("settings.teamLocked")}{" "}
                 <Link href="/billing" className="underline">
-                  upgrade
-                </Link>{" "}
-                to collaborate.
+                  {t("settings.upgradeToCollaborate")}
+                </Link>
               </p>
             )}
           </div>
         </Card>
 
         <Card>
-          <CardHeader title="Account" />
+          <CardHeader title={t("settings.account")} />
           <div className="px-5 pb-5 text-sm text-ink-soft">
             <p>
               {profile.full_name || "—"} · {profile.email}
             </p>
             <p className="mt-1 text-xs text-ink-faint">
-              Plan: <span className="font-medium uppercase">{profile.plan}</span> — manage on{" "}
+              {t("settings.planLabel")} <span className="font-medium uppercase">{profile.plan}</span>{" "}
+              — {t("settings.manageOn")}{" "}
               <Link href="/billing" className="text-accent-strong underline">
-                Billing
+                {t("nav.billing")}
               </Link>
             </p>
           </div>
@@ -217,7 +225,7 @@ export default async function SettingsPage() {
 
         {isOwner && (
           <Card className="border-poor/20">
-            <CardHeader title="Danger zone" hint="Deletes the workspace with all scans and content" />
+            <CardHeader title={t("settings.dangerZone")} hint={t("settings.dangerHint")} />
             <div className="px-5 pb-5">
               <DeleteProjectButton projectId={project.id} name={project.name} />
             </div>

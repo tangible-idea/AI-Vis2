@@ -9,6 +9,7 @@ import { Card, CardHeader, EmptyState, PageHeader, Badge, LockedOverlay } from "
 import { VisibilityHeatmap } from "@/components/charts";
 import { ScanButton } from "@/components/scan-button";
 import { TrendingUp } from "lucide-react";
+import { getT } from "@/lib/i18n/server";
 import type { Engine, Prompt, ScanResult } from "@/lib/types";
 
 export const metadata = { title: "Monitor" };
@@ -17,6 +18,7 @@ export default async function MonitorPage() {
   const { project, profile } = await requireProject();
   const supabase = await createClient();
   const limits = planLimits(profile.plan);
+  const t = await getT();
 
   const [{ data: scans }, { data: prompts }] = await Promise.all([
     supabase
@@ -60,11 +62,15 @@ export default async function MonitorPage() {
   return (
     <>
       <PageHeader
-        title="Monitor"
+        title={t("monitor.title")}
         subtitle={
           lastDone
-            ? `What AI actually says about you — scan ${timeAgo(lastDone.completed_at)} · ${promptList.length} prompts × ${ENGINE_IDS.length} platforms`
-            : "What does AI say about you? Run a scan to find out"
+            ? t("monitor.subtitleScanned", {
+                time: timeAgo(lastDone.completed_at),
+                prompts: promptList.length,
+                engines: ENGINE_IDS.length,
+              })
+            : t("monitor.subtitleEmpty")
         }
         action={<ScanButton projectId={project.id} />}
       />
@@ -72,18 +78,12 @@ export default async function MonitorPage() {
       <div className="stagger space-y-4">
         {/* heatmap */}
         <Card>
-          <CardHeader
-            title="Visibility heatmap"
-            hint="Where your brand appears, prompt by prompt"
-          />
+          <CardHeader title={t("monitor.heatmap")} hint={t("monitor.heatmapHint")} />
           <div className="px-5 pb-5">
             {heatmapRows.length && resultList.length ? (
               <VisibilityHeatmap rows={heatmapRows} />
             ) : (
-              <EmptyState
-                title="No results yet"
-                body="Your first completed scan will map every prompt against every engine here."
-              />
+              <EmptyState title={t("monitor.noResults")} body={t("monitor.noResultsBody")} />
             )}
           </div>
         </Card>
@@ -92,8 +92,8 @@ export default async function MonitorPage() {
         {resultList.length > 0 && (
           <Card>
             <CardHeader
-              title="Prompt explorer"
-              hint="What each engine actually said — mentions, competitors and sources per answer"
+              title={t("monitor.promptExplorer")}
+              hint={t("monitor.promptExplorerHint")}
             />
             <div className="divide-y divide-line px-5 pb-4">
               {promptList.map((p) => {
@@ -134,11 +134,11 @@ export default async function MonitorPage() {
                               {engineInfo(r.engine).label}
                             </span>
                             <span className="flex items-center gap-1">
-                              {r.recommended && <Badge tone="good">recommended</Badge>}
+                              {r.recommended && <Badge tone="good">{t("monitor.recommendedBadge")}</Badge>}
                               {r.brand_mentioned && r.brand_position && (
                                 <Badge tone="neutral">#{r.brand_position}</Badge>
                               )}
-                              {!r.brand_mentioned && <Badge tone="poor">not mentioned</Badge>}
+                              {!r.brand_mentioned && <Badge tone="poor">{t("monitor.notMentioned")}</Badge>}
                               <span className="text-[10px] text-ink-faint">{timeAgo(r.created_at)}</span>
                             </span>
                           </div>
@@ -149,13 +149,13 @@ export default async function MonitorPage() {
                             <div className="mt-2 space-y-1 border-t border-line pt-2">
                               {r.competitors_mentioned.length > 0 && (
                                 <p className="text-[11px] text-ink-faint">
-                                  <span className="font-medium text-ink-soft">Competitors:</span>{" "}
+                                  <span className="font-medium text-ink-soft">{t("monitor.competitorsLabel")}</span>{" "}
                                   {r.competitors_mentioned.join(", ")}
                                 </p>
                               )}
                               {(r.sources ?? []).length > 0 && (
                                 <p className="truncate text-[11px] text-ink-faint">
-                                  <span className="font-medium text-ink-soft">Sources:</span>{" "}
+                                  <span className="font-medium text-ink-soft">{t("monitor.sourcesLabel")}</span>{" "}
                                   {(r.sources ?? []).map((s, i) => (
                                     <span key={s.url}>
                                       {i > 0 && ", "}
@@ -187,11 +187,11 @@ export default async function MonitorPage() {
         {limits.trends ? (
           <Card>
             <CardHeader
-              title="Trending searches"
-              hint={`Rising searches in ${project.industry} — explore more on Trends`}
+              title={t("monitor.trendingSearches")}
+              hint={t("monitor.trendingHint", { industry: project.industry })}
               action={
                 <Link href="/trends" className="text-xs text-accent-strong hover:underline">
-                  Explore
+                  {t("common.explore")}
                 </Link>
               }
             />
@@ -218,9 +218,12 @@ export default async function MonitorPage() {
             </div>
           </Card>
         ) : (
-          <LockedOverlay message="Trending searches are available on Starter and Pro">
+          <LockedOverlay message={t("monitor.trendsLocked")}>
             <Card>
-              <CardHeader title="Trending searches" hint="Rising searches in your category" />
+              <CardHeader
+                title={t("monitor.trendingSearches")}
+                hint={t("monitor.trendingHint", { industry: project.industry })}
+              />
               <div className="space-y-3 px-5 pb-5">
                 {trends.slice(0, 3).map((t) => (
                   <div key={t.keyword} className="h-8 rounded bg-hover" />
@@ -232,10 +235,10 @@ export default async function MonitorPage() {
 
         {/* scan history */}
         <Card>
-          <CardHeader title="Scan history" />
+          <CardHeader title={t("monitor.scanHistory")} />
           <div className="divide-y divide-line px-5 pb-3">
             {(scans ?? []).length === 0 && (
-              <p className="py-4 text-sm text-ink-faint">No scans yet.</p>
+              <p className="py-4 text-sm text-ink-faint">{t("monitor.noScansYet")}</p>
             )}
             {(scans ?? []).map((s) => (
               <div key={s.id} className="flex items-center gap-3 py-2.5 text-sm">

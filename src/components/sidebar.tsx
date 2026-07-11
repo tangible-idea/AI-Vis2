@@ -21,40 +21,41 @@ import type { Plan, Project } from "@/lib/types";
 import { switchProject } from "@/app/(app)/actions";
 import { logout } from "@/app/(auth)/actions";
 import { LegalLinks } from "@/components/legal-links";
+import { useT } from "@/lib/i18n";
 
 /** Navigation mirrors the product journey: Measure → Optimize → Improve → Share. */
-const NAV_GROUPS: { label: string | null; items: { href: string; label: string; icon: typeof Radar }[] }[] = [
+const NAV_GROUPS: { labelKey: string | null; items: { href: string; labelKey: string; icon: typeof Radar }[] }[] = [
   {
-    label: "Measure",
+    labelKey: "nav.groupMeasure",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/monitor", label: "Monitor", icon: Radar },
-      { href: "/sources", label: "Sources", icon: Link2 },
+      { href: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+      { href: "/monitor", labelKey: "nav.monitor", icon: Radar },
+      { href: "/sources", labelKey: "nav.sources", icon: Link2 },
     ],
   },
   {
-    label: "Optimize",
+    labelKey: "nav.groupOptimize",
     items: [
-      { href: "/trends", label: "Trends", icon: Flame },
-      { href: "/optimize", label: "Optimize", icon: Wand2 },
+      { href: "/trends", labelKey: "nav.trends", icon: Flame },
+      { href: "/optimize", labelKey: "nav.optimize", icon: Wand2 },
     ],
   },
   {
-    label: "Improve",
+    labelKey: "nav.groupImprove",
     items: [
-      { href: "/timeline", label: "Timeline", icon: History },
-      { href: "/improve", label: "Improve", icon: TrendingUp },
+      { href: "/timeline", labelKey: "nav.timeline", icon: History },
+      { href: "/improve", labelKey: "nav.improve", icon: TrendingUp },
     ],
   },
   {
-    label: "Share",
-    items: [{ href: "/reports", label: "Reports", icon: FileText }],
+    labelKey: "nav.groupShare",
+    items: [{ href: "/reports", labelKey: "nav.reports", icon: FileText }],
   },
   {
-    label: null,
+    labelKey: null,
     items: [
-      { href: "/billing", label: "Billing", icon: CreditCard },
-      { href: "/settings", label: "Settings", icon: Settings },
+      { href: "/billing", labelKey: "nav.billing", icon: CreditCard },
+      { href: "/settings", labelKey: "nav.settings", icon: Settings },
     ],
   },
 ];
@@ -73,7 +74,14 @@ export function Sidebar({
   mockMode: boolean;
 }) {
   const pathname = usePathname();
+  const t = useT();
   const active = projects.find((p) => p.id === activeProjectId);
+
+  // brands with several market views show their country to stay distinguishable
+  const nameCounts = new Map<string, number>();
+  for (const p of projects) nameCounts.set(p.name, (nameCounts.get(p.name) ?? 0) + 1);
+  const projectLabel = (p: Project) =>
+    `${p.name}${(nameCounts.get(p.name) ?? 0) > 1 ? ` · ${p.country}` : ""}${p.is_demo ? " (demo)" : ""}`;
 
   return (
     <>
@@ -92,12 +100,11 @@ export function Sidebar({
               value={activeProjectId ?? ""}
               onChange={(e) => switchProject(e.target.value)}
               className="w-full cursor-pointer appearance-none truncate rounded-lg border border-line bg-paper py-1.5 pl-2.5 pr-7 text-xs font-medium text-ink hover:bg-hover focus:outline-none"
-              aria-label="Switch project"
+              aria-label={t("nav.switchProject")}
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
-                  {p.is_demo ? " (demo)" : ""}
+                  {projectLabel(p)}
                 </option>
               ))}
             </select>
@@ -107,14 +114,14 @@ export function Sidebar({
 
         <nav className="flex-1 space-y-3 overflow-y-auto px-3">
           {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label ?? gi}>
-              {group.label && (
+            <div key={group.labelKey ?? gi}>
+              {group.labelKey && (
                 <p className="mb-0.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
-                  {group.label}
+                  {t(group.labelKey)}
                 </p>
               )}
               <div className="space-y-0.5">
-                {group.items.map(({ href, label, icon: Icon }) => {
+                {group.items.map(({ href, labelKey, icon: Icon }) => {
                   const isActive = pathname.startsWith(href);
                   return (
                     <Link
@@ -128,7 +135,7 @@ export function Sidebar({
                       )}
                     >
                       <Icon className="h-4 w-4" strokeWidth={1.8} />
-                      {label}
+                      {t(labelKey)}
                     </Link>
                   );
                 })}
@@ -140,7 +147,7 @@ export function Sidebar({
         <div className="space-y-2 border-t border-line px-3 py-3">
           {mockMode && (
             <p className="rounded-md bg-mid-soft px-2 py-1 text-[10px] font-medium leading-tight text-mid">
-              Mock mode — set POE_API_KEY for real scans
+              {t("nav.mockMode")}
             </p>
           )}
           <div className="flex items-center justify-between px-1">
@@ -151,7 +158,7 @@ export function Sidebar({
               onClick={() => logout()}
               className="flex cursor-pointer items-center gap-1 text-[11px] text-ink-faint hover:text-ink"
             >
-              <LogOut className="h-3 w-3" /> Log out
+              <LogOut className="h-3 w-3" /> {t("common.logOut")}
             </button>
           </div>
         </div>
@@ -177,18 +184,18 @@ export function Sidebar({
               value={activeProjectId ?? ""}
               onChange={(e) => switchProject(e.target.value)}
               className="max-w-[45%] truncate rounded-md border border-line bg-paper px-2 py-1 text-xs"
-              aria-label="Switch project"
+              aria-label={t("nav.switchProject")}
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {projectLabel(p)}
                 </option>
               ))}
             </select>
           )}
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
-          {NAV.map(({ href, label }) => (
+          {NAV.map(({ href, labelKey }) => (
             <Link
               key={href}
               href={href}
@@ -199,7 +206,7 @@ export function Sidebar({
                   : "text-ink-soft hover:bg-hover"
               )}
             >
-              {label}
+              {t(labelKey)}
             </Link>
           ))}
         </nav>

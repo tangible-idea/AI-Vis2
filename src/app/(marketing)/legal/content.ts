@@ -114,7 +114,8 @@ export const LEGAL_DOCS: LegalDoc[] = [
       {
         heading: "4. Subscriptions and billing",
         body: [
-          `Paid plans are billed through Polar.sh on the cycle shown at checkout and renew automatically until cancelled. Cancelling stops future renewals; your plan remains active until the end of the paid period. Lifetime plans are one-time purchases governed by the limits stated at purchase. Taxes may be added where required. See the Refund Policy for refunds.`,
+          `Paid plans are billed through Polar.sh on the cycle shown at checkout and renew automatically until cancelled. You can cancel your subscription at any time from the billing page; cancelling stops future renewals and your plan remains fully active until the end of the current paid billing period. Amounts already paid for the current billing period are non-refundable except where applicable law requires otherwise. Taxes may be added where required.`,
+          `Lifetime plans are one-time purchases that provide ongoing access within the plan limits stated at the time of purchase. Those limits are fixed to the offer purchased and may differ from our subscription plans; purchases made through a partner marketplace (such as AppSumo) are also subject to that marketplace's purchase terms.`,
         ],
       },
       {
@@ -216,35 +217,6 @@ export const LEGAL_DOCS: LegalDoc[] = [
         body: [
           `We may remove content, suspend features or terminate accounts that breach this policy, with notice where practical. Report abuse to ${CONTACT_EMAIL}.`,
         ],
-      },
-    ],
-  },
-  {
-    slug: "refunds",
-    title: "Refund Policy",
-    updated: UPDATED,
-    sections: [
-      {
-        heading: "1. Monthly and annual subscriptions",
-        body: [
-          `If Sightline isn't right for you, contact us within 14 days of your first payment for a full refund — no questions asked. Renewal payments are generally non-refundable, but if you cancel within 72 hours of an annual renewal and have not materially used the service since, we will refund that renewal.`,
-        ],
-      },
-      {
-        heading: "2. Lifetime deals",
-        body: [
-          `Lifetime plans purchased through partners such as AppSumo follow the partner's refund policy and timeline; refund requests should be made through the marketplace where you purchased.`,
-        ],
-      },
-      {
-        heading: "3. How refunds are processed",
-        body: [
-          `Approved refunds are returned to the original payment method via our payment provider (Polar.sh), normally within 5–10 business days. Statutory rights that cannot be waived in your jurisdiction, including EU/UK consumer withdrawal rights, remain unaffected.`,
-        ],
-      },
-      {
-        heading: "4. Contact",
-        body: [`Request a refund or ask a question: ${CONTACT_EMAIL}.`],
       },
     ],
   },

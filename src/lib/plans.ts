@@ -49,8 +49,8 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     priceNote: "per month",
     maxProjects: 3,
     maxPrompts: 20,
-    maxCompetitors: 5,
-    scansPerMonth: 8,
+    maxCompetitors: 10,
+    scansPerMonth: 30,
     totalScans: null,
     contentGenerations: 40,
     maxTeamMembers: 3,
@@ -67,9 +67,10 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     price: "$149",
     priceNote: "per month",
     maxProjects: 10,
-    maxPrompts: 100,
-    maxCompetitors: 20,
-    scansPerMonth: 100,
+    maxPrompts: 50,
+    maxCompetitors: 30,
+    // "unlimited" in the UI — a generous fair-use ceiling guards abuse
+    scansPerMonth: 300,
     totalScans: null,
     contentGenerations: 1000,
     maxTeamMembers: 10,
@@ -138,16 +139,17 @@ export function historyCutoffIso(limits: PlanLimits): string | null {
   return new Date(Date.now() - limits.historyDays * 86_400_000).toISOString();
 }
 
-/** Feature list rows for the pricing page / billing comparison. */
-export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; values?: [string, string, string] }[] = [
-  { label: "Tracked prompts", key: null, values: ["5", "20", "100"] },
-  { label: "Competitors", key: null, values: ["2", "5", "20"] },
-  { label: "Scans", key: null, values: ["5 total", "8 / month", "Unlimited*"] },
-  { label: "AI content generations", key: null, values: ["3", "40", "Unlimited*"] },
-  { label: "Trending topics", key: "trends" },
+/** Feature list rows for the pricing page / billing comparison (MECE: usage → features → Pro-only). */
+export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; values?: [string, string, string]; group?: string }[] = [
+  { group: "Usage", label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
+  { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "Unlimited*"] },
+  { label: "Competitors tracked", key: null, values: ["2", "10", "30"] },
+  { label: "Brand workspaces & markets", key: null, values: ["1", "3", "10"] },
+  { label: "Content generations (pages, schema, llms.txt)", key: null, values: ["3", "40 / month", "Unlimited*"] },
+  { group: "Features", label: "Trending topics", key: "trends" },
   { label: "Weekly email reports", key: "weeklyReports" },
   { label: "Shareable report links", key: "shareLinks" },
-  { label: "API access", key: "api" },
+  { label: "Team collaboration", key: null, values: ["—", "3 seats", "10 seats"] },
+  { group: "Pro only", label: "API access", key: "api" },
   { label: "White label reports", key: "whiteLabel" },
-  { label: "Team collaboration", key: "team" },
 ];

@@ -8,6 +8,7 @@ import { ShareManager } from "./share-manager";
 import { PrintButton } from "./print-button";
 import { SocialShare } from "./social-share";
 import { ExecSummary } from "./exec-summary";
+import { getT } from "@/lib/i18n/server";
 import type { ShareLink, Snapshot } from "@/lib/types";
 
 export const metadata = { title: "Reports" };
@@ -16,6 +17,7 @@ export default async function ReportsPage() {
   const { project, profile } = await requireProject();
   const supabase = await createClient();
   const limits = planLimits(profile.plan);
+  const t = await getT();
 
   const [{ data: links }, { data: snapshots }] = await Promise.all([
     supabase
@@ -54,17 +56,11 @@ export default async function ReportsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Reports"
-        subtitle="Am I improving? Share the proof with clients, execs and your team"
-      />
+      <PageHeader title={t("reports.title")} subtitle={t("reports.subtitle")} />
 
       <div className="stagger space-y-4">
         <Card>
-          <CardHeader
-            title="Share links"
-            hint="Read-only report pages for clients and execs — no login required"
-          />
+          <CardHeader title={t("reports.shareLinks")} hint={t("reports.shareLinksHint")} />
           <div className="px-5 pb-5">
             <ShareManager
               projectId={project.id}
@@ -75,10 +71,7 @@ export default async function ReportsPage() {
         </Card>
 
         <Card>
-          <CardHeader
-            title="Share your progress"
-            hint="Auto-generated social copy — edit it, then post anywhere"
-          />
+          <CardHeader title={t("reports.shareProgress")} hint={t("reports.shareProgressHint")} />
           <div className="px-5 pb-5">
             <SocialShare
               brand={project.name}
@@ -90,17 +83,14 @@ export default async function ReportsPage() {
         </Card>
 
         <Card>
-          <CardHeader
-            title="Executive summary"
-            hint="A one-page briefing on your AI visibility, written for stakeholders"
-          />
+          <CardHeader title={t("reports.execSummary")} hint={t("reports.execSummaryHint")} />
           <div className="px-5 pb-5">
             <ExecSummary projectId={project.id} metrics={metrics} />
           </div>
         </Card>
 
         <Card>
-          <CardHeader title="Export" hint="Latest scan, ready to send — exports carry no platform branding" />
+          <CardHeader title={t("reports.export")} hint={t("reports.exportHint")} />
           <div className="flex flex-wrap gap-2 px-5 pb-5">
             <a
               href={`/api/reports/export?projectId=${project.id}&format=md`}
@@ -122,17 +112,13 @@ export default async function ReportsPage() {
 
         <Card>
           <CardHeader
-            title="Weekly email digest"
-            hint={
-              limits.weeklyReports
-                ? "Enabled — sent every Monday morning with your score, trends and top actions"
-                : "Available on Starter and Pro — a Monday-morning summary of score changes, competitor moves and new recommendations"
-            }
+            title={t("reports.digest")}
+            hint={limits.weeklyReports ? t("reports.digestOn") : t("reports.digestOff")}
           />
           <div className="px-5 pb-5">
             <p className="text-xs text-ink-faint">
-              Sent to {profile.email ?? "your account email"} via Resend.
-              {!limits.weeklyReports && " Upgrade on the Billing page to enable."}
+              {t("reports.sentTo", { email: profile.email ?? "—" })}
+              {!limits.weeklyReports && ` ${t("reports.upgradeToEnable")}`}
             </p>
           </div>
         </Card>

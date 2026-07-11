@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import { LEGAL_DOCS } from "../content";
 import { LEGAL_PAGES } from "@/components/legal-links";
@@ -16,6 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  // refund terms now live inside the Terms of Service (billing section)
+  if (slug === "refunds") permanentRedirect("/legal/terms");
   const doc = LEGAL_DOCS.find((d) => d.slug === slug);
   if (!doc) notFound();
 

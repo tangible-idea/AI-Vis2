@@ -6,6 +6,7 @@ import { buildTimeline } from "@/lib/timeline";
 import { historyCutoffIso, planLimits } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 import { Card, CardHeader, PageHeader } from "@/components/ui";
+import { getT } from "@/lib/i18n/server";
 import { TimelineFeed } from "./feed";
 import { RecapActions } from "./recap-actions";
 
@@ -14,6 +15,7 @@ export const metadata = { title: "Timeline" };
 export default async function TimelinePage() {
   const { project, userId, profile } = await requireProject();
   const supabase = await createClient();
+  const t = await getT();
 
   const [{ events, insights, achievements, recap }, { data: membership }] = await Promise.all([
     buildTimeline(supabase, project, { sinceIso: historyCutoffIso(planLimits(profile.plan)) }),
@@ -41,16 +43,13 @@ export default async function TimelinePage() {
 
   return (
     <>
-      <PageHeader
-        title="Timeline"
-        subtitle="What changed since your last visit — every meaningful move in one feed"
-      />
+      <PageHeader title={t("timeline.title")} subtitle={t("timeline.subtitle")} />
 
       <div className="stagger space-y-4">
         {/* key insights */}
         {insights.length > 0 && (
           <Card className="border-accent/30 bg-accent-soft/40">
-            <CardHeader title="Key insights" hint="The moves that matter most right now" />
+            <CardHeader title={t("timeline.keyInsights")} hint={t("timeline.keyInsightsHint")} />
             <div className="divide-y divide-line/70 px-5 pb-3">
               {insights.map((ev) => (
                 <div key={ev.id} className="flex items-center gap-3 py-2.5">
@@ -76,7 +75,7 @@ export default async function TimelinePage() {
         <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
           {/* feed */}
           <Card className="print-block">
-            <CardHeader title="Activity" hint="Filter by what you care about" />
+            <CardHeader title={t("timeline.activity")} hint={t("timeline.activityHint")} />
             <div className="px-5 pb-5">
               <TimelineFeed projectId={project.id} events={events} canComment={canComment} />
             </div>
@@ -86,7 +85,7 @@ export default async function TimelinePage() {
             {/* monthly recap */}
             {recap && (
               <Card className="print-block">
-                <CardHeader title="This month" hint="Last 30 days at a glance" />
+                <CardHeader title={t("timeline.thisMonth")} hint={t("timeline.thisMonthHint")} />
                 <div className="px-5 pb-5">
                   <div className="flex items-baseline gap-2">
                     <span

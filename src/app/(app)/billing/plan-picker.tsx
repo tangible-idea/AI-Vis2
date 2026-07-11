@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { Button, Card, Badge } from "@/components/ui";
 import { PLANS } from "@/lib/plans";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import type { Plan } from "@/lib/types";
 
 const ORDER: Plan[] = ["free", "starter", "pro"];
@@ -13,16 +14,16 @@ const ORDER: Plan[] = ["free", "starter", "pro"];
 const HIGHLIGHTS: Partial<Record<Plan, string[]>> = {
   free: ["5 tracked prompts", "5 scans total", "2 competitors", "Partial dashboard"],
   starter: [
-    "20 prompts · 8 scans / month",
-    "Trending topics",
+    "20 prompts · 30 scans / month",
+    "10 competitors · 3 team seats",
     "Content & schema generation, llms.txt",
-    "Weekly email reports · share links",
+    "Trends · weekly reports · share links",
   ],
   pro: [
-    "100 prompts · unlimited scans",
-    "20 competitors, all markets",
+    "Everything in Starter",
+    "50 prompts · unlimited scans",
+    "30 competitors · 10 markets · 10 seats",
     "API access & white label",
-    "Team collaboration",
   ],
 };
 
@@ -30,6 +31,7 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
   const [busy, setBusy] = useState<Plan | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const t = useT();
 
   async function choose(plan: Plan) {
     setBusy(plan);
@@ -41,7 +43,7 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError(data.error ?? "Could not change plan");
+      setError(data.error ?? t("billing.planError"));
     } else if (data.checkoutUrl) {
       window.location.href = data.checkoutUrl; // Polar hosted checkout / portal
       return;
@@ -55,8 +57,7 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
     <>
       {currentPlan === "lifetime" && (
         <div className="mb-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-ink">
-          You&apos;re on the <strong>Lifetime</strong> plan (AppSumo) — weekly scans, trends and
-          sharing included forever. Upgrade below only if you need more capacity.
+          {t("billing.lifetimeNote")}
         </div>
       )}
       {error && <p className="mb-3 text-sm text-poor">{error}</p>}
@@ -72,7 +73,7 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
             >
               {featured && (
                 <Badge tone="accent" className="absolute -top-2.5 left-4">
-                  Most popular
+                  {t("billing.mostPopular")}
                 </Badge>
               )}
               <p className="text-sm font-semibold">{p.label}</p>
@@ -94,7 +95,11 @@ export function PlanPicker({ currentPlan }: { currentPlan: Plan }) {
                 disabled={isCurrent || busy !== null}
                 onClick={() => choose(plan)}
               >
-                {isCurrent ? "Current plan" : busy === plan ? "Switching…" : `Switch to ${p.label}`}
+                {isCurrent
+                  ? t("billing.currentPlan")
+                  : busy === plan
+                    ? t("billing.switching")
+                    : t("billing.switchTo", { plan: p.label })}
               </Button>
             </Card>
           );

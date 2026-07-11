@@ -22,8 +22,8 @@ export function SocialShare({
 }) {
   const [copy, setCopy] = useState(
     delta && delta > 0
-      ? `We improved ${brand}'s AI Visibility Score to ${score}/100 (▲ +${delta}) this month through continuous optimization. Curious how your brand performs in ChatGPT, Claude, Gemini and Perplexity? Run a free AI Visibility Scan.`
-      : `${brand}'s AI Visibility Score is ${score}/100. We're tracking how AI assistants like ChatGPT and Gemini talk about our brand — and improving it every week. Curious how your brand performs? Run a free AI Visibility Scan.`
+      ? `We've been measuring how ChatGPT, Gemini and Perplexity talk about ${brand} — and moved our AI Visibility Score to ${score}/100 (▲ +${delta}). Turns out you can change what AI says about you, once you can see it. Have you checked yours?`
+      : `We asked ChatGPT, Gemini and Perplexity what they tell buyers about ${brand}. AI already has an opinion about your brand — most teams have just never seen it. Ours scored ${score}/100. Worth checking where yours lands.`
   );
   const [copied, setCopied] = useState(false);
 

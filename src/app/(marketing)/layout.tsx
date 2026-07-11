@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LegalLinks } from "@/components/legal-links";
+import { LanguageSelector } from "@/components/language-selector";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -37,6 +38,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             >
               Start free
             </Link>
+            <LanguageSelector className="hidden sm:inline-flex" />
           </nav>
         </div>
       </header>

@@ -46,6 +46,8 @@ export interface Profile {
   email: string | null;
   full_name: string | null;
   plan: Plan;
+  /** Preferred UI language (i18n locale code); null = device default. */
+  ui_language: string | null;
   created_at: string;
 }
 
@@ -192,6 +194,9 @@ export interface ShareLink {
   expires_at: string | null;
   created_at: string;
 }
+
+/** Countries offered for market selection — one per AI Visibility scan/market view. */
+export const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", "VN", "ID", "MY"] as const;
 
 /**
  * Generic industry options for onboarding / preview. Phrased the way buyers

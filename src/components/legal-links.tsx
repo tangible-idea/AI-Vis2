@@ -6,7 +6,6 @@ export const LEGAL_PAGES = [
   { slug: "terms", label: "Terms" },
   { slug: "cookies", label: "Cookies" },
   { slug: "acceptable-use", label: "Acceptable use" },
-  { slug: "refunds", label: "Refunds" },
 ] as const;
 
 /** Legal footer links, shown across marketing, auth, app and share pages. */

@@ -6,10 +6,9 @@ import { ChevronDown, Sparkles } from "lucide-react";
 import { createProject, type OnboardingState } from "../actions";
 import { useScan } from "@/lib/use-scan";
 import { Button, Card, Input, Label, Select } from "@/components/ui";
-import { CONTENT_LANGUAGES, INDUSTRIES } from "@/lib/types";
+import { CONTENT_LANGUAGES, COUNTRIES, INDUSTRIES } from "@/lib/types";
 import { PREVIEW_STORAGE_KEY, type PreviewInputs } from "@/lib/preview";
-
-const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", "VN", "ID", "MY"];
+import { useT } from "@/lib/i18n";
 
 export default function OnboardingPage() {
   const [state, action, pending] = useActionState<OnboardingState | null, FormData>(
@@ -22,6 +21,7 @@ export default function OnboardingPage() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [prefill, setPrefill] = useState<PreviewInputs | null>(null);
   const router = useRouter();
+  const t = useT();
 
   // Carry over what the visitor already typed into the pre-signup preview.
   useEffect(() => {
@@ -64,16 +64,13 @@ export default function OnboardingPage() {
         <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft">
           <Sparkles className="h-6 w-6 animate-pulse-dot text-accent-strong" />
         </span>
-        <h1 className="mt-6 text-xl font-semibold">Running your first scan</h1>
-        <p className="mt-2 text-sm text-ink-faint">
-          Asking ChatGPT, Claude, Gemini and Perplexity the questions your buyers ask.
-          This usually takes under a minute.
-        </p>
+        <h1 className="mt-6 text-xl font-semibold">{t("onboarding.scanTitle")}</h1>
+        <p className="mt-2 text-sm text-ink-faint">{t("onboarding.scanBody")}</p>
         {phase === "error" && (
           <div className="mt-6 space-y-3">
             <p className="text-sm text-poor">{scanError}</p>
             <Button variant="secondary" onClick={() => router.push("/dashboard")}>
-              Continue to dashboard
+              {t("onboarding.continueDashboard")}
             </Button>
           </div>
         )}
@@ -84,19 +81,16 @@ export default function OnboardingPage() {
   return (
     <div className="mx-auto max-w-lg animate-rise">
       <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-faint">
-        Step 1 of 2 · About your business
+        {t("onboarding.step")}
       </p>
-      <h1 className="mt-1 text-xl font-semibold tracking-tight">Set up your scan</h1>
-      <p className="mt-1 text-sm text-ink-faint">
-        We only need the basics to run your first scan — but the more you tell us,
-        the sharper your prompts, scores and recommendations will be.
-      </p>
+      <h1 className="mt-1 text-xl font-semibold tracking-tight">{t("onboarding.title")}</h1>
+      <p className="mt-1 text-sm text-ink-faint">{t("onboarding.subtitle")}</p>
 
       <Card className="mt-6 p-6">
         <form action={action} className="space-y-4" key={prefill ? "prefilled" : "blank"}>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="name">Brand name *</Label>
+              <Label htmlFor="name">{t("onboarding.brandName")}</Label>
               <Input
                 id="name"
                 name="name"
@@ -106,7 +100,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div>
-              <Label htmlFor="website">Domain *</Label>
+              <Label htmlFor="website">{t("onboarding.domain")}</Label>
               <Input
                 id="website"
                 name="website"
@@ -117,7 +111,7 @@ export default function OnboardingPage() {
             </div>
           </div>
           <div>
-            <Label htmlFor="industry">Industry *</Label>
+            <Label htmlFor="industry">{t("onboarding.industry")}</Label>
             <Select
               id="industry"
               name="industry"
@@ -133,8 +127,8 @@ export default function OnboardingPage() {
           </div>
           <div>
             <Label htmlFor="description">
-              What does your business do?{" "}
-              <span className="font-normal text-ink-faint">(optional)</span>
+              {t("onboarding.descriptionLabel")}{" "}
+              <span className="font-normal text-ink-faint">{t("onboarding.optional")}</span>
             </Label>
             <textarea
               id="description"
@@ -145,10 +139,7 @@ export default function OnboardingPage() {
               placeholder="e.g. Online reservation software for independent restaurants in Korea and Japan"
               className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
             />
-            <p className="mt-1 text-[11px] text-ink-faint">
-              A short description helps us phrase scan prompts the way your buyers
-              actually ask — better detail, better results.
-            </p>
+            <p className="mt-1 text-[11px] text-ink-faint">{t("onboarding.descriptionHint")}</p>
           </div>
 
           <button
@@ -157,8 +148,8 @@ export default function OnboardingPage() {
             className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-dashed border-line-strong px-3 py-2 text-left text-xs font-medium text-ink-soft hover:bg-hover"
           >
             <span>
-              Add more detail — competitors, market, language{" "}
-              <span className="font-normal text-ink-faint">(optional, improves accuracy)</span>
+              {t("onboarding.moreDetail")}{" "}
+              <span className="font-normal text-ink-faint">{t("onboarding.moreDetailHint")}</span>
             </span>
             <ChevronDown
               className={`h-3.5 w-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`}
@@ -169,7 +160,7 @@ export default function OnboardingPage() {
             <div className="space-y-4 rounded-lg bg-hover/50 p-3">
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <Label htmlFor="country">Country</Label>
+                  <Label htmlFor="country">{t("common.country")}</Label>
                   <Select id="country" name="country" defaultValue="US">
                     {COUNTRIES.map((c) => (
                       <option key={c}>{c}</option>
@@ -177,7 +168,7 @@ export default function OnboardingPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="language">Language</Label>
+                  <Label htmlFor="language">{t("common.language")}</Label>
                   <Select id="language" name="language" defaultValue="en">
                     {CONTENT_LANGUAGES.map((l) => (
                       <option key={l.code} value={l.code}>
@@ -187,16 +178,16 @@ export default function OnboardingPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="target_market">Target market</Label>
+                  <Label htmlFor="target_market">{t("onboarding.targetMarket")}</Label>
                   <Input id="target_market" name="target_market" placeholder="SMBs" />
                 </div>
               </div>
               <div>
-                <Label>Competitors (up to 3) — enter their domains</Label>
+                <Label>{t("onboarding.competitors")}</Label>
                 <div className="grid gap-2 sm:grid-cols-3">
-                  <Input name="competitor1" placeholder="competitor.com" />
-                  <Input name="competitor2" placeholder="rival.io" />
-                  <Input name="competitor3" placeholder="challenger.co" />
+                  <Input name="competitor1" placeholder="competitor1.com" />
+                  <Input name="competitor2" placeholder="competitor2.com" />
+                  <Input name="competitor3" placeholder="competitor3.com" />
                 </div>
               </div>
             </div>
@@ -204,11 +195,9 @@ export default function OnboardingPage() {
 
           {state?.error && <p className="text-sm text-poor">{state.error}</p>}
           <Button type="submit" disabled={pending} className="w-full">
-            {pending ? "Creating project…" : "Continue → run first scan"}
+            {pending ? t("onboarding.creating") : t("onboarding.continue")}
           </Button>
-          <p className="text-center text-[11px] text-ink-faint">
-            Step 2 scans ChatGPT, Claude, Gemini &amp; Perplexity — under a minute.
-          </p>
+          <p className="text-center text-[11px] text-ink-faint">{t("onboarding.step2Hint")}</p>
         </form>
       </Card>
 
@@ -218,7 +207,7 @@ export default function OnboardingPage() {
           disabled={demoLoading}
           className="cursor-pointer text-sm text-ink-faint underline-offset-4 hover:text-ink hover:underline disabled:opacity-50"
         >
-          {demoLoading ? "Loading demo…" : "Or explore with a demo project first"}
+          {demoLoading ? t("onboarding.demoLoading") : t("onboarding.demoLink")}
         </button>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { ScoreHero, ScoreTrend, SovBars, StatTile } from "@/components/charts";
 import { ScanButton } from "@/components/scan-button";
 import { LastScanSummary, type ActivityItem } from "./last-scan-summary";
 import { PlatformCards, type PlatformCardData } from "./platform-cards";
+import { getT } from "@/lib/i18n/server";
 import type { Engine, Prompt, Recommendation, ScanResult, ShareLink, Snapshot } from "@/lib/types";
 
 export const metadata = { title: "Dashboard" };
@@ -21,6 +22,7 @@ export default async function DashboardPage() {
   const { project, profile } = await requireProject();
   const supabase = await createClient();
   const limits = planLimits(profile.plan);
+  const t = await getT();
 
   const [{ data: snapshots }, { data: recs }, { data: scans }, { data: prompts }, { data: links }, { data: contentRows }] =
     await Promise.all([
@@ -73,15 +75,19 @@ export default async function DashboardPage() {
       <>
         <PageHeader
           title={project.name}
-          subtitle="Your first scan will populate this dashboard."
-          action={<ScanButton projectId={project.id} label="Run first scan" />}
+          subtitle={t("dashboard.firstScanSubtitle")}
+          action={<ScanButton projectId={project.id} label={t("common.runFirstScan")} />}
         />
         <EmptyState
-          title={lastScan?.status === "running" || lastScan?.status === "pending" ? "Scan in progress…" : "No scans yet"}
+          title={
+            lastScan?.status === "running" || lastScan?.status === "pending"
+              ? t("dashboard.scanInProgress")
+              : t("dashboard.noScans")
+          }
           body={
             lastScan?.status === "running" || lastScan?.status === "pending"
-              ? "We're asking ChatGPT, Claude, Gemini, Perplexity and Google AI Overview about your brand. Refresh in a minute."
-              : "Run a scan to see how AI engines answer your buyers' questions."
+              ? t("dashboard.scanInProgressBody")
+              : t("dashboard.noScansBody")
           }
         />
       </>
@@ -199,7 +205,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={project.name}
-        subtitle={`Last scan ${timeAgo(lastDone?.completed_at ?? latest.created_at)} · ${project.industry}`}
+        subtitle={`${t("dashboard.lastScan", { time: timeAgo(lastDone?.completed_at ?? latest.created_at) })} · ${project.industry}`}
         action={<ScanButton projectId={project.id} />}
       />
 
@@ -207,9 +213,9 @@ export default async function DashboardPage() {
         {/* 1 — AI Visibility Score hero */}
         <Card className="p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <ScoreHero score={latest.overall_score} delta={delta} label="AI Visibility Score" />
+            <ScoreHero score={latest.overall_score} delta={delta} label={t("dashboard.score")} />
             <div className="text-right">
-              <p className="text-[11px] uppercase tracking-wider text-ink-faint">Best platform</p>
+              <p className="text-[11px] uppercase tracking-wider text-ink-faint">{t("dashboard.bestPlatform")}</p>
               <p className="mt-1 text-sm font-semibold" style={{ color: platformInfo(best[0])?.color }}>
                 {platformInfo(best[0])?.label} · {best[1]}
               </p>
@@ -241,9 +247,9 @@ export default async function DashboardPage() {
         {/* 3 — AI Platform Performance */}
         <section>
           <div className="mb-2 flex items-center justify-between px-1">
-            <h2 className="text-sm font-semibold">AI platform performance</h2>
+            <h2 className="text-sm font-semibold">{t("dashboard.platformPerformance")}</h2>
             <Link href="/monitor" className="text-xs text-accent-strong hover:underline">
-              Prompt-level detail
+              {t("dashboard.promptDetail")}
             </Link>
           </div>
           <PlatformCards platforms={platforms} />
@@ -253,11 +259,11 @@ export default async function DashboardPage() {
         {history.length > 1 && (
           <Card>
             <CardHeader
-              title="Visibility trend"
-              hint="Overall score across all platforms"
+              title={t("dashboard.visibilityTrend")}
+              hint={t("dashboard.visibilityTrendHint")}
               action={
                 <Link href="/improve" className="text-xs text-accent-strong hover:underline">
-                  Full history
+                  {t("dashboard.fullHistory")}
                 </Link>
               }
             />
@@ -270,11 +276,11 @@ export default async function DashboardPage() {
         {/* 5 — Competitor benchmark */}
         <Card>
           <CardHeader
-            title="Competitor benchmark"
-            hint="Share of voice across all AI answers"
+            title={t("dashboard.competitorBenchmark")}
+            hint={t("dashboard.competitorBenchmarkHint")}
             action={
               <Link href="/settings" className="text-xs text-accent-strong hover:underline">
-                Manage competitors
+                {t("dashboard.manageCompetitors")}
               </Link>
             }
           />
@@ -287,11 +293,11 @@ export default async function DashboardPage() {
         {limits.trends && trends.length > 0 && (
           <Card>
             <CardHeader
-              title="Google Trends"
-              hint={`Rising searches in ${project.country} — generate content while demand grows`}
+              title={t("dashboard.googleTrends")}
+              hint={t("dashboard.googleTrendsHint", { country: project.country })}
               action={
                 <Link href="/trends" className="text-xs text-accent-strong hover:underline">
-                  Explore trends
+                  {t("dashboard.exploreTrends")}
                 </Link>
               }
             />
@@ -324,19 +330,17 @@ export default async function DashboardPage() {
         {/* 7 — Recommended actions */}
         <Card>
           <CardHeader
-            title="Recommended actions"
-            hint="Generated from your latest scan"
+            title={t("dashboard.recommendedActions")}
+            hint={t("dashboard.recommendedActionsHint")}
             action={
               <ButtonLink href="/optimize" variant="secondary" size="sm">
-                All actions <ArrowRight className="h-3.5 w-3.5" />
+                {t("dashboard.allActions")} <ArrowRight className="h-3.5 w-3.5" />
               </ButtonLink>
             }
           />
           <div className="divide-y divide-line px-5 pb-3">
             {openRecs.length === 0 && (
-              <p className="py-4 text-sm text-ink-faint">
-                Nothing open — run a scan to refresh recommendations.
-              </p>
+              <p className="py-4 text-sm text-ink-faint">{t("dashboard.nothingOpen")}</p>
             )}
             {openRecs.slice(0, 3).map((r) => (
               <Link key={r.id} href="/optimize" className="group flex items-center gap-3 py-3">
@@ -354,27 +358,27 @@ export default async function DashboardPage() {
 
         {/* 8 — Weekly progress */}
         <section>
-          <h2 className="mb-2 px-1 text-sm font-semibold">Weekly progress</h2>
+          <h2 className="mb-2 px-1 text-sm font-semibold">{t("dashboard.weeklyProgress")}</h2>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatTile
-              label="Mention rate"
+              label={t("dashboard.mentionRate")}
               value={pct(latest.mention_rate)}
-              hint={pp(latest.mention_rate, previous?.mention_rate) ?? "of buyer prompts"}
+              hint={pp(latest.mention_rate, previous?.mention_rate) ?? t("dashboard.ofBuyerPrompts")}
             />
             <StatTile
-              label="Recommended"
+              label={t("dashboard.recommendedRate")}
               value={pct(latest.recommendation_rate)}
-              hint={pp(latest.recommendation_rate, previous?.recommendation_rate) ?? "of buyer prompts"}
+              hint={pp(latest.recommendation_rate, previous?.recommendation_rate) ?? t("dashboard.ofBuyerPrompts")}
             />
             <StatTile
-              label="Avg. position"
+              label={t("dashboard.avgPosition")}
               value={latest.avg_position ? `#${latest.avg_position.toFixed(1)}` : "—"}
-              hint="when mentioned"
+              hint={t("dashboard.whenMentioned")}
             />
             <StatTile
-              label="Platform coverage"
+              label={t("dashboard.platformCoverage")}
               value={pct(latest.coverage)}
-              hint={`of ${ENGINES.length} AI platforms`}
+              hint={t("dashboard.ofPlatforms", { count: ENGINES.length })}
             />
           </div>
         </section>
@@ -382,22 +386,22 @@ export default async function DashboardPage() {
         {/* 9 — Recent reports */}
         <Card>
           <CardHeader
-            title="Recent reports"
-            hint="Share links and exports"
+            title={t("dashboard.recentReports")}
+            hint={t("dashboard.recentReportsHint")}
             action={
               <Link href="/reports" className="text-xs text-accent-strong hover:underline">
-                All reports
+                {t("dashboard.allReports")}
               </Link>
             }
           />
           <div className="divide-y divide-line px-5 pb-3">
             {activeLinks.length === 0 && (
               <p className="py-4 text-sm text-ink-faint">
-                No share links yet — create one on{" "}
                 <Link href="/reports" className="text-accent-strong underline">
-                  Reports
-                </Link>{" "}
-                to share your progress.
+                  {t("nav.reports")}
+                </Link>
+                {" — "}
+                {t("dashboard.noShareLinks")}
               </p>
             )}
             {activeLinks.map((l) => (
