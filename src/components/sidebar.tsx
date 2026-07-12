@@ -13,15 +13,16 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  ChevronDown,
   Link2,
   History,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Plan, Project } from "@/lib/types";
 import { switchProject } from "@/app/(app)/actions";
 import { logout } from "@/app/(auth)/actions";
 import { LegalLinks } from "@/components/legal-links";
+import { ProjectSwitcher, type SwitcherProject } from "@/components/project-switcher";
 import { useT } from "@/lib/i18n";
 
 /** Navigation mirrors the product journey: Measure → Optimize → Improve → Share. */
@@ -46,6 +47,7 @@ const NAV_GROUPS: { labelKey: string | null; items: { href: string; labelKey: st
     items: [
       { href: "/timeline", labelKey: "nav.timeline", icon: History },
       { href: "/improve", labelKey: "nav.improve", icon: TrendingUp },
+      { href: "/benchmarks", labelKey: "nav.benchmarks", icon: BarChart3 },
     ],
   },
   {
@@ -65,13 +67,21 @@ const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
 export function Sidebar({
   projects,
+  switcherProjects,
   activeProjectId,
   plan,
+  planLabel,
+  maxProjects,
+  canCreate,
   mockMode,
 }: {
   projects: Project[];
+  switcherProjects: SwitcherProject[];
   activeProjectId: string | null;
   plan: Plan;
+  planLabel: string;
+  maxProjects: number;
+  canCreate: boolean;
   mockMode: boolean;
 }) {
   const pathname = usePathname();
@@ -97,25 +107,15 @@ export function Sidebar({
           <span className="font-display text-lg leading-none">Sightline</span>
         </div>
 
-        {projects.length > 0 && (
-          <div className="relative mx-3 mb-3">
-            <select
-              value={activeProjectId ?? ""}
-              onChange={(e) => onSwitch(e.target.value)}
-              disabled={switching}
-              className={cn(
-                "w-full cursor-pointer appearance-none truncate rounded-lg border border-line bg-paper py-1.5 pl-2.5 pr-7 text-xs font-medium text-ink hover:bg-hover focus:outline-none",
-                switching && "animate-pulse opacity-60"
-              )}
-              aria-label={t("nav.switchProject")}
-            >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {projectLabel(p)}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
+        {switcherProjects.length > 0 && (
+          <div className="mx-3 mb-3">
+            <ProjectSwitcher
+              projects={switcherProjects}
+              activeProjectId={activeProjectId}
+              canCreate={canCreate}
+              planLabel={planLabel}
+              maxProjects={maxProjects}
+            />
           </div>
         )}
 

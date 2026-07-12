@@ -147,3 +147,44 @@ export async function deleteProject(projectId: string) {
   revalidatePath("/", "layout");
   redirect("/dashboard");
 }
+
+/** Archives a project: data is kept, but it leaves the working set and no longer counts toward plan limits. */
+export async function archiveProject(projectId: string) {
+  const { supabase, user } = await requireUser();
+  await supabase
+    .from("projects")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", projectId)
+    .eq("user_id", user.id);
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
+}
+
+/** Restores an archived project, subject to the plan's active-project limit. */
+export async function restoreProject(projectId: string): Promise<{ error?: string }> {
+  const { supabase, user } = await requireUser();
+
+  const [{ data: profile }, { count }] = await Promise.all([
+    supabase.from("profiles").select("plan").eq("id", user.id).single(),
+    supabase
+      .from("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_demo", false)
+      .is("archived_at", null),
+  ]);
+  const limits = planLimits(profile?.plan);
+  if ((count ?? 0) >= limits.maxProjects) {
+    return {
+      error: `Your ${limits.label} plan includes ${limits.maxProjects} active project${limits.maxProjects > 1 ? "s" : ""}. Archive another project or upgrade to restore this one.`,
+    };
+  }
+
+  await supabase
+    .from("projects")
+    .update({ archived_at: null })
+    .eq("id", projectId)
+    .eq("user_id", user.id);
+  revalidatePath("/", "layout");
+  return {};
+}

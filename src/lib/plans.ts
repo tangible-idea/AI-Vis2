@@ -4,6 +4,7 @@ export interface PlanLimits {
   label: string;
   price: string;
   priceNote: string;
+  /** Active (non-archived) projects the organization can own. */
   maxProjects: number;
   maxPrompts: number;
   maxCompetitors: number;
@@ -16,6 +17,8 @@ export interface PlanLimits {
   /** Days of history shown in trends/timeline; null = unlimited. */
   historyDays: number | null;
   trends: boolean;
+  /** Market benchmarks (foundation now, calculations later). */
+  benchmarks: boolean;
   weeklyReports: boolean;
   shareLinks: boolean;
   api: boolean;
@@ -37,6 +40,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxTeamMembers: 0,
     historyDays: null,
     trends: false,
+    benchmarks: false,
     weeklyReports: false,
     shareLinks: false,
     api: false,
@@ -56,6 +60,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxTeamMembers: 3,
     historyDays: null,
     trends: true,
+    benchmarks: true,
     weeklyReports: true,
     shareLinks: true,
     api: false,
@@ -66,7 +71,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     label: "Pro",
     price: "$149",
     priceNote: "per month",
-    maxProjects: 10,
+    maxProjects: 8,
     maxPrompts: 50,
     maxCompetitors: 30,
     // "unlimited" in the UI — a generous fair-use ceiling guards abuse
@@ -76,6 +81,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxTeamMembers: 10,
     historyDays: null,
     trends: true,
+    benchmarks: true,
     weeklyReports: true,
     shareLinks: true,
     api: true,
@@ -84,11 +90,12 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
   },
   // AppSumo lifetime deal — capped so the plan stays profitable while
   // acting as an acquisition channel. Tune via PLAN_LIMITS_JSON, no deploy.
+  // Never surfaced on pricing or other public UI.
   lifetime: {
     label: "Lifetime",
     price: "$79",
     priceNote: "one-time (AppSumo)",
-    maxProjects: 1,
+    maxProjects: 2,
     maxPrompts: 10,
     maxCompetitors: 3,
     scansPerMonth: 4,
@@ -97,6 +104,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxTeamMembers: 2,
     historyDays: 180,
     trends: true,
+    benchmarks: true,
     weeklyReports: true,
     shareLinks: true,
     api: false,
@@ -144,7 +152,7 @@ export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; value
   { group: "Usage", label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
   { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "Unlimited*"] },
   { label: "Competitors tracked", key: null, values: ["2", "10", "30"] },
-  { label: "Brand workspaces & markets", key: null, values: ["1", "3", "10"] },
+  { label: "Brand projects & markets", key: null, values: ["1", "3", "8"] },
   { label: "Content generations (pages, schema, llms.txt)", key: null, values: ["3", "40 / month", "Unlimited*"] },
   { group: "Features", label: "Trending topics", key: "trends" },
   { label: "Weekly email reports", key: "weeklyReports" },

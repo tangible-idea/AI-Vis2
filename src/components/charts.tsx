@@ -68,6 +68,56 @@ export function ScoreTrend({ snapshots }: { snapshots: Snapshot[] }) {
   );
 }
 
+/**
+ * Weekly Visibility Score — one point per week (the week's latest snapshot),
+ * so progress reads at a glance without per-scan noise.
+ */
+export function WeeklyScoreTrend({ snapshots }: { snapshots: Snapshot[] }) {
+  const byWeek = new Map<string, Snapshot>();
+  for (const s of snapshots) {
+    const d = new Date(s.created_at);
+    // key by the Monday of the snapshot's week; later snapshots overwrite
+    const monday = new Date(d);
+    monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    byWeek.set(monday.toISOString().slice(0, 10), s);
+  }
+  const weekly = [...byWeek.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([week, s]) => ({
+      date: formatDateShort(week),
+      score: s.overall_score,
+    }));
+  return (
+    <ResponsiveContainer width="100%" height={200}>
+      <LineChart data={weekly} margin={{ top: 8, right: 12, bottom: 0, left: -22 }}>
+        <CartesianGrid stroke={LINE} strokeDasharray="0" vertical={false} />
+        <XAxis
+          dataKey="date"
+          tick={{ fontSize: 11, fill: INK_FAINT }}
+          axisLine={{ stroke: LINE }}
+          tickLine={false}
+        />
+        <YAxis
+          domain={[0, 100]}
+          tick={{ fontSize: 11, fill: INK_FAINT }}
+          axisLine={false}
+          tickLine={false}
+        />
+        <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: INK_FAINT, strokeWidth: 1 }} />
+        <Line
+          type="monotone"
+          dataKey="score"
+          name="Weekly Visibility Score"
+          stroke={ACCENT}
+          strokeWidth={2}
+          dot={{ r: 3, fill: ACCENT, strokeWidth: 0 }}
+          activeDot={{ r: 5, stroke: "#fff", strokeWidth: 2 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
 /** Per-engine score trend — one line per engine, direct-labeled legend row. */
 export function EngineTrend({ snapshots }: { snapshots: Snapshot[] }) {
   const engines = Object.keys(snapshots.at(-1)?.engine_scores ?? {}) as Engine[];

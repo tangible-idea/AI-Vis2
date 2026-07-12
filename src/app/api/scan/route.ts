@@ -18,10 +18,16 @@ export async function POST(request: Request) {
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, user_id")
+    .select("id, user_id, archived_at")
     .eq("id", projectId)
     .single();
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  if (project.archived_at) {
+    return NextResponse.json(
+      { error: "This project is archived. Restore it in Settings to run scans." },
+      { status: 403 }
+    );
+  }
 
   // plan gating uses the workspace owner's plan (members share the quota)
   const admin = createAdminClient();

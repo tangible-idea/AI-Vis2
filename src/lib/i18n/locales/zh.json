@@ -20,7 +20,9 @@
     "all": "全部",
     "priorityHigh": "高优先级",
     "priorityMedium": "中优先级",
-    "priorityLow": "低优先级"
+    "priorityLow": "低优先级",
+    "yes": "是",
+    "no": "否"
   },
   "nav": {
     "groupMeasure": "衡量",
@@ -38,7 +40,8 @@
     "billing": "账单",
     "settings": "设置",
     "switchProject": "切换项目",
-    "mockMode": "模拟模式 — 设置 POE_API_KEY 以进行真实扫描"
+    "mockMode": "模拟模式 — 设置 POE_API_KEY 以进行真实扫描",
+    "benchmarks": "基准对比"
   },
   "market": {
     "label": "市场",
@@ -136,7 +139,10 @@
     "activityScan": "已完成全平台扫描",
     "activityBenchmark": "竞品对比已更新",
     "activityRecs": "建议已刷新",
-    "activityGenerated": "已生成：{title}"
+    "activityGenerated": "已生成：{title}",
+    "scoreExplanation": "AI 可见度分数反映您的品牌在主流 AI 平台上被发现和引用的频率。",
+    "weeklyTrend": "每周可见度趋势",
+    "weeklyTrendHint": "按周查看您的 AI 可见度分数"
   },
   "monitor": {
     "title": "监测",
@@ -191,7 +197,16 @@
       "knowledge_base": "帮助中心内容以引擎最喜欢引用的问答形式回答买家问题。",
       "blog": "编辑类内容赢得了这次引用。被引用的主题值得扩展成更深入的页面。",
       "third_party": "引擎认为在该主题上可信的独立网站。在那里被提及会增强你的可见度。"
-    }
+    },
+    "brandMentioned": "您的品牌:",
+    "competitorMentioned": "竞争对手:",
+    "frequency": "此来源在最近一次扫描中被 {count} 条回答引用。",
+    "frequencyOnce": "此来源在最近一次扫描中被引用一次。",
+    "frequencyHigh": "此来源出现的频率约为同类来源的 {times} 倍。",
+    "citedText": "被引用的原文",
+    "aiResponse": "AI 回答",
+    "whyReferenced": "此来源被引用的原因:",
+    "competitorsNamed": "此回答中提到的竞争对手:"
   },
   "trends": {
     "title": "趋势",
@@ -210,7 +225,13 @@
     "trendingTopics": "热门话题",
     "topicsHint": "受关注的更广泛主题",
     "noResults": "无结果 — 试试其他关键词。",
-    "related": "相关"
+    "related": "相关",
+    "explore": "探索",
+    "topQueries": "热门查询",
+    "topQueriesHint": "您所在市场搜索最多的问题",
+    "risingQueriesTitle": "上升查询",
+    "trendingNow": "当前热点",
+    "trendingNowHint": "当前市场正在获得关注的更广泛主题"
   },
   "optimize": {
     "title": "优化",
@@ -321,7 +342,15 @@
     "invitePending": "邀请待处理 — 首次登录后加入",
     "deleteProject": "删除项目",
     "deleting": "删除中…",
-    "deleteConfirm": "删除“{name}”及其所有扫描、内容和历史？此操作无法撤销。"
+    "deleteConfirm": "删除“{name}”及其所有扫描、内容和历史？此操作无法撤销。",
+    "archiveProject": "归档项目",
+    "archiving": "归档中…",
+    "archiveConfirm": "归档“{name}”？数据将保留，且不再计入套餐限额。您可以随时恢复。",
+    "archivedProjects": "已归档项目",
+    "archivedHint": "已归档项目保留历史记录，且不计入套餐限额",
+    "archivedAgo": "归档于 {time}",
+    "restore": "恢复",
+    "restoring": "恢复中…"
   },
   "summary": {
     "title": "上次扫描摘要",
@@ -398,5 +427,40 @@
     "sug3": "我应该先做什么？",
     "placeholder": "询问你的可见度…",
     "error": "抱歉，出了点问题。请重试。"
+  },
+  "switcher": {
+    "search": "搜索项目…",
+    "noMatches": "没有符合搜索的项目。",
+    "markets": "{count} 个市场",
+    "lastScan": "扫描于 {time}",
+    "noScan": "尚未扫描",
+    "newProject": "新建项目",
+    "limitReached": "您的{plan}套餐包含 {max} 个活跃项目 — 请在设置中归档一个项目，或升级以添加更多。",
+    "pin": "置顶项目",
+    "unpin": "取消置顶"
+  },
+  "benchmarks": {
+    "title": "市场基准",
+    "subtitle": "在 {industry} · {country} 中的对比",
+    "subtitleLocked": "了解您的 AI 可见度与市场相比处于什么水平",
+    "lockedTitle": "对比您的 AI 可见度",
+    "lockedBody": "与行业和市场的可见度对比功能在 Starter 和 Pro 套餐中提供。",
+    "lockBenchmark": "对比您的 AI 可见度",
+    "lockTopPrompts": "您所在市场的热门提示词",
+    "lockIndustry": "行业对比",
+    "lockContent": "表现最佳的内容",
+    "collectingNote": "基准数据完全基于汇总的匿名市场统计 — 绝不使用任何客户的提示词、报告或身份信息。随着行业和市场数据的积累，以下板块将自动解锁。",
+    "comingSoon": "即将推出",
+    "placeholderBody": "随着您所在行业的匿名市场数据积累，此板块将解锁。",
+    "shareOfVoice": "声量份额",
+    "shareOfVoiceHint": "AI 回答中您的品牌与市场的对比",
+    "distribution": "AI 可见度分布",
+    "distributionHint": "同类品牌在您所在行业的得分区间",
+    "promptCoverage": "提示词覆盖率",
+    "promptCoverageHint": "您出现在市场买家问题中的比例",
+    "benchmarkTrends": "基准趋势",
+    "benchmarkTrendsHint": "市场可见度随时间的变化",
+    "recommendedActions": "推荐行动",
+    "recommendedActionsHint": "市场领先品牌的不同做法"
   }
 }

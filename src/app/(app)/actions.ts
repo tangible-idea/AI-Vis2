@@ -48,14 +48,16 @@ export async function createProject(
   const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
   const limits = planLimits(profile?.plan);
 
+  // plan limits count active projects only — archived ones don't block new work
   const { count: projectCount } = await supabase
     .from("projects")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
-    .eq("is_demo", false);
+    .eq("is_demo", false)
+    .is("archived_at", null);
   if ((projectCount ?? 0) >= limits.maxProjects) {
     return {
-      error: `Your ${limits.label} plan includes ${limits.maxProjects} workspace${limits.maxProjects > 1 ? "s" : ""}. Upgrade to add more brands.`,
+      error: `Your ${limits.label} plan includes ${limits.maxProjects} active project${limits.maxProjects > 1 ? "s" : ""}. Archive or delete a project in Settings, or upgrade to add more brands.`,
     };
   }
 
@@ -126,7 +128,8 @@ export async function addMarket(projectId: string, country: string): Promise<{ e
     .from("projects")
     .select("id, website, country")
     .eq("user_id", user.id)
-    .eq("website", source.website);
+    .eq("website", source.website)
+    .is("archived_at", null);
   const existing = (siblings ?? []).find((p) => p.country === country);
   if (existing) {
     await switchProject(existing.id);
@@ -139,10 +142,11 @@ export async function addMarket(projectId: string, country: string): Promise<{ e
     .from("projects")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
-    .eq("is_demo", false);
+    .eq("is_demo", false)
+    .is("archived_at", null);
   if ((projectCount ?? 0) >= limits.maxProjects) {
     return {
-      error: `Your ${limits.label} plan includes ${limits.maxProjects} workspace${limits.maxProjects > 1 ? "s" : ""} (markets count as workspaces). Upgrade to monitor more countries.`,
+      error: `Your ${limits.label} plan includes ${limits.maxProjects} active project${limits.maxProjects > 1 ? "s" : ""} (markets count as projects). Archive one in Settings or upgrade to monitor more countries.`,
     };
   }
 

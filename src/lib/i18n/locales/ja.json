@@ -20,7 +20,9 @@
     "all": "すべて",
     "priorityHigh": "優先度 高",
     "priorityMedium": "優先度 中",
-    "priorityLow": "優先度 低"
+    "priorityLow": "優先度 低",
+    "yes": "はい",
+    "no": "いいえ"
   },
   "nav": {
     "groupMeasure": "計測",
@@ -38,7 +40,8 @@
     "billing": "請求",
     "settings": "設定",
     "switchProject": "プロジェクト切替",
-    "mockMode": "モックモード — 実スキャンには POE_API_KEY を設定してください"
+    "mockMode": "モックモード — 実スキャンには POE_API_KEY を設定してください",
+    "benchmarks": "ベンチマーク"
   },
   "market": {
     "label": "マーケット",
@@ -136,7 +139,10 @@
     "activityScan": "全プラットフォームのスキャン完了",
     "activityBenchmark": "競合ベンチマークを更新",
     "activityRecs": "推奨アクションを更新",
-    "activityGenerated": "生成: {title}"
+    "activityGenerated": "生成: {title}",
+    "scoreExplanation": "AI可視性スコアは、主要なAIプラットフォームでブランドがどれだけ頻繁に発見・参照されているかを示します。",
+    "weeklyTrend": "週間可視性トレンド",
+    "weeklyTrendHint": "週ごとのAI可視性スコア"
   },
   "monitor": {
     "title": "モニター",
@@ -191,7 +197,16 @@
       "knowledge_base": "ヘルプセンターのコンテンツは、エンジンが引用を好むQ&A形式そのままで買い手の質問に答えます。",
       "blog": "編集コンテンツがこの引用を獲得しました。引用されるテーマは、より深いページに拡張する価値があります。",
       "third_party": "エンジンがこのテーマで信頼できると判断した独立サイトです。そこで言及されると可視性が強化されます。"
-    }
+    },
+    "brandMentioned": "自社ブランド:",
+    "competitorMentioned": "競合:",
+    "frequency": "このソースは最新スキャンで{count}件の回答に参照されました。",
+    "frequencyOnce": "このソースは最新スキャンで1回参照されました。",
+    "frequencyHigh": "このソースは類似ソースの約{times}倍の頻度で登場しました。",
+    "citedText": "引用された本文",
+    "aiResponse": "AIの回答",
+    "whyReferenced": "このソースが参照された理由:",
+    "competitorsNamed": "この回答で言及された競合:"
   },
   "trends": {
     "title": "トレンド",
@@ -210,7 +225,13 @@
     "trendingTopics": "急上昇トピック",
     "topicsHint": "注目を集める幅広いテーマ",
     "noResults": "結果なし — 別のキーワードをお試しください。",
-    "related": "関連"
+    "related": "関連",
+    "explore": "探索",
+    "topQueries": "人気クエリ",
+    "topQueriesHint": "市場で最も検索されている質問",
+    "risingQueriesTitle": "急上昇クエリ",
+    "trendingNow": "今話題のトピック",
+    "trendingNowHint": "いま市場で注目を集めている幅広いテーマ"
   },
   "optimize": {
     "title": "最適化",
@@ -321,7 +342,15 @@
     "invitePending": "招待保留中 — 初回サインイン時に参加します",
     "deleteProject": "プロジェクトを削除",
     "deleting": "削除中…",
-    "deleteConfirm": "「{name}」とそのスキャン・コンテンツ・履歴をすべて削除しますか？元に戻せません。"
+    "deleteConfirm": "「{name}」とそのスキャン・コンテンツ・履歴をすべて削除しますか？元に戻せません。",
+    "archiveProject": "プロジェクトをアーカイブ",
+    "archiving": "アーカイブ中…",
+    "archiveConfirm": "「{name}」をアーカイブしますか？データは保持され、プラン上限にカウントされません。いつでも復元できます。",
+    "archivedProjects": "アーカイブ済みプロジェクト",
+    "archivedHint": "アーカイブ済みプロジェクトは履歴を保持し、プラン上限にカウントされません",
+    "archivedAgo": "{time}にアーカイブ",
+    "restore": "復元",
+    "restoring": "復元中…"
   },
   "summary": {
     "title": "最終スキャン概要",
@@ -398,5 +427,40 @@
     "sug3": "まず何をすべき？",
     "placeholder": "可視性について質問…",
     "error": "申し訳ありません。問題が発生しました。もう一度お試しください。"
+  },
+  "switcher": {
+    "search": "プロジェクトを検索…",
+    "noMatches": "検索に一致するプロジェクトがありません。",
+    "markets": "{count}マーケット",
+    "lastScan": "スキャン: {time}",
+    "noScan": "スキャン未実行",
+    "newProject": "新規プロジェクト",
+    "limitReached": "{plan}プランにはアクティブなプロジェクトが{max}件含まれます — 設定でアーカイブするかアップグレードしてください。",
+    "pin": "プロジェクトをピン留め",
+    "unpin": "ピン留めを解除"
+  },
+  "benchmarks": {
+    "title": "マーケットベンチマーク",
+    "subtitle": "{industry}・{country}市場での比較",
+    "subtitleLocked": "自社のAI可視性を市場と比較しましょう",
+    "lockedTitle": "AI可視性をベンチマーク",
+    "lockedBody": "業界・市場との可視性比較はStarterとProで利用できます。",
+    "lockBenchmark": "AI可視性をベンチマーク",
+    "lockTopPrompts": "市場の人気プロンプト",
+    "lockIndustry": "業界比較",
+    "lockContent": "最も成果の高いコンテンツ",
+    "collectingNote": "ベンチマークは集計された匿名の市場統計のみで作成され、顧客のプロンプト・レポート・身元は一切使用しません。業界・市場のデータが蓄積されると、以下のセクションが自動的に解放されます。",
+    "comingSoon": "近日公開",
+    "placeholderBody": "業界の匿名市場データが蓄積されると、このセクションが解放されます。",
+    "shareOfVoice": "シェア・オブ・ボイス",
+    "shareOfVoiceHint": "AI回答における自社ブランド vs 市場",
+    "distribution": "AI可視性の分布",
+    "distributionHint": "業界内で同様のブランドが位置するスコア帯",
+    "promptCoverage": "プロンプトカバレッジ",
+    "promptCoverageHint": "市場の購買者の質問のうち自社が登場する割合",
+    "benchmarkTrends": "ベンチマークトレンド",
+    "benchmarkTrendsHint": "市場の可視性の時間的な変化",
+    "recommendedActions": "推奨アクション",
+    "recommendedActionsHint": "市場のトップブランドが行っていること"
   }
 }

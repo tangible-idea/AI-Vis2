@@ -20,7 +20,9 @@
     "all": "All",
     "priorityHigh": "high priority",
     "priorityMedium": "medium priority",
-    "priorityLow": "low priority"
+    "priorityLow": "low priority",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "groupMeasure": "Measure",
@@ -38,7 +40,8 @@
     "billing": "Billing",
     "settings": "Settings",
     "switchProject": "Switch project",
-    "mockMode": "Mock mode — set POE_API_KEY for real scans"
+    "mockMode": "Mock mode — set POE_API_KEY for real scans",
+    "benchmarks": "Benchmarks"
   },
   "market": {
     "label": "Markets",
@@ -136,7 +139,10 @@
     "activityScan": "Scan completed across all platforms",
     "activityBenchmark": "Competitor benchmark updated",
     "activityRecs": "Recommendations refreshed",
-    "activityGenerated": "Generated: {title}"
+    "activityGenerated": "Generated: {title}",
+    "scoreExplanation": "Your AI Visibility Score reflects how frequently your brand is discovered and referenced across leading AI platforms.",
+    "weeklyTrend": "Weekly visibility trend",
+    "weeklyTrendHint": "Your AI Visibility Score, week by week"
   },
   "monitor": {
     "title": "Monitor",
@@ -191,7 +197,16 @@
       "knowledge_base": "Help-center content answers buyer questions in the exact Q&A format engines prefer to cite.",
       "blog": "Editorial content earned this citation. Topics that get cited are worth expanding into deeper pages.",
       "third_party": "An independent site the engine considers credible on this topic. Getting mentioned there strengthens your visibility."
-    }
+    },
+    "brandMentioned": "Your brand:",
+    "competitorMentioned": "Competitors:",
+    "frequency": "This source was referenced in {count} answers in your latest scan.",
+    "frequencyOnce": "This source was referenced once in your latest scan.",
+    "frequencyHigh": "This source appeared approximately {times} times more often than similar sources.",
+    "citedText": "Exact cited text",
+    "aiResponse": "AI response",
+    "whyReferenced": "Why this source was referenced:",
+    "competitorsNamed": "Competitors named in this answer:"
   },
   "trends": {
     "title": "Trends",
@@ -210,7 +225,13 @@
     "trendingTopics": "Trending topics",
     "topicsHint": "Broader themes gaining attention",
     "noResults": "No results — try different keywords.",
-    "related": "Related"
+    "related": "Related",
+    "explore": "Explore",
+    "topQueries": "Top queries",
+    "topQueriesHint": "What your market searches for the most",
+    "risingQueriesTitle": "Rising queries",
+    "trendingNow": "Trending now",
+    "trendingNowHint": "Broader themes gaining attention in your market right now"
   },
   "optimize": {
     "title": "Optimize",
@@ -321,7 +342,15 @@
     "invitePending": "Invite pending — joins on first sign-in",
     "deleteProject": "Delete project",
     "deleting": "Deleting…",
-    "deleteConfirm": "Delete “{name}” and all its scans, content and history? This cannot be undone."
+    "deleteConfirm": "Delete “{name}” and all its scans, content and history? This cannot be undone.",
+    "archiveProject": "Archive project",
+    "archiving": "Archiving…",
+    "archiveConfirm": "Archive “{name}”? Its data is kept and it stops counting toward your plan limit. You can restore it anytime.",
+    "archivedProjects": "Archived projects",
+    "archivedHint": "Archived projects keep their history and don't count toward your plan limit",
+    "archivedAgo": "Archived {time}",
+    "restore": "Restore",
+    "restoring": "Restoring…"
   },
   "summary": {
     "title": "Last scan summary",
@@ -398,5 +427,40 @@
     "sug3": "What should I do first?",
     "placeholder": "Ask about your visibility…",
     "error": "Sorry, something went wrong. Please try again."
+  },
+  "switcher": {
+    "search": "Search projects…",
+    "noMatches": "No projects match your search.",
+    "markets": "{count} markets",
+    "lastScan": "scanned {time}",
+    "noScan": "no scans yet",
+    "newProject": "New project",
+    "limitReached": "Your {plan} plan includes {max} active projects — archive one in Settings or upgrade to add more.",
+    "pin": "Pin project",
+    "unpin": "Unpin project"
+  },
+  "benchmarks": {
+    "title": "Market Benchmarks",
+    "subtitle": "How you compare in {industry} · {country}",
+    "subtitleLocked": "See how your AI visibility compares against your market",
+    "lockedTitle": "Benchmark your AI Visibility",
+    "lockedBody": "Compare your visibility against your industry and market — available on Starter and Pro.",
+    "lockBenchmark": "Benchmark your AI Visibility",
+    "lockTopPrompts": "Top prompts in your market",
+    "lockIndustry": "Industry comparison",
+    "lockContent": "Best-performing content",
+    "collectingNote": "Benchmarks are built from aggregated, anonymous market statistics — never from any customer's prompts, reports or identity. Sections below unlock automatically as coverage of your industry and market grows.",
+    "comingSoon": "Coming soon",
+    "placeholderBody": "This section unlocks as anonymized market data accumulates for your industry.",
+    "shareOfVoice": "Share of Voice",
+    "shareOfVoiceHint": "Your brand vs the market across AI answers",
+    "distribution": "AI Visibility Distribution",
+    "distributionHint": "Where brands like yours score in your industry",
+    "promptCoverage": "Prompt Coverage",
+    "promptCoverageHint": "How many of your market's buyer questions you appear in",
+    "benchmarkTrends": "Benchmark Trends",
+    "benchmarkTrendsHint": "How your market's visibility shifts over time",
+    "recommendedActions": "Recommended Actions",
+    "recommendedActionsHint": "What top performers in your market do differently"
   }
 }

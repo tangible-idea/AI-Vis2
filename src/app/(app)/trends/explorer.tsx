@@ -162,19 +162,45 @@ export function TrendsExplorer({
         </Card>
       )}
 
-      <Card>
-        <CardHeader title={t("trends.trendingSearches")} hint={t("trends.risingQueries")} />
-        <div className="px-5 pb-4">
-          <TrendRows results={searches} related={related} />
+      {/* Explore — the market's demand picture: what people search most,
+          and what's gaining fastest. Same cached data, two lenses. */}
+      <section>
+        <h2 className="mb-2 px-1 text-sm font-semibold">{t("trends.explore")}</h2>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader title={t("trends.topQueries")} hint={t("trends.topQueriesHint")} />
+            <div className="px-5 pb-4">
+              <TrendRows results={topQueries(searches)} related={related} />
+            </div>
+          </Card>
+          <Card>
+            <CardHeader title={t("trends.risingQueriesTitle")} hint={t("trends.risingQueries")} />
+            <div className="px-5 pb-4">
+              <TrendRows results={risingQueries(searches)} related={related} />
+            </div>
+          </Card>
         </div>
-      </Card>
+      </section>
 
       <Card>
-        <CardHeader title={t("trends.trendingTopics")} hint={t("trends.topicsHint")} />
+        <CardHeader title={t("trends.trendingNow")} hint={t("trends.trendingNowHint")} />
         <div className="px-5 pb-4">
           <TrendRows results={topics} related={related} />
         </div>
       </Card>
     </div>
   );
+}
+
+/** Highest search volume first — "what does this market ask the most?" */
+function topQueries(results: TrendResult[]): TrendResult[] {
+  return [...results].sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume)).slice(0, 5);
+}
+
+/** Fastest-growing demand first — "what should I cover before rivals do?" */
+function risingQueries(results: TrendResult[]): TrendResult[] {
+  return [...results]
+    .filter((r) => r.direction !== "declining")
+    .sort((a, b) => b.growth - a.growth)
+    .slice(0, 5);
 }

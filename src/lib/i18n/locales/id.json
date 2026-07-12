@@ -20,7 +20,9 @@
     "all": "Semua",
     "priorityHigh": "prioritas tinggi",
     "priorityMedium": "prioritas sedang",
-    "priorityLow": "prioritas rendah"
+    "priorityLow": "prioritas rendah",
+    "yes": "Ya",
+    "no": "Tidak"
   },
   "nav": {
     "groupMeasure": "Ukur",
@@ -38,7 +40,8 @@
     "billing": "Tagihan",
     "settings": "Pengaturan",
     "switchProject": "Ganti proyek",
-    "mockMode": "Mode simulasi — atur POE_API_KEY untuk pemindaian nyata"
+    "mockMode": "Mode simulasi — atur POE_API_KEY untuk pemindaian nyata",
+    "benchmarks": "Tolok Ukur"
   },
   "market": {
     "label": "Pasar",
@@ -136,7 +139,10 @@
     "activityScan": "Pemindaian selesai di semua platform",
     "activityBenchmark": "Tolok ukur kompetitor diperbarui",
     "activityRecs": "Rekomendasi disegarkan",
-    "activityGenerated": "Dibuat: {title}"
+    "activityGenerated": "Dibuat: {title}",
+    "scoreExplanation": "Skor Visibilitas AI mencerminkan seberapa sering merek Anda ditemukan dan dirujuk di platform AI terkemuka.",
+    "weeklyTrend": "Tren visibilitas mingguan",
+    "weeklyTrendHint": "Skor Visibilitas AI Anda dari minggu ke minggu"
   },
   "monitor": {
     "title": "Pemantauan",
@@ -191,7 +197,16 @@
       "knowledge_base": "Konten pusat bantuan menjawab pertanyaan pembeli dalam format tanya-jawab yang paling disukai mesin untuk dikutip.",
       "blog": "Konten editorial meraih kutipan ini. Topik yang dikutip layak dikembangkan menjadi halaman yang lebih dalam.",
       "third_party": "Situs independen yang dianggap kredibel oleh mesin untuk topik ini. Disebut di sana memperkuat visibilitas Anda."
-    }
+    },
+    "brandMentioned": "Merek Anda:",
+    "competitorMentioned": "Pesaing:",
+    "frequency": "Sumber ini dirujuk dalam {count} jawaban pada pemindaian terakhir Anda.",
+    "frequencyOnce": "Sumber ini dirujuk satu kali pada pemindaian terakhir Anda.",
+    "frequencyHigh": "Sumber ini muncul sekitar {times} kali lebih sering dibanding sumber serupa.",
+    "citedText": "Teks yang dikutip",
+    "aiResponse": "Jawaban AI",
+    "whyReferenced": "Mengapa sumber ini dirujuk:",
+    "competitorsNamed": "Pesaing yang disebut dalam jawaban ini:"
   },
   "trends": {
     "title": "Tren",
@@ -210,7 +225,13 @@
     "trendingTopics": "Topik tren",
     "topicsHint": "Tema lebih luas yang menarik perhatian",
     "noResults": "Tidak ada hasil — coba kata kunci lain.",
-    "related": "Terkait"
+    "related": "Terkait",
+    "explore": "Jelajahi",
+    "topQueries": "Kueri teratas",
+    "topQueriesHint": "Apa yang paling sering dicari pasar Anda",
+    "risingQueriesTitle": "Kueri yang naik",
+    "trendingNow": "Sedang tren",
+    "trendingNowHint": "Tema yang lebih luas yang sedang menarik perhatian di pasar Anda"
   },
   "optimize": {
     "title": "Optimalkan",
@@ -321,7 +342,15 @@
     "invitePending": "Undangan tertunda — bergabung saat login pertama",
     "deleteProject": "Hapus proyek",
     "deleting": "Menghapus…",
-    "deleteConfirm": "Hapus “{name}” beserta semua pemindaian, konten, dan riwayatnya? Tidak dapat dibatalkan."
+    "deleteConfirm": "Hapus “{name}” beserta semua pemindaian, konten, dan riwayatnya? Tidak dapat dibatalkan.",
+    "archiveProject": "Arsipkan proyek",
+    "archiving": "Mengarsipkan…",
+    "archiveConfirm": "Arsipkan “{name}”? Datanya tetap tersimpan dan tidak lagi dihitung dalam batas paket. Anda dapat memulihkannya kapan saja.",
+    "archivedProjects": "Proyek yang diarsipkan",
+    "archivedHint": "Proyek yang diarsipkan menyimpan riwayatnya dan tidak dihitung dalam batas paket",
+    "archivedAgo": "Diarsipkan {time}",
+    "restore": "Pulihkan",
+    "restoring": "Memulihkan…"
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",
@@ -398,5 +427,40 @@
     "sug3": "Apa yang harus saya lakukan dulu?",
     "placeholder": "Tanyakan tentang visibilitas Anda…",
     "error": "Maaf, terjadi kesalahan. Silakan coba lagi."
+  },
+  "switcher": {
+    "search": "Cari proyek…",
+    "noMatches": "Tidak ada proyek yang cocok dengan pencarian.",
+    "markets": "{count} pasar",
+    "lastScan": "dipindai {time}",
+    "noScan": "belum ada pemindaian",
+    "newProject": "Proyek baru",
+    "limitReached": "Paket {plan} Anda mencakup {max} proyek aktif — arsipkan satu proyek di Pengaturan atau tingkatkan paket untuk menambah.",
+    "pin": "Sematkan proyek",
+    "unpin": "Lepas sematan"
+  },
+  "benchmarks": {
+    "title": "Tolok Ukur Pasar",
+    "subtitle": "Posisi Anda di {industry} · {country}",
+    "subtitleLocked": "Lihat perbandingan visibilitas AI Anda dengan pasar",
+    "lockedTitle": "Tolok ukur Visibilitas AI Anda",
+    "lockedBody": "Perbandingan visibilitas dengan industri dan pasar — tersedia di paket Starter dan Pro.",
+    "lockBenchmark": "Tolok ukur Visibilitas AI Anda",
+    "lockTopPrompts": "Prompt teratas di pasar Anda",
+    "lockIndustry": "Perbandingan industri",
+    "lockContent": "Konten berkinerja terbaik",
+    "collectingNote": "Tolok ukur dibangun hanya dari statistik pasar anonim yang diagregasi — tidak pernah dari prompt, laporan, atau identitas pelanggan mana pun. Bagian di bawah akan terbuka otomatis seiring bertambahnya data industri dan pasar Anda.",
+    "comingSoon": "Segera hadir",
+    "placeholderBody": "Bagian ini akan terbuka seiring terkumpulnya data pasar anonim untuk industri Anda.",
+    "shareOfVoice": "Pangsa Suara",
+    "shareOfVoiceHint": "Merek Anda vs pasar dalam jawaban AI",
+    "distribution": "Distribusi Visibilitas AI",
+    "distributionHint": "Rentang skor merek serupa di industri Anda",
+    "promptCoverage": "Cakupan Prompt",
+    "promptCoverageHint": "Seberapa banyak pertanyaan pembeli di pasar Anda yang menampilkan Anda",
+    "benchmarkTrends": "Tren Tolok Ukur",
+    "benchmarkTrendsHint": "Perubahan visibilitas pasar Anda dari waktu ke waktu",
+    "recommendedActions": "Tindakan yang Disarankan",
+    "recommendedActionsHint": "Apa yang dilakukan berbeda oleh merek teratas di pasar Anda"
   }
 }

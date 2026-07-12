@@ -20,7 +20,9 @@
     "all": "전체",
     "priorityHigh": "우선순위 높음",
     "priorityMedium": "우선순위 중간",
-    "priorityLow": "우선순위 낮음"
+    "priorityLow": "우선순위 낮음",
+    "yes": "예",
+    "no": "아니요"
   },
   "nav": {
     "groupMeasure": "측정",
@@ -38,7 +40,8 @@
     "billing": "결제",
     "settings": "설정",
     "switchProject": "프로젝트 전환",
-    "mockMode": "모의 모드 — 실제 스캔에는 POE_API_KEY를 설정하세요"
+    "mockMode": "모의 모드 — 실제 스캔에는 POE_API_KEY를 설정하세요",
+    "benchmarks": "벤치마크"
   },
   "market": {
     "label": "마켓",
@@ -136,7 +139,10 @@
     "activityScan": "전체 플랫폼 스캔 완료",
     "activityBenchmark": "경쟁사 벤치마크 갱신됨",
     "activityRecs": "추천 항목 갱신됨",
-    "activityGenerated": "생성됨: {title}"
+    "activityGenerated": "생성됨: {title}",
+    "scoreExplanation": "AI 가시성 점수는 주요 AI 플랫폼에서 브랜드가 얼마나 자주 발견되고 인용되는지를 나타냅니다.",
+    "weeklyTrend": "주간 가시성 추이",
+    "weeklyTrendHint": "주 단위 AI 가시성 점수"
   },
   "monitor": {
     "title": "모니터",
@@ -191,7 +197,16 @@
       "knowledge_base": "헬프센터 콘텐츠는 엔진이 인용을 선호하는 Q&A 형식 그대로 구매자 질문에 답합니다.",
       "blog": "에디토리얼 콘텐츠가 이 인용을 얻어냈습니다. 인용되는 주제는 더 깊은 페이지로 확장할 가치가 있습니다.",
       "third_party": "엔진이 이 주제에 신뢰할 만하다고 판단한 독립 사이트입니다. 그곳에서 언급되면 가시성이 강화됩니다."
-    }
+    },
+    "brandMentioned": "내 브랜드:",
+    "competitorMentioned": "경쟁사:",
+    "frequency": "이 소스는 최근 스캔에서 {count}개의 답변에 인용되었습니다.",
+    "frequencyOnce": "이 소스는 최근 스캔에서 한 번 인용되었습니다.",
+    "frequencyHigh": "이 소스는 비슷한 소스보다 약 {times}배 더 자주 나타났습니다.",
+    "citedText": "인용된 원문",
+    "aiResponse": "AI 응답",
+    "whyReferenced": "이 소스가 인용된 이유:",
+    "competitorsNamed": "이 답변에 언급된 경쟁사:"
   },
   "trends": {
     "title": "트렌드",
@@ -210,7 +225,13 @@
     "trendingTopics": "인기 토픽",
     "topicsHint": "주목받는 더 넓은 주제들",
     "noResults": "결과 없음 — 다른 키워드를 시도해 보세요.",
-    "related": "연관"
+    "related": "연관",
+    "explore": "탐색",
+    "topQueries": "인기 검색어",
+    "topQueriesHint": "시장에서 가장 많이 검색되는 질문",
+    "risingQueriesTitle": "급상승 검색어",
+    "trendingNow": "지금 뜨는 주제",
+    "trendingNowHint": "지금 시장에서 주목받는 폭넓은 테마"
   },
   "optimize": {
     "title": "최적화",
@@ -321,7 +342,15 @@
     "invitePending": "초대 대기 중 — 첫 로그인 시 합류합니다",
     "deleteProject": "프로젝트 삭제",
     "deleting": "삭제 중…",
-    "deleteConfirm": "“{name}”와(과) 모든 스캔, 콘텐츠, 기록을 삭제할까요? 되돌릴 수 없습니다."
+    "deleteConfirm": "“{name}”와(과) 모든 스캔, 콘텐츠, 기록을 삭제할까요? 되돌릴 수 없습니다.",
+    "archiveProject": "프로젝트 보관",
+    "archiving": "보관 중…",
+    "archiveConfirm": "“{name}”을(를) 보관할까요? 데이터는 유지되며 플랜 한도에 포함되지 않습니다. 언제든 복원할 수 있습니다.",
+    "archivedProjects": "보관된 프로젝트",
+    "archivedHint": "보관된 프로젝트는 기록이 유지되며 플랜 한도에 포함되지 않습니다",
+    "archivedAgo": "{time} 보관됨",
+    "restore": "복원",
+    "restoring": "복원 중…"
   },
   "summary": {
     "title": "마지막 스캔 요약",
@@ -398,5 +427,40 @@
     "sug3": "무엇부터 해야 할까?",
     "placeholder": "가시성에 대해 물어보세요…",
     "error": "죄송합니다. 문제가 발생했습니다. 다시 시도해 주세요."
+  },
+  "switcher": {
+    "search": "프로젝트 검색…",
+    "noMatches": "검색과 일치하는 프로젝트가 없습니다.",
+    "markets": "마켓 {count}개",
+    "lastScan": "스캔: {time}",
+    "noScan": "아직 스캔 없음",
+    "newProject": "새 프로젝트",
+    "limitReached": "{plan} 플랜에는 활성 프로젝트 {max}개가 포함됩니다 — 설정에서 프로젝트를 보관하거나 업그레이드하세요.",
+    "pin": "프로젝트 고정",
+    "unpin": "고정 해제"
+  },
+  "benchmarks": {
+    "title": "마켓 벤치마크",
+    "subtitle": "{industry} · {country} 시장 내 비교",
+    "subtitleLocked": "내 AI 가시성이 시장 대비 어느 수준인지 확인하세요",
+    "lockedTitle": "AI 가시성 벤치마크",
+    "lockedBody": "업계·시장 대비 가시성 비교는 Starter와 Pro에서 제공됩니다.",
+    "lockBenchmark": "AI 가시성 벤치마크",
+    "lockTopPrompts": "내 시장의 인기 프롬프트",
+    "lockIndustry": "업계 비교",
+    "lockContent": "최고 성과 콘텐츠",
+    "collectingNote": "벤치마크는 집계된 익명 시장 통계로만 만들어지며, 고객의 프롬프트·리포트·신원은 절대 사용하지 않습니다. 업계·시장 데이터가 쌓이면 아래 섹션이 자동으로 열립니다.",
+    "comingSoon": "곧 제공",
+    "placeholderBody": "업계의 익명 시장 데이터가 쌓이면 이 섹션이 열립니다.",
+    "shareOfVoice": "쉐어 오브 보이스",
+    "shareOfVoiceHint": "AI 답변 속 내 브랜드 vs 시장",
+    "distribution": "AI 가시성 분포",
+    "distributionHint": "업계에서 비슷한 브랜드들의 점수 분포",
+    "promptCoverage": "프롬프트 커버리지",
+    "promptCoverageHint": "시장의 구매자 질문 중 내가 등장하는 비율",
+    "benchmarkTrends": "벤치마크 추이",
+    "benchmarkTrendsHint": "시장 가시성의 시간에 따른 변화",
+    "recommendedActions": "추천 액션",
+    "recommendedActionsHint": "시장 상위 브랜드가 다르게 하는 것"
   }
 }

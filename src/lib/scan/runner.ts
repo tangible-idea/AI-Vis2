@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { createAdminClient } from "../supabase/server";
 import { getProvider, isMockMode, type ChatMessage } from "../ai/provider";
 import { ENGINES } from "../ai/engines";
@@ -11,6 +12,18 @@ const SCAN_SYSTEM_PROMPT =
   "You are a helpful assistant. Answer the user's question the way you normally would, naming specific products, companies or services where relevant.";
 
 const CONCURRENCY = 6;
+
+/**
+ * Identical prompts asked to the same engine for the same market/language
+ * within this window reuse the cached answer instead of a new provider
+ * call — deduplicating across organizations, projects and scheduled runs.
+ */
+const RESPONSE_CACHE_HOURS = 24;
+
+/** Stable identity for a prompt across customers: whitespace/case-insensitive. */
+export function promptHash(text: string): string {
+  return createHash("sha256").update(text.trim().toLowerCase().replace(/\s+/g, " ")).digest("hex");
+}
 
 /**
  * Executes a scan end-to-end: queries every engine with every active prompt,
@@ -40,6 +53,7 @@ export async function runScan(scanId: string): Promise<void> {
         .order("created_at"),
     ]);
     if (!project) throw new Error("Project not found");
+    if (project.archived_at) throw new Error("Project is archived — restore it to run scans");
     if (!prompts?.length) throw new Error("No active prompts to scan");
 
     const competitorNames = (competitors ?? []).map((c) => c.name);
@@ -68,20 +82,54 @@ export async function runScan(scanId: string): Promise<void> {
     };
     await reportProgress(jobs[0].engine, true);
 
+    // mock answers embed this project's context, so they're never shareable;
+    // only real provider responses enter the cross-customer cache
+    const cacheable = !isMockMode();
+    const cacheCutoff = new Date(Date.now() - RESPONSE_CACHE_HOURS * 3_600_000).toISOString();
+
     await mapLimit(jobs, CONCURRENCY, async (job) => {
-      const messages: ChatMessage[] = [
-        { role: "system", content: SCAN_SYSTEM_PROMPT },
-        ...(isMockMode() ? [mockContextMessage(project.name, competitorNames)] : []),
-        { role: "user", content: job.prompt.text },
-      ];
+      const hash = promptHash(job.prompt.text);
 
       let text = "";
-      try {
-        text = await provider.complete(job.model, messages);
-      } catch (err) {
-        console.error(`[scan] ${job.engine} failed for "${job.prompt.text}":`, err);
-        done++;
-        return; // one failed call shouldn't sink the scan
+      if (cacheable) {
+        const { data: cached } = await db
+          .from("ai_responses")
+          .select("response_text")
+          .eq("prompt_hash", hash)
+          .eq("engine", job.engine)
+          .eq("country", project.country)
+          .eq("language", project.language)
+          .gte("created_at", cacheCutoff)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (cached) text = cached.response_text;
+      }
+
+      if (!text) {
+        const messages: ChatMessage[] = [
+          { role: "system", content: SCAN_SYSTEM_PROMPT },
+          ...(isMockMode() ? [mockContextMessage(project.name, competitorNames)] : []),
+          { role: "user", content: job.prompt.text },
+        ];
+        try {
+          text = await provider.complete(job.model, messages);
+        } catch (err) {
+          console.error(`[scan] ${job.engine} failed for "${job.prompt.text}":`, err);
+          done++;
+          return; // one failed call shouldn't sink the scan
+        }
+        if (cacheable && text) {
+          await db.from("ai_responses").insert({
+            prompt_hash: hash,
+            prompt_text: job.prompt.text,
+            engine: job.engine,
+            model: job.model,
+            country: project.country,
+            language: project.language,
+            response_text: text,
+          });
+        }
       }
 
       const analyzed = analyzeResponse(text, project.name, competitorNames, {
@@ -115,6 +163,28 @@ export async function runScan(scanId: string): Promise<void> {
         sources: r.sources,
       }))
     );
+
+    // anonymous prompt observations — the normalized metadata layer future
+    // market benchmarks aggregate over. No user/org/project identity, and
+    // best-effort: an insert failure never sinks the scan.
+    if (cacheable && !project.is_demo) {
+      const promptById = new Map(prompts.map((p) => [p.id, p as Prompt]));
+      const { error: obsError } = await db.from("prompt_observations").insert(
+        rows.map((r) => ({
+          prompt_hash: promptHash(promptById.get(r.prompt_id)?.text ?? ""),
+          intent: promptById.get(r.prompt_id)?.category ?? "custom",
+          country: project.country,
+          language: project.language,
+          industry: project.industry,
+          engine: r.engine,
+          brand_mentioned: r.brand_mentioned,
+          competitor_mentioned: r.competitors_mentioned.length > 0,
+          cited: r.cited,
+          source_domains: r.sources.map((s) => s.domain),
+        }))
+      );
+      if (obsError) console.error("[scan] observation insert failed:", obsError.message);
+    }
 
     const engineIds = ENGINES.map((e) => e.id);
     const scores = computeScores(rows, project.name, competitorNames, engineIds);

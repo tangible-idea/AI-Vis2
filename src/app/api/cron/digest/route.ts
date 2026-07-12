@@ -36,7 +36,8 @@ export async function GET(request: Request) {
       .from("projects")
       .select("*")
       .eq("user_id", profile.id)
-      .eq("is_demo", false);
+      .eq("is_demo", false)
+      .is("archived_at", null);
 
     for (const project of projects ?? []) {
       const { data: snapshots } = await db

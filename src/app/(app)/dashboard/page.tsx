@@ -7,7 +7,7 @@ import { getTrendsSource } from "@/lib/trends";
 import { historyCutoffIso, planLimits } from "@/lib/plans";
 import { pct, timeAgo, formatDate, cn } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader, Badge, ButtonLink } from "@/components/ui";
-import { ScoreHero, ScoreTrend, SovBars, StatTile } from "@/components/charts";
+import { ScoreHero, WeeklyScoreTrend, SovBars, StatTile } from "@/components/charts";
 import { ScanButton } from "@/components/scan-button";
 import { LastScanSummary, type ActivityItem } from "./last-scan-summary";
 import { PlatformCards, type PlatformCardData } from "./platform-cards";
@@ -221,6 +221,9 @@ export default async function DashboardPage() {
               </p>
             </div>
           </div>
+          <p className="mt-3 max-w-xl text-xs leading-relaxed text-ink-faint">
+            {t("dashboard.scoreExplanation")}
+          </p>
         </Card>
 
         {/* 2 — Last Scan Summary (executive briefing) */}
@@ -255,12 +258,12 @@ export default async function DashboardPage() {
           <PlatformCards platforms={platforms} />
         </section>
 
-        {/* 4 — Visibility trend */}
+        {/* 4 — Weekly visibility trend */}
         {history.length > 1 && (
           <Card>
             <CardHeader
-              title={t("dashboard.visibilityTrend")}
-              hint={t("dashboard.visibilityTrendHint")}
+              title={t("dashboard.weeklyTrend")}
+              hint={t("dashboard.weeklyTrendHint")}
               action={
                 <Link href="/improve" className="text-xs text-accent-strong hover:underline">
                   {t("dashboard.fullHistory")}
@@ -268,7 +271,7 @@ export default async function DashboardPage() {
               }
             />
             <div className="px-3 pb-4">
-              <ScoreTrend snapshots={history} />
+              <WeeklyScoreTrend snapshots={history} />
             </div>
           </Card>
         )}

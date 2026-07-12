@@ -88,7 +88,7 @@ const NEWS_SITES = ["techcrunch.com", "forbes.com", "reuters.com", "bloomberg.co
 export function extractSources(text: string, brand: string, ctx: AnalyzerContext): CitationSource[] {
   const found = new Map<string, CitationSource>();
 
-  const add = (raw: string) => {
+  const add = (raw: string, title?: string) => {
     const url = raw.replace(/[).,;\]]+$/, "");
     const withProto = /^https?:\/\//i.test(url) ? url : `https://${url}`;
     try {
@@ -101,6 +101,7 @@ export function extractSources(text: string, brand: string, ctx: AnalyzerContext
           url: withProto,
           domain,
           type: classifySource(domain, u.pathname, brand, ctx),
+          ...(title ? { title: title.slice(0, 120) } : {}),
         });
       }
     } catch {
@@ -108,8 +109,8 @@ export function extractSources(text: string, brand: string, ctx: AnalyzerContext
     }
   };
 
-  // markdown links + bare URLs
-  for (const m of text.matchAll(/\]\((https?:\/\/[^\s)]+)\)/g)) add(m[1]);
+  // markdown links (link text doubles as the page title) + bare URLs
+  for (const m of text.matchAll(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g)) add(m[2], m[1]);
   for (const m of text.matchAll(/(?<!\()https?:\/\/[^\s)\]"'<>]+/g)) add(m[0]);
   // "Sources: acme.com, g2.com" style bare-domain lists
   for (const line of text.split("\n")) {

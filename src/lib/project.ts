@@ -46,7 +46,9 @@ export const getAppContext = cache(async (): Promise<AppContext> => {
 
   const cookieStore = await cookies();
   const pid = cookieStore.get(PROJECT_COOKIE)?.value;
-  const list = projects ?? [];
+  // archived projects keep their data but leave the working set — they're
+  // managed from Settings and don't count toward plan limits
+  const list = (projects ?? []).filter((p) => !p.archived_at);
   const project = list.find((p) => p.id === pid) ?? list[0] ?? null;
 
   return {

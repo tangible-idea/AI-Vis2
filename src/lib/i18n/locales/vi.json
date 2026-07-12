@@ -20,7 +20,9 @@
     "all": "Tất cả",
     "priorityHigh": "ưu tiên cao",
     "priorityMedium": "ưu tiên trung bình",
-    "priorityLow": "ưu tiên thấp"
+    "priorityLow": "ưu tiên thấp",
+    "yes": "Có",
+    "no": "Không"
   },
   "nav": {
     "groupMeasure": "Đo lường",
@@ -38,7 +40,8 @@
     "billing": "Thanh toán",
     "settings": "Cài đặt",
     "switchProject": "Chuyển dự án",
-    "mockMode": "Chế độ giả lập — đặt POE_API_KEY để quét thật"
+    "mockMode": "Chế độ giả lập — đặt POE_API_KEY để quét thật",
+    "benchmarks": "Đối chuẩn"
   },
   "market": {
     "label": "Thị trường",
@@ -136,7 +139,10 @@
     "activityScan": "Đã hoàn tất quét trên mọi nền tảng",
     "activityBenchmark": "Đã cập nhật so sánh đối thủ",
     "activityRecs": "Đã làm mới khuyến nghị",
-    "activityGenerated": "Đã tạo: {title}"
+    "activityGenerated": "Đã tạo: {title}",
+    "scoreExplanation": "Điểm Hiển thị AI phản ánh tần suất thương hiệu của bạn được tìm thấy và trích dẫn trên các nền tảng AI hàng đầu.",
+    "weeklyTrend": "Xu hướng hiển thị hàng tuần",
+    "weeklyTrendHint": "Điểm Hiển thị AI của bạn theo từng tuần"
   },
   "monitor": {
     "title": "Theo dõi",
@@ -191,7 +197,16 @@
       "knowledge_base": "Nội dung trung tâm trợ giúp trả lời câu hỏi người mua đúng định dạng hỏi-đáp mà engine thích trích dẫn.",
       "blog": "Nội dung biên tập đã giành được trích dẫn này. Chủ đề được trích dẫn đáng để mở rộng thành trang chuyên sâu hơn.",
       "third_party": "Một trang độc lập mà engine coi là đáng tin về chủ đề này. Được nhắc đến ở đó giúp tăng độ hiển thị của bạn."
-    }
+    },
+    "brandMentioned": "Thương hiệu của bạn:",
+    "competitorMentioned": "Đối thủ:",
+    "frequency": "Nguồn này được trích dẫn trong {count} câu trả lời ở lần quét gần nhất.",
+    "frequencyOnce": "Nguồn này được trích dẫn một lần trong lần quét gần nhất.",
+    "frequencyHigh": "Nguồn này xuất hiện thường xuyên hơn khoảng {times} lần so với các nguồn tương tự.",
+    "citedText": "Đoạn văn được trích dẫn",
+    "aiResponse": "Câu trả lời của AI",
+    "whyReferenced": "Vì sao nguồn này được trích dẫn:",
+    "competitorsNamed": "Đối thủ được nhắc đến trong câu trả lời này:"
   },
   "trends": {
     "title": "Xu hướng",
@@ -210,7 +225,13 @@
     "trendingTopics": "Chủ đề thịnh hành",
     "topicsHint": "Các chủ đề rộng hơn đang được chú ý",
     "noResults": "Không có kết quả — thử từ khóa khác.",
-    "related": "Liên quan"
+    "related": "Liên quan",
+    "explore": "Khám phá",
+    "topQueries": "Truy vấn hàng đầu",
+    "topQueriesHint": "Những gì thị trường của bạn tìm kiếm nhiều nhất",
+    "risingQueriesTitle": "Truy vấn đang tăng",
+    "trendingNow": "Đang thịnh hành",
+    "trendingNowHint": "Các chủ đề rộng hơn đang thu hút sự chú ý trong thị trường của bạn"
   },
   "optimize": {
     "title": "Tối ưu",
@@ -321,7 +342,15 @@
     "invitePending": "Lời mời đang chờ — tham gia khi đăng nhập lần đầu",
     "deleteProject": "Xóa dự án",
     "deleting": "Đang xóa…",
-    "deleteConfirm": "Xóa “{name}” cùng toàn bộ lần quét, nội dung và lịch sử? Không thể hoàn tác."
+    "deleteConfirm": "Xóa “{name}” cùng toàn bộ lần quét, nội dung và lịch sử? Không thể hoàn tác.",
+    "archiveProject": "Lưu trữ dự án",
+    "archiving": "Đang lưu trữ…",
+    "archiveConfirm": "Lưu trữ “{name}”? Dữ liệu được giữ lại và không còn tính vào giới hạn gói. Bạn có thể khôi phục bất cứ lúc nào.",
+    "archivedProjects": "Dự án đã lưu trữ",
+    "archivedHint": "Dự án đã lưu trữ giữ nguyên lịch sử và không tính vào giới hạn gói",
+    "archivedAgo": "Đã lưu trữ {time}",
+    "restore": "Khôi phục",
+    "restoring": "Đang khôi phục…"
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",
@@ -398,5 +427,40 @@
     "sug3": "Tôi nên làm gì trước?",
     "placeholder": "Hỏi về độ hiển thị của bạn…",
     "error": "Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại."
+  },
+  "switcher": {
+    "search": "Tìm kiếm dự án…",
+    "noMatches": "Không có dự án nào khớp với tìm kiếm.",
+    "markets": "{count} thị trường",
+    "lastScan": "đã quét {time}",
+    "noScan": "chưa có lần quét nào",
+    "newProject": "Dự án mới",
+    "limitReached": "Gói {plan} của bạn bao gồm {max} dự án đang hoạt động — hãy lưu trữ một dự án trong Cài đặt hoặc nâng cấp để thêm.",
+    "pin": "Ghim dự án",
+    "unpin": "Bỏ ghim"
+  },
+  "benchmarks": {
+    "title": "Đối chuẩn thị trường",
+    "subtitle": "Vị thế của bạn trong {industry} · {country}",
+    "subtitleLocked": "Xem mức hiển thị AI của bạn so với thị trường",
+    "lockedTitle": "Đối chuẩn mức Hiển thị AI của bạn",
+    "lockedBody": "So sánh mức hiển thị với ngành và thị trường — có trong gói Starter và Pro.",
+    "lockBenchmark": "Đối chuẩn mức Hiển thị AI của bạn",
+    "lockTopPrompts": "Các prompt hàng đầu trong thị trường của bạn",
+    "lockIndustry": "So sánh ngành",
+    "lockContent": "Nội dung hiệu quả nhất",
+    "collectingNote": "Đối chuẩn chỉ được xây dựng từ thống kê thị trường ẩn danh, tổng hợp — không bao giờ dùng prompt, báo cáo hay danh tính của khách hàng. Các mục bên dưới sẽ tự động mở khóa khi dữ liệu ngành và thị trường của bạn tích lũy đủ.",
+    "comingSoon": "Sắp ra mắt",
+    "placeholderBody": "Mục này sẽ mở khóa khi dữ liệu thị trường ẩn danh của ngành bạn tích lũy đủ.",
+    "shareOfVoice": "Thị phần tiếng nói",
+    "shareOfVoiceHint": "Thương hiệu của bạn so với thị trường trong các câu trả lời AI",
+    "distribution": "Phân bố Hiển thị AI",
+    "distributionHint": "Mức điểm của các thương hiệu tương tự trong ngành của bạn",
+    "promptCoverage": "Độ phủ prompt",
+    "promptCoverageHint": "Tỷ lệ câu hỏi của người mua trong thị trường mà bạn xuất hiện",
+    "benchmarkTrends": "Xu hướng đối chuẩn",
+    "benchmarkTrendsHint": "Mức hiển thị của thị trường thay đổi theo thời gian",
+    "recommendedActions": "Hành động đề xuất",
+    "recommendedActionsHint": "Điều các thương hiệu dẫn đầu thị trường làm khác biệt"
   }
 }

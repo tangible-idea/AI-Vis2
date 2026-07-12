@@ -51,9 +51,22 @@ export interface Profile {
   created_at: string;
 }
 
+/**
+ * Top-level ownership layer: one organization per customer account,
+ * auto-created on signup (see migration 0006). Invisible in the UI for
+ * now — it anchors billing, teams and usage limits going forward.
+ */
+export interface Organization {
+  id: string;
+  owner_id: string;
+  name: string;
+  created_at: string;
+}
+
 export interface Project {
   id: string;
   user_id: string;
+  org_id: string | null;
   name: string;
   website: string;
   industry: string;
@@ -61,6 +74,9 @@ export interface Project {
   language: string;
   target_market: string | null;
   description: string | null;
+  logo_url: string | null;
+  /** Archived projects keep their data but don't count toward plan limits. */
+  archived_at: string | null;
   is_demo: boolean;
   created_at: string;
 }
@@ -130,6 +146,8 @@ export interface CitationSource {
   url: string;
   domain: string;
   type: SourceType;
+  /** Page title, when the engine's answer linked it as "[title](url)". */
+  title?: string;
 }
 
 export interface ScanResult {

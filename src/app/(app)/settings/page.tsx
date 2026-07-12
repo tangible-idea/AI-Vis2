@@ -8,7 +8,7 @@ import { updateProject, addCompetitor, addPrompt, inviteMember } from "./actions
 import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
 import { MemberList } from "./member-list";
-import { DeleteProjectButton } from "./danger";
+import { ArchiveProjectButton, ArchivedProjects, DeleteProjectButton } from "./danger";
 import { getT } from "@/lib/i18n/server";
 import type { ProjectMember } from "@/lib/types";
 
@@ -21,7 +21,7 @@ export default async function SettingsPage() {
   const isOwner = project.user_id === userId;
   const t = await getT();
 
-  const [{ data: competitors }, { data: prompts }, { data: members }] = await Promise.all([
+  const [{ data: competitors }, { data: prompts }, { data: members }, { data: archived }] = await Promise.all([
     supabase
       .from("competitors")
       .select("*")
@@ -34,6 +34,12 @@ export default async function SettingsPage() {
       .select("*")
       .eq("project_id", project.id)
       .order("created_at"),
+    supabase
+      .from("projects")
+      .select("id, name, country, archived_at")
+      .eq("user_id", userId)
+      .not("archived_at", "is", null)
+      .order("archived_at", { ascending: false }),
   ]);
   const memberList = (members ?? []) as ProjectMember[];
 
@@ -223,10 +229,20 @@ export default async function SettingsPage() {
           </div>
         </Card>
 
+        {isOwner && (archived?.length ?? 0) > 0 && (
+          <Card>
+            <CardHeader title={t("settings.archivedProjects")} hint={t("settings.archivedHint")} />
+            <div className="px-5 pb-4">
+              <ArchivedProjects projects={archived ?? []} />
+            </div>
+          </Card>
+        )}
+
         {isOwner && (
           <Card className="border-poor/20">
             <CardHeader title={t("settings.dangerZone")} hint={t("settings.dangerHint")} />
-            <div className="px-5 pb-5">
+            <div className="flex flex-wrap gap-2 px-5 pb-5">
+              <ArchiveProjectButton projectId={project.id} name={project.name} />
               <DeleteProjectButton projectId={project.id} name={project.name} />
             </div>
           </Card>
