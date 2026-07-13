@@ -141,6 +141,17 @@ export async function removeMember(id: string) {
   revalidatePath("/settings");
 }
 
+/** Monitoring configuration: opt a project in or out of weekly scheduled scans. */
+export async function setAutoScan(projectId: string, enabled: boolean) {
+  const { supabase, user } = await requireUser();
+  await supabase
+    .from("projects")
+    .update({ auto_scan_enabled: enabled })
+    .eq("id", projectId)
+    .eq("user_id", user.id);
+  revalidatePath("/settings");
+}
+
 export async function deleteProject(projectId: string) {
   const { supabase } = await requireUser();
   await supabase.from("projects").delete().eq("id", projectId);

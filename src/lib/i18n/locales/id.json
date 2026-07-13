@@ -350,7 +350,13 @@
     "archivedHint": "Proyek yang diarsipkan menyimpan riwayatnya dan tidak dihitung dalam batas paket",
     "archivedAgo": "Diarsipkan {time}",
     "restore": "Pulihkan",
-    "restoring": "Memulihkan…"
+    "restoring": "Memulihkan…",
+    "monitoring": "Pemantauan",
+    "monitoringHint": "Pemindaian terjadwal menjaga riwayat visibilitas tetap terbaru tanpa dijalankan manual",
+    "autoScanLabel": "Pemindaian terjadwal mingguan",
+    "autoScanBody": "Berjalan setiap Senin dalam batas pemindaian bulanan paket Anda. Proyek yang diarsipkan tidak pernah dipindai.",
+    "monitoringLocked": "Pemantauan terjadwal tersedia di Starter dan Pro —",
+    "upgradeToMonitor": "tingkatkan untuk mengaktifkan."
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",

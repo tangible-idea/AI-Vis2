@@ -350,7 +350,13 @@
     "archivedHint": "보관된 프로젝트는 기록이 유지되며 플랜 한도에 포함되지 않습니다",
     "archivedAgo": "{time} 보관됨",
     "restore": "복원",
-    "restoring": "복원 중…"
+    "restoring": "복원 중…",
+    "monitoring": "모니터링",
+    "monitoringHint": "예약 스캔이 수동 실행 없이 가시성 히스토리를 최신으로 유지합니다",
+    "autoScanLabel": "주간 예약 스캔",
+    "autoScanBody": "매주 월요일, 플랜의 월간 스캔 한도 내에서 실행됩니다. 보관된 프로젝트는 스캔되지 않습니다.",
+    "monitoringLocked": "예약 모니터링은 Starter와 Pro에서 제공됩니다 —",
+    "upgradeToMonitor": "업그레이드하여 활성화하세요."
   },
   "summary": {
     "title": "마지막 스캔 요약",

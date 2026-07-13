@@ -350,7 +350,13 @@
     "archivedHint": "Archived projects keep their history and don't count toward your plan limit",
     "archivedAgo": "Archived {time}",
     "restore": "Restore",
-    "restoring": "Restoring…"
+    "restoring": "Restoring…",
+    "monitoring": "Monitoring",
+    "monitoringHint": "Scheduled scans keep your visibility history fresh without manual runs",
+    "autoScanLabel": "Weekly scheduled scan",
+    "autoScanBody": "Runs every Monday within your plan's monthly scan limit. Archived projects are never scanned.",
+    "monitoringLocked": "Scheduled monitoring is available on Starter and Pro —",
+    "upgradeToMonitor": "upgrade to enable it."
   },
   "summary": {
     "title": "Last scan summary",

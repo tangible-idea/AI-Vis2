@@ -77,6 +77,8 @@ export interface Project {
   logo_url: string | null;
   /** Archived projects keep their data but don't count toward plan limits. */
   archived_at: string | null;
+  /** Monitoring configuration: include this project in weekly scheduled scans (paid plans). */
+  auto_scan_enabled: boolean;
   is_demo: boolean;
   created_at: string;
 }

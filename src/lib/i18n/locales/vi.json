@@ -350,7 +350,13 @@
     "archivedHint": "Dự án đã lưu trữ giữ nguyên lịch sử và không tính vào giới hạn gói",
     "archivedAgo": "Đã lưu trữ {time}",
     "restore": "Khôi phục",
-    "restoring": "Đang khôi phục…"
+    "restoring": "Đang khôi phục…",
+    "monitoring": "Giám sát",
+    "monitoringHint": "Quét theo lịch giữ lịch sử hiển thị luôn mới mà không cần chạy thủ công",
+    "autoScanLabel": "Quét theo lịch hàng tuần",
+    "autoScanBody": "Chạy vào thứ Hai hàng tuần trong giới hạn quét hàng tháng của gói. Dự án đã lưu trữ sẽ không bao giờ được quét.",
+    "monitoringLocked": "Giám sát theo lịch có trên gói Starter và Pro —",
+    "upgradeToMonitor": "nâng cấp để bật."
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",

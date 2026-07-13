@@ -350,7 +350,13 @@
     "archivedHint": "アーカイブ済みプロジェクトは履歴を保持し、プラン上限にカウントされません",
     "archivedAgo": "{time}にアーカイブ",
     "restore": "復元",
-    "restoring": "復元中…"
+    "restoring": "復元中…",
+    "monitoring": "モニタリング",
+    "monitoringHint": "スケジュールスキャンが手動実行なしで可視性履歴を最新に保ちます",
+    "autoScanLabel": "週次スケジュールスキャン",
+    "autoScanBody": "毎週月曜日、プランの月間スキャン上限内で実行されます。アーカイブ済みプロジェクトはスキャンされません。",
+    "monitoringLocked": "スケジュールモニタリングはStarterとProで利用できます —",
+    "upgradeToMonitor": "アップグレードして有効にする。"
   },
   "summary": {
     "title": "最終スキャン概要",

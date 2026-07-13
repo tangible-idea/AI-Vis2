@@ -9,6 +9,7 @@ import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
 import { MemberList } from "./member-list";
 import { ArchiveProjectButton, ArchivedProjects, DeleteProjectButton } from "./danger";
+import { MonitoringToggle } from "./monitoring-toggle";
 import { getT } from "@/lib/i18n/server";
 import type { ProjectMember } from "@/lib/types";
 
@@ -207,6 +208,22 @@ export default async function SettingsPage() {
                 {t("settings.teamLocked")}{" "}
                 <Link href="/billing" className="underline">
                   {t("settings.upgradeToCollaborate")}
+                </Link>
+              </p>
+            )}
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader title={t("settings.monitoring")} hint={t("settings.monitoringHint")} />
+          <div className="px-5 pb-5">
+            {limits.totalScans == null ? (
+              <MonitoringToggle projectId={project.id} enabled={project.auto_scan_enabled} />
+            ) : (
+              <p className="text-xs text-mid">
+                {t("settings.monitoringLocked")}{" "}
+                <Link href="/billing" className="underline">
+                  {t("settings.upgradeToMonitor")}
                 </Link>
               </p>
             )}

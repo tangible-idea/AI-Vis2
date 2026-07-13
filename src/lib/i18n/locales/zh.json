@@ -350,7 +350,13 @@
     "archivedHint": "已归档项目保留历史记录，且不计入套餐限额",
     "archivedAgo": "归档于 {time}",
     "restore": "恢复",
-    "restoring": "恢复中…"
+    "restoring": "恢复中…",
+    "monitoring": "监测",
+    "monitoringHint": "定时扫描无需手动运行即可保持可见性历史记录最新",
+    "autoScanLabel": "每周定时扫描",
+    "autoScanBody": "每周一在您套餐的每月扫描额度内运行。已归档的项目不会被扫描。",
+    "monitoringLocked": "定时监测在 Starter 和 Pro 套餐中提供 —",
+    "upgradeToMonitor": "升级以启用。"
   },
   "summary": {
     "title": "上次扫描摘要",

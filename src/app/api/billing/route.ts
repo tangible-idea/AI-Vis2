@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getBillingProvider } from "@/lib/billing/provider";
+import { planLimits } from "@/lib/plans";
 import type { Plan } from "@/lib/types";
 
 /**
@@ -18,6 +19,23 @@ export async function POST(request: Request) {
   const { plan } = (await request.json()) as { plan: Plan };
   if (!["free", "starter", "pro"].includes(plan)) {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+  }
+
+  // downgrade guard: active projects must fit inside the target plan
+  const target = planLimits(plan);
+  const { count: activeProjects } = await supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("is_demo", false)
+    .is("archived_at", null);
+  if ((activeProjects ?? 0) > target.maxProjects) {
+    return NextResponse.json(
+      {
+        error: `You have ${activeProjects} active projects, but the ${target.label} plan includes ${target.maxProjects}. Archive or delete projects in Settings before switching.`,
+      },
+      { status: 400 }
+    );
   }
 
   const billing = getBillingProvider();

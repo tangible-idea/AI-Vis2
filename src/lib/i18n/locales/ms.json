@@ -350,7 +350,13 @@
     "archivedHint": "Projek yang diarkibkan mengekalkan sejarahnya dan tidak dikira dalam had pelan",
     "archivedAgo": "Diarkibkan {time}",
     "restore": "Pulihkan",
-    "restoring": "Memulihkan…"
+    "restoring": "Memulihkan…",
+    "monitoring": "Pemantauan",
+    "monitoringHint": "Imbasan berjadual memastikan sejarah keterlihatan sentiasa terkini tanpa jalankan manual",
+    "autoScanLabel": "Imbasan berjadual mingguan",
+    "autoScanBody": "Berjalan setiap Isnin dalam had imbasan bulanan pelan anda. Projek yang diarkibkan tidak akan diimbas.",
+    "monitoringLocked": "Pemantauan berjadual tersedia pada Starter dan Pro —",
+    "upgradeToMonitor": "naik taraf untuk mengaktifkan."
   },
   "summary": {
     "title": "Ringkasan imbasan terakhir",
