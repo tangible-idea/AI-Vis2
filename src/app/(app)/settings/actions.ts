@@ -27,9 +27,27 @@ export async function updateProject(formData: FormData) {
       country: String(formData.get("country") ?? "US"),
       language: String(formData.get("language") ?? "en"),
       target_market: String(formData.get("target_market") ?? "").trim() || null,
+      logo_url: String(formData.get("logo_url") ?? "").trim() || null,
     })
     .eq("id", projectId);
   revalidatePath("/", "layout");
+}
+
+/** White-label branding (Pro): company identity shown on exported reports. */
+export async function updateBranding(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
+  if (!planLimits(profile?.plan).whiteLabel) return;
+
+  await supabase
+    .from("organizations")
+    .update({
+      name: String(formData.get("company_name") ?? "").trim(),
+      website: String(formData.get("company_website") ?? "").trim() || null,
+      logo_url: String(formData.get("company_logo") ?? "").trim() || null,
+    })
+    .eq("owner_id", user.id);
+  revalidatePath("/settings");
 }
 
 export async function addCompetitor(formData: FormData) {
@@ -97,15 +115,33 @@ export async function addPrompt(formData: FormData) {
 }
 
 export async function togglePrompt(id: string, isActive: boolean) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+
+  // resuming counts toward the plan's active-prompt limit
+  if (isActive) {
+    const { data: prompt } = await supabase.from("prompts").select("project_id").eq("id", id).single();
+    if (!prompt) return;
+    const [{ data: profile }, { count }] = await Promise.all([
+      supabase.from("profiles").select("plan").eq("id", user.id).single(),
+      supabase
+        .from("prompts")
+        .select("id", { count: "exact", head: true })
+        .eq("project_id", prompt.project_id)
+        .eq("is_active", true),
+    ]);
+    if ((count ?? 0) >= planLimits(profile?.plan).maxPrompts) return;
+  }
+
   await supabase.from("prompts").update({ is_active: isActive }).eq("id", id);
   revalidatePath("/settings");
+  revalidatePath("/prompts");
 }
 
 export async function removePrompt(id: string) {
   const { supabase } = await requireUser();
   await supabase.from("prompts").delete().eq("id", id);
   revalidatePath("/settings");
+  revalidatePath("/prompts");
 }
 
 export async function inviteMember(formData: FormData) {

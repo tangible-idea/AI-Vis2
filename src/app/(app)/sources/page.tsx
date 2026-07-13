@@ -6,7 +6,7 @@ import { timeAgo } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader, Badge } from "@/components/ui";
 import { ScanButton } from "@/components/scan-button";
 import { getT } from "@/lib/i18n/server";
-import type { Engine, ScanResult, SourceType } from "@/lib/types";
+import type { CitationSource, Engine, ScanResult, SourceType } from "@/lib/types";
 
 export const metadata = { title: "Sources" };
 
@@ -87,16 +87,17 @@ export default async function SourcesPage() {
   const supabase = await createClient();
   const t = await getT();
 
-  const { data: lastDone } = await supabase
+  const { data: doneScans } = await supabase
     .from("scans")
     .select("id, completed_at")
     .eq("project_id", project.id)
     .eq("status", "done")
     .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(2);
+  const lastDone = doneScans?.[0] ?? null;
+  const prevDone = doneScans?.[1] ?? null;
 
-  const [{ data: resultRows }, { data: promptRows }] = await Promise.all([
+  const [{ data: resultRows }, { data: promptRows }, { data: prevRows }] = await Promise.all([
     lastDone
       ? supabase
           .from("scan_results")
@@ -104,6 +105,9 @@ export default async function SourcesPage() {
           .eq("scan_id", lastDone.id)
       : Promise.resolve({ data: [] }),
     supabase.from("prompts").select("id, text").eq("project_id", project.id),
+    prevDone
+      ? supabase.from("scan_results").select("sources").eq("scan_id", prevDone.id)
+      : Promise.resolve({ data: [] }),
   ]);
   const results = (resultRows ?? []) as Pick<
     ScanResult,
@@ -160,6 +164,36 @@ export default async function SourcesPage() {
     return count === 1 ? t("sources.frequencyOnce") : t("sources.frequency", { count });
   };
 
+  // source-type breakdown: how citations split by category, with the trend
+  // vs the previous scan (share of citations, in percentage points)
+  const typeShares = (list: { sources?: CitationSource[] | null }[]) => {
+    const counts = new Map<SourceType, number>();
+    let total = 0;
+    for (const r of list) {
+      for (const s of r.sources ?? []) {
+        counts.set(s.type, (counts.get(s.type) ?? 0) + 1);
+        total++;
+      }
+    }
+    return { counts, total };
+  };
+  const current = typeShares(results);
+  const previous = typeShares((prevRows ?? []) as { sources: CitationSource[] }[]);
+  const breakdown = [...current.counts.entries()]
+    .map(([type, count]) => {
+      const share = count / Math.max(current.total, 1);
+      const prevShare = previous.total
+        ? (previous.counts.get(type) ?? 0) / previous.total
+        : null;
+      return {
+        type,
+        count,
+        share,
+        trend: prevShare === null ? null : Math.round((share - prevShare) * 100),
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+
   return (
     <>
       <PageHeader
@@ -188,6 +222,43 @@ export default async function SourcesPage() {
               <p className="tabular mt-1.5 text-2xl font-medium text-poor">{competitorCount}</p>
             </div>
           </div>
+        )}
+
+        {breakdown.length > 0 && (
+          <Card>
+            <CardHeader title={t("sources.breakdownTitle")} hint={t("sources.breakdownHint")} />
+            <div className="divide-y divide-line px-5 pb-4">
+              {breakdown.map((b) => (
+                <div key={b.type} className="flex items-center gap-3 py-2.5">
+                  <Badge tone={TYPE_TONE[b.type]}>{t(`sources.type.${b.type}`)}</Badge>
+                  <div className="h-1.5 min-w-0 flex-1 rounded-full bg-hover">
+                    <div
+                      className="h-full rounded-full bg-accent"
+                      style={{ width: `${Math.max(Math.round(b.share * 100), 2)}%` }}
+                    />
+                  </div>
+                  <span className="tabular w-10 shrink-0 text-right text-xs text-ink-soft">
+                    {b.count}
+                  </span>
+                  <span className="tabular w-10 shrink-0 text-right text-xs font-medium text-ink">
+                    {Math.round(b.share * 100)}%
+                  </span>
+                  <span
+                    className={
+                      "tabular w-14 shrink-0 text-right text-[11px] " +
+                      (b.trend == null || b.trend === 0
+                        ? "text-ink-faint"
+                        : b.trend > 0
+                          ? "text-good"
+                          : "text-poor")
+                    }
+                  >
+                    {b.trend == null ? "—" : b.trend === 0 ? "·" : `${b.trend > 0 ? "▲" : "▼"} ${Math.abs(b.trend)}pp`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
         )}
 
         <Card>

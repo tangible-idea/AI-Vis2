@@ -16,6 +16,7 @@ import {
   Link2,
   History,
   BarChart3,
+  MessagesSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Plan, Project } from "@/lib/types";
@@ -32,6 +33,7 @@ const NAV_GROUPS: { labelKey: string | null; items: { href: string; labelKey: st
     items: [
       { href: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
       { href: "/monitor", labelKey: "nav.monitor", icon: Radar },
+      { href: "/prompts", labelKey: "nav.prompts", icon: MessagesSquare },
       { href: "/sources", labelKey: "nav.sources", icon: Link2 },
     ],
   },
@@ -54,8 +56,10 @@ const NAV_GROUPS: { labelKey: string | null; items: { href: string; labelKey: st
     labelKey: "nav.groupShare",
     items: [{ href: "/reports", labelKey: "nav.reports", icon: FileText }],
   },
+  // Organization: account-level concerns (billing, settings, team lives in
+  // Settings until it needs its own page)
   {
-    labelKey: null,
+    labelKey: "nav.groupOrganization",
     items: [
       { href: "/billing", labelKey: "nav.billing", icon: CreditCard },
       { href: "/settings", labelKey: "nav.settings", icon: Settings },

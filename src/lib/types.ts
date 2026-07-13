@@ -60,6 +60,9 @@ export interface Organization {
   id: string;
   owner_id: string;
   name: string;
+  /** White-label branding (Pro): shown on exported reports. */
+  logo_url: string | null;
+  website: string | null;
   created_at: string;
 }
 
@@ -96,6 +99,8 @@ export interface Prompt {
   project_id: string;
   text: string;
   category: PromptCategory;
+  /** Free-form grouping in the Prompt Explorer ("CRM", "AI SEO", …). */
+  topic: string | null;
   is_active: boolean;
 }
 

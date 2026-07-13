@@ -60,3 +60,32 @@ export function generateDefaultPrompts(input: PromptSeedInput): { text: string; 
 
   return prompts;
 }
+
+/**
+ * Template-based prompt suggestions for a user-entered topic ("CRM",
+ * "AI SEO", …) — the offline/mock fallback for the Prompt Explorer's
+ * AI-generated recommendations. Same buyer-intent spread as the default set.
+ */
+export function generateTopicPrompts(input: {
+  topic: string;
+  brand: string;
+  country: string;
+  competitors: string[];
+}): { text: string; category: PromptCategory }[] {
+  const topic = input.topic.trim();
+  const prompts: { text: string; category: PromptCategory }[] = [
+    { text: `What are the best ${topic} solutions right now?`, category: "category" },
+    { text: `Which ${topic} tool would you recommend for a small business?`, category: "purchase" },
+    { text: `How do I choose a ${topic} provider? What should I look for?`, category: "informational" },
+    { text: `Best ${topic} options in ${input.country}`, category: "local" },
+    { text: `My team is struggling with ${topic} — what's the easiest way to solve this?`, category: "problem" },
+    { text: `Is ${input.brand} a good choice for ${topic}?`, category: "branded" },
+  ];
+  if (input.competitors[0]) {
+    prompts.push({
+      text: `Best alternatives to ${input.competitors[0]} for ${topic}`,
+      category: "comparison",
+    });
+  }
+  return prompts;
+}

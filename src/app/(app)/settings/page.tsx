@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
 import { CONTENT_LANGUAGES, COUNTRIES, type Competitor, type Prompt } from "@/lib/types";
-import { updateProject, addCompetitor, addPrompt, inviteMember } from "./actions";
+import { updateProject, addCompetitor, addPrompt, inviteMember, updateBranding } from "./actions";
 import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
 import { MemberList } from "./member-list";
@@ -22,7 +22,7 @@ export default async function SettingsPage() {
   const isOwner = project.user_id === userId;
   const t = await getT();
 
-  const [{ data: competitors }, { data: prompts }, { data: members }, { data: archived }] = await Promise.all([
+  const [{ data: competitors }, { data: prompts }, { data: members }, { data: archived }, { data: org }] = await Promise.all([
     supabase
       .from("competitors")
       .select("*")
@@ -41,6 +41,11 @@ export default async function SettingsPage() {
       .eq("user_id", userId)
       .not("archived_at", "is", null)
       .order("archived_at", { ascending: false }),
+    supabase
+      .from("organizations")
+      .select("name, logo_url, website")
+      .eq("owner_id", userId)
+      .maybeSingle(),
   ]);
   const memberList = (members ?? []) as ProjectMember[];
 
@@ -76,6 +81,17 @@ export default async function SettingsPage() {
                 <Label htmlFor="s-target">{t("settings.targetMarket")}</Label>
                 <Input id="s-target" name="target_market" defaultValue={project.target_market ?? ""} />
               </div>
+            </div>
+            <div>
+              <Label htmlFor="s-logo">{t("settings.brandLogo")}</Label>
+              <Input
+                id="s-logo"
+                name="logo_url"
+                type="url"
+                placeholder="https://acme.com/logo.png"
+                defaultValue={project.logo_url ?? ""}
+              />
+              <p className="mt-1 text-[11px] text-ink-faint">{t("settings.brandLogoHint")}</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -141,6 +157,11 @@ export default async function SettingsPage() {
               max: limits.maxPrompts,
               plan: limits.label,
             })}
+            action={
+              <Link href="/prompts" className="text-xs text-accent-strong hover:underline">
+                {t("settings.openExplorer")}
+              </Link>
+            }
           />
           <div className="space-y-4 px-5 pb-5">
             <PromptRows prompts={promptList} />
@@ -229,6 +250,43 @@ export default async function SettingsPage() {
             )}
           </div>
         </Card>
+
+        {isOwner && limits.whiteLabel && (
+          <Card>
+            <CardHeader title={t("settings.branding")} hint={t("settings.brandingHint")} />
+            <form action={updateBranding} className="space-y-4 px-5 pb-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="b-name">{t("settings.companyName")}</Label>
+                  <Input id="b-name" name="company_name" defaultValue={org?.name ?? ""} />
+                </div>
+                <div>
+                  <Label htmlFor="b-website">{t("settings.companyWebsite")}</Label>
+                  <Input
+                    id="b-website"
+                    name="company_website"
+                    type="url"
+                    placeholder="https://your-agency.com"
+                    defaultValue={org?.website ?? ""}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="b-logo">{t("settings.companyLogo")}</Label>
+                <Input
+                  id="b-logo"
+                  name="company_logo"
+                  type="url"
+                  placeholder="https://your-agency.com/logo.png"
+                  defaultValue={org?.logo_url ?? ""}
+                />
+              </div>
+              <Button type="submit" variant="secondary" size="sm">
+                {t("common.saveChanges")}
+              </Button>
+            </form>
+          </Card>
+        )}
 
         <Card>
           <CardHeader title={t("settings.account")} />

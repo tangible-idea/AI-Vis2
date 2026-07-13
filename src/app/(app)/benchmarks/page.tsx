@@ -1,29 +1,27 @@
-import { BarChart3, Lock, PieChart, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Lock } from "lucide-react";
 import { requireProject } from "@/lib/project";
 import { planLimits } from "@/lib/plans";
+import { getBenchmarkStats, MIN_SAMPLE, SAMPLE_ENGINE_BENCHMARKS } from "@/lib/benchmarks";
+import { ENGINES, engineInfo } from "@/lib/ai/engines";
+import { COUNTRIES, INDUSTRIES } from "@/lib/types";
+import { pct } from "@/lib/utils";
 import { Card, CardHeader, PageHeader, Badge, ButtonLink } from "@/components/ui";
+import { StatTile } from "@/components/charts";
 import { getT } from "@/lib/i18n/server";
 
 export const metadata = { title: "Benchmarks" };
 
 /**
- * Market Benchmarks — page structure and reusable placeholder cards only.
- * Calculations arrive once enough anonymous prompt observations exist (see
- * prompt_observations, migration 0006); the layout, gating and copy are
- * final so unlocking is a data change, not a UI project.
+ * Market Benchmarks — always useful: platform coverage, corpus size and
+ * engine-level mention/citation rates from the anonymous observation layer.
+ * Below MIN_SAMPLE the distribution shows clearly-labeled illustrative
+ * data; real aggregates take over automatically as coverage grows. Never
+ * exposes customer-specific information.
  */
 export default async function BenchmarksPage() {
   const { project, profile } = await requireProject();
   const limits = planLimits(profile.plan);
   const t = await getT();
-
-  const sections: { key: string; icon: typeof BarChart3 }[] = [
-    { key: "shareOfVoice", icon: PieChart },
-    { key: "distribution", icon: BarChart3 },
-    { key: "promptCoverage", icon: Target },
-    { key: "benchmarkTrends", icon: TrendingUp },
-    { key: "recommendedActions", icon: Sparkles },
-  ];
 
   if (!limits.benchmarks) {
     // progressive disclosure for free users: name the value, no hard paywall
@@ -53,6 +51,9 @@ export default async function BenchmarksPage() {
     );
   }
 
+  const stats = await getBenchmarkStats();
+  const engineRows = stats.belowSample ? SAMPLE_ENGINE_BENCHMARKS : stats.engines;
+
   return (
     <>
       <PageHeader
@@ -63,22 +64,113 @@ export default async function BenchmarksPage() {
         <p className="rounded-xl border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-ink-soft shadow-card">
           {t("benchmarks.collectingNote")}
         </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {sections.map(({ key, icon: Icon }) => (
-            <Card key={key} className={key === "recommendedActions" ? "sm:col-span-2" : undefined}>
-              <CardHeader
-                title={t(`benchmarks.${key}`)}
-                hint={t(`benchmarks.${key}Hint`)}
-                action={<Badge tone="accent">{t("benchmarks.comingSoon")}</Badge>}
-              />
-              <div className="px-5 pb-5">
-                <div className="dot-grid flex flex-col items-center justify-center rounded-xl border border-dashed border-line-strong px-6 py-10 text-center">
-                  <Icon className="h-5 w-5 text-ink-faint" strokeWidth={1.6} />
-                  <p className="mt-2 max-w-sm text-xs text-ink-faint">{t("benchmarks.placeholderBody")}</p>
+
+        {/* corpus coverage */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatTile
+            label={t("benchmarks.promptsAnalyzed")}
+            value={String(stats.distinctPrompts)}
+            hint={t("benchmarks.promptsAnalyzedHint")}
+          />
+          <StatTile
+            label={t("benchmarks.answersAnalyzed")}
+            value={String(stats.observations)}
+            hint={t("benchmarks.answersAnalyzedHint")}
+          />
+          <StatTile
+            label={t("benchmarks.sourcesAnalyzed")}
+            value={String(stats.sourcesAnalyzed)}
+            hint={t("benchmarks.sourcesAnalyzedHint")}
+          />
+          <StatTile
+            label={t("benchmarks.platformsCovered")}
+            value={String(ENGINES.length)}
+            hint={ENGINES.map((e) => e.label).join(" · ")}
+          />
+        </div>
+
+        {/* engine-level mention & citation rates */}
+        <Card>
+          <CardHeader
+            title={t("benchmarks.engineRates")}
+            hint={t("benchmarks.engineRatesHint")}
+            action={
+              stats.belowSample ? (
+                <Badge tone="mid">{t("benchmarks.sampleData")}</Badge>
+              ) : (
+                <Badge tone="good">{t("benchmarks.liveData")}</Badge>
+              )
+            }
+          />
+          <div className="divide-y divide-line px-5 pb-4">
+            {engineRows.map((row) => {
+              const info = engineInfo(row.engine);
+              return (
+                <div key={row.engine} className="flex items-center gap-3 py-2.5">
+                  <span
+                    className="w-32 shrink-0 truncate text-xs font-semibold"
+                    style={{ color: info.color }}
+                  >
+                    {info.label}
+                  </span>
+                  <div className="h-1.5 min-w-0 flex-1 rounded-full bg-hover">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.max(Math.round(row.mentionRate * 100), 2)}%`,
+                        background: info.color,
+                      }}
+                    />
+                  </div>
+                  <span className="tabular w-24 shrink-0 text-right text-xs text-ink-soft">
+                    {t("benchmarks.mentionShort", { rate: pct(row.mentionRate) })}
+                  </span>
+                  <span className="tabular w-24 shrink-0 text-right text-xs text-ink-faint">
+                    {t("benchmarks.citationShort", { rate: pct(row.citationRate) })}
+                  </span>
                 </div>
-              </div>
-            </Card>
-          ))}
+              );
+            })}
+          </div>
+          {stats.belowSample && (
+            <p className="px-5 pb-4 text-[11px] leading-relaxed text-ink-faint">
+              {t("benchmarks.sampleNote", { min: MIN_SAMPLE })}
+            </p>
+          )}
+        </Card>
+
+        {/* available coverage */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card>
+            <CardHeader
+              title={t("benchmarks.industriesTitle")}
+              hint={t("benchmarks.industriesHint", {
+                count: stats.industries.length || INDUSTRIES.length,
+              })}
+            />
+            <div className="flex flex-wrap gap-1.5 px-5 pb-5">
+              {(stats.industries.length ? stats.industries : [...INDUSTRIES]).map((i) => (
+                <Badge key={i} tone={i === project.industry ? "accent" : "neutral"}>
+                  {i}
+                </Badge>
+              ))}
+            </div>
+          </Card>
+          <Card>
+            <CardHeader
+              title={t("benchmarks.marketsTitle")}
+              hint={t("benchmarks.marketsHint", {
+                count: stats.countries.length || COUNTRIES.length,
+              })}
+            />
+            <div className="flex flex-wrap gap-1.5 px-5 pb-5">
+              {(stats.countries.length ? stats.countries : [...COUNTRIES]).map((c) => (
+                <Badge key={c} tone={c === project.country ? "accent" : "neutral"}>
+                  {c}
+                </Badge>
+              ))}
+            </div>
+          </Card>
         </div>
       </div>
     </>

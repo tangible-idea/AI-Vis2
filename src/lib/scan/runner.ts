@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { createAdminClient } from "../supabase/server";
-import { getProvider, isMockMode, type ChatMessage } from "../ai/provider";
+import { completeWithRetry, getProvider, isMockMode, type ChatMessage } from "../ai/provider";
 import { ENGINES } from "../ai/engines";
 import { mockContextMessage } from "../ai/mock";
 import { analyzeResponse } from "./analyzer";
@@ -113,7 +113,7 @@ export async function runScan(scanId: string): Promise<void> {
           { role: "user", content: job.prompt.text },
         ];
         try {
-          text = await provider.complete(job.model, messages);
+          text = await completeWithRetry(provider, job.model, messages);
         } catch (err) {
           console.error(`[scan] ${job.engine} failed for "${job.prompt.text}":`, err);
           done++;

@@ -11,6 +11,7 @@ import { ScoreHero, WeeklyScoreTrend, SovBars, StatTile } from "@/components/cha
 import { ScanButton } from "@/components/scan-button";
 import { LastScanSummary, type ActivityItem } from "./last-scan-summary";
 import { PlatformCards, type PlatformCardData } from "./platform-cards";
+import { RecentConversations, type ConversationItem } from "./recent-conversations";
 import { getT } from "@/lib/i18n/server";
 import type { Engine, Prompt, Recommendation, ScanResult, ShareLink, Snapshot } from "@/lib/types";
 
@@ -247,7 +248,29 @@ export default async function DashboardPage() {
           shareUrl={shareUrl}
         />
 
-        {/* 3 — AI Platform Performance */}
+        {/* 3 — Recent AI Conversations (primary activity feed) */}
+        <RecentConversations
+          projectName={project.name}
+          items={
+            [...results]
+              .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
+              .slice(0, 8)
+              .map((r) => ({
+                id: r.id,
+                engine: r.engine,
+                promptText: promptText.get(r.prompt_id) ?? "(prompt no longer tracked)",
+                response_text: r.response_text,
+                brand_mentioned: r.brand_mentioned,
+                brand_position: r.brand_position,
+                recommended: r.recommended,
+                competitors_mentioned: r.competitors_mentioned,
+                sources: r.sources,
+                created_at: r.created_at,
+              })) satisfies ConversationItem[]
+          }
+        />
+
+        {/* 4 — AI Platform Performance */}
         <section>
           <div className="mb-2 flex items-center justify-between px-1">
             <h2 className="text-sm font-semibold">{t("dashboard.platformPerformance")}</h2>
@@ -258,7 +281,7 @@ export default async function DashboardPage() {
           <PlatformCards platforms={platforms} />
         </section>
 
-        {/* 4 — Weekly visibility trend */}
+        {/* 5 — Weekly visibility trend */}
         {history.length > 1 && (
           <Card>
             <CardHeader
@@ -276,7 +299,7 @@ export default async function DashboardPage() {
           </Card>
         )}
 
-        {/* 5 — Competitor benchmark */}
+        {/* 6 — Competitor benchmark */}
         <Card>
           <CardHeader
             title={t("dashboard.competitorBenchmark")}
@@ -292,7 +315,7 @@ export default async function DashboardPage() {
           </div>
         </Card>
 
-        {/* 6 — Google Trends */}
+        {/* 7 — Google Trends */}
         {limits.trends && trends.length > 0 && (
           <Card>
             <CardHeader
@@ -330,7 +353,7 @@ export default async function DashboardPage() {
           </Card>
         )}
 
-        {/* 7 — Recommended actions */}
+        {/* 8 — Recommended actions */}
         <Card>
           <CardHeader
             title={t("dashboard.recommendedActions")}
@@ -359,7 +382,7 @@ export default async function DashboardPage() {
           </div>
         </Card>
 
-        {/* 8 — Weekly progress */}
+        {/* 9 — Weekly progress */}
         <section>
           <h2 className="mb-2 px-1 text-sm font-semibold">{t("dashboard.weeklyProgress")}</h2>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -386,7 +409,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        {/* 9 — Recent reports */}
+        {/* 10 — Recent reports */}
         <Card>
           <CardHeader
             title={t("dashboard.recentReports")}

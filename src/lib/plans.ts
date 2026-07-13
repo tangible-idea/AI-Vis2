@@ -74,8 +74,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxProjects: 8,
     maxPrompts: 50,
     maxCompetitors: 30,
-    // "unlimited" in the UI — a generous fair-use ceiling guards abuse
-    scansPerMonth: 300,
+    scansPerMonth: 100,
     totalScans: null,
     contentGenerations: 1000,
     maxTeamMembers: 10,
@@ -84,7 +83,8 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     benchmarks: true,
     weeklyReports: true,
     shareLinks: true,
-    api: true,
+    // API access ships once production-ready — never advertised before then
+    api: false,
     whiteLabel: true,
     team: true,
   },
@@ -150,14 +150,14 @@ export function historyCutoffIso(limits: PlanLimits): string | null {
 /** Feature list rows for the pricing page / billing comparison (MECE: usage → features → Pro-only). */
 export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; values?: [string, string, string]; group?: string }[] = [
   { group: "Usage", label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
-  { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "Unlimited*"] },
+  { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "100 / month"] },
   { label: "Competitors tracked", key: null, values: ["2", "10", "30"] },
   { label: "Brand projects & markets", key: null, values: ["1", "3", "8"] },
   { label: "Content generations (pages, schema, llms.txt)", key: null, values: ["3", "40 / month", "Unlimited*"] },
   { group: "Features", label: "Trending topics", key: "trends" },
+  { label: "Market benchmarks", key: "benchmarks" },
   { label: "Weekly email reports", key: "weeklyReports" },
   { label: "Shareable report links", key: "shareLinks" },
   { label: "Team collaboration", key: null, values: ["—", "3 seats", "10 seats"] },
-  { group: "Pro only", label: "API access", key: "api" },
-  { label: "White label reports", key: "whiteLabel" },
+  { group: "Pro only", label: "White label reports", key: "whiteLabel" },
 ];

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { MailCheck } from "lucide-react";
 import { signup } from "../actions";
 import { Button, Card, Input, Label } from "@/components/ui";
@@ -9,6 +10,8 @@ import { useT } from "@/lib/i18n";
 
 export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, null);
+  const params = useSearchParams();
+  const next = params.get("next") ?? "/onboarding";
   const t = useT();
 
   if (state?.sent) {
@@ -37,6 +40,7 @@ export default function SignupPage() {
       <h1 className="text-lg font-semibold">{t("auth.startFree")}</h1>
       <p className="mt-1 text-sm text-ink-faint">{t("auth.signupSubtitle")}</p>
       <form action={action} className="mt-5 space-y-4">
+        <input type="hidden" name="next" value={next} />
         <div>
           <Label htmlFor="name">{t("auth.name")}</Label>
           <Input id="name" name="name" required placeholder="Jane Kim" />

@@ -33,6 +33,15 @@ interface BrandEntry {
 }
 
 const PIN_KEY = "sightline_pins";
+const RECENT_KEY = "sightline_recent";
+
+function loadRecents(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
 
 function host(website: string) {
   try {
@@ -72,10 +81,14 @@ export function ProjectSwitcher({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [pins, setPins] = useState<string[]>([]);
+  const [recents, setRecents] = useState<string[]>([]);
   const [switching, startSwitch] = useTransition();
   const rootRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setPins(loadPins()), []);
+  useEffect(() => {
+    setPins(loadPins());
+    setRecents(loadRecents());
+  }, []);
 
   // close on outside click / Escape
   useEffect(() => {
@@ -117,8 +130,15 @@ export function ProjectSwitcher({
   const filtered = q
     ? entries.filter((e) => e.name.toLowerCase().includes(q) || e.website.toLowerCase().includes(q))
     : entries;
+  // pinned first, then recently opened, then original order
+  const recentRank = (key: string) => {
+    const i = recents.indexOf(key);
+    return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+  };
   const sorted = [...filtered].sort(
-    (a, b) => Number(pins.includes(b.key)) - Number(pins.includes(a.key))
+    (a, b) =>
+      Number(pins.includes(b.key)) - Number(pins.includes(a.key)) ||
+      recentRank(a.key) - recentRank(b.key)
   );
 
   const active = entries.find((e) => e.markets.some((m) => m.id === activeProjectId));
@@ -133,6 +153,11 @@ export function ProjectSwitcher({
 
   function select(entry: BrandEntry) {
     setOpen(false);
+    const next = [entry.key, ...recents.filter((k) => k !== entry.key)].slice(0, 8);
+    setRecents(next);
+    try {
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+    } catch {}
     if (entry.target.id !== activeProjectId) startSwitch(() => switchProject(entry.target.id));
   }
 
@@ -209,7 +234,7 @@ export function ProjectSwitcher({
                         )}
                       </span>
                       <span className="block truncate text-[10px] text-ink-faint">
-                        {host(e.website)} ·{" "}
+                        {host(e.website)} · {e.target.country} ·{" "}
                         {e.lastScanAt
                           ? t("switcher.lastScan", { time: timeAgo(e.lastScanAt) })
                           : t("switcher.noScan")}

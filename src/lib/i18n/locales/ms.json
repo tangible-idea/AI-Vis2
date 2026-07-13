@@ -41,7 +41,9 @@
     "settings": "Tetapan",
     "switchProject": "Tukar projek",
     "mockMode": "Mod olokan — tetapkan POE_API_KEY untuk imbasan sebenar",
-    "benchmarks": "Penanda Aras"
+    "benchmarks": "Penanda Aras",
+    "prompts": "Penjelajah Prompt",
+    "groupOrganization": "Organisasi"
   },
   "market": {
     "label": "Pasaran",
@@ -91,7 +93,8 @@
     "demoLoading": "Memuatkan demo…",
     "scanTitle": "Menjalankan imbasan pertama anda",
     "scanBody": "Bertanya kepada ChatGPT, Claude, Gemini dan Perplexity soalan yang ditanya pembeli anda. Biasanya kurang daripada seminit.",
-    "continueDashboard": "Teruskan ke papan pemuka"
+    "continueDashboard": "Teruskan ke papan pemuka",
+    "manageProjects": "Urus projek di Tetapan"
   },
   "scan": {
     "scanning": "Mengimbas…",
@@ -206,7 +209,9 @@
     "citedText": "Teks yang dipetik",
     "aiResponse": "Jawapan AI",
     "whyReferenced": "Sebab sumber ini dirujuk:",
-    "competitorsNamed": "Pesaing yang dinamakan dalam jawapan ini:"
+    "competitorsNamed": "Pesaing yang dinamakan dalam jawapan ini:",
+    "breakdownTitle": "Jenis sumber",
+    "breakdownHint": "Jenis sumber yang dipercayai platform AI — bahagian sitasi dan trend berbanding imbasan sebelumnya"
   },
   "trends": {
     "title": "Trend",
@@ -356,7 +361,15 @@
     "autoScanLabel": "Imbasan berjadual mingguan",
     "autoScanBody": "Berjalan setiap Isnin dalam had imbasan bulanan pelan anda. Projek yang diarkibkan tidak akan diimbas.",
     "monitoringLocked": "Pemantauan berjadual tersedia pada Starter dan Pro —",
-    "upgradeToMonitor": "naik taraf untuk mengaktifkan."
+    "upgradeToMonitor": "naik taraf untuk mengaktifkan.",
+    "brandLogo": "URL logo jenama",
+    "brandLogoHint": "Pilihan — dipaparkan dalam penukar projek dan laporan; jika kosong, favicon laman anda digunakan.",
+    "openExplorer": "Buka Penjelajah Prompt",
+    "branding": "Penjenamaan laporan (white label)",
+    "brandingHint": "Identiti syarikat anda pada laporan yang dieksport — logo, nama dan laman web",
+    "companyName": "Nama syarikat",
+    "companyWebsite": "Laman web syarikat",
+    "companyLogo": "URL logo syarikat"
   },
   "summary": {
     "title": "Ringkasan imbasan terakhir",
@@ -467,6 +480,82 @@
     "benchmarkTrends": "Trend Penanda Aras",
     "benchmarkTrendsHint": "Perubahan keterlihatan pasaran anda mengikut masa",
     "recommendedActions": "Tindakan Disyorkan",
-    "recommendedActionsHint": "Apa yang dilakukan secara berbeza oleh jenama terbaik pasaran anda"
+    "recommendedActionsHint": "Apa yang dilakukan secara berbeza oleh jenama terbaik pasaran anda",
+    "promptsAnalyzed": "Prompt pembeli dianalisis",
+    "promptsAnalyzedHint": "soalan unik, tempoh terkini",
+    "answersAnalyzed": "Jawapan AI dianalisis",
+    "answersAnalyzedHint": "merentas semua platform yang dipantau",
+    "sourcesAnalyzed": "Sumber dianalisis",
+    "sourcesAnalyzedHint": "sitasi yang diekstrak daripada jawapan",
+    "platformsCovered": "Platform AI diliputi",
+    "engineRates": "Keterlihatan jenama mengikut platform AI",
+    "engineRatesHint": "Kekerapan jenama disebut dan disitasi mengikut platform, merentas keseluruhan pasaran",
+    "sampleData": "Data ilustrasi",
+    "liveData": "Agregat langsung",
+    "mentionShort": "disebut {rate}",
+    "citationShort": "disitasi {rate}",
+    "sampleNote": "Taburan ilustrasi dipaparkan sementara korpus pasaran tanpa nama masih berkembang (bawah {min} pemerhatian). Agregat sebenar menggantikannya secara automatik — data khusus pelanggan tidak pernah dipaparkan.",
+    "industriesTitle": "Industri",
+    "industriesHint": "{count} industri dalam korpus penanda aras",
+    "marketsTitle": "Pasaran",
+    "marketsHint": "{count} pasaran dalam korpus penanda aras"
+  },
+  "promptExplorer": {
+    "title": "Penjelajah Prompt",
+    "subtitle": "{count} daripada {max} prompt aktif pada pelan {plan} — soalan yang kami tanya kepada setiap platform AI",
+    "topicTitle": "Jana prompt daripada topik",
+    "topicHint": "Masukkan topik seperti “Digital Marketing”, “CRM” atau “AI SEO” — kami akan merangka soalan yang ditanya pembeli anda",
+    "topicPlaceholder": "cth. Digital Marketing",
+    "generate": "Cadangkan prompt",
+    "generating": "Menjana…",
+    "suggestError": "Gagal menjana cadangan — sila cuba lagi.",
+    "noSuggestions": "Tiada prompt baharu untuk topik ini — mungkin semuanya sudah dijejaki.",
+    "reviewHint": "Prompt yang disyorkan untuk “{topic}” — terima, sunting atau tolak sebelum menyimpan. Hanya prompt yang diterima akan dipantau.",
+    "accept": "Terima prompt",
+    "reject": "Tolak prompt",
+    "editPrompt": "Sunting prompt",
+    "addAccepted": "Tambah {count} prompt",
+    "discard": "Buang",
+    "saving": "Menyimpan…",
+    "saved": "{count} prompt ditambah — akan disertakan dalam imbasan seterusnya.",
+    "duplicate": "Anda sudah menjejaki prompt ini.",
+    "manualTitle": "Tambah prompt secara manual",
+    "manualHint": "Tulis soalan tepat seperti yang ditanya pembeli kepada pembantu AI",
+    "manualPlaceholder": "cth. CRM terbaik untuk syarikat pemula",
+    "limitReached": "Had prompt dicapai ({max} aktif).",
+    "generalGroup": "Umum",
+    "groupHint": "{active} aktif daripada {total} prompt",
+    "paused": "dijeda",
+    "pause": "Jeda prompt",
+    "resume": "Sambung prompt",
+    "delete": "Padam prompt"
+  },
+  "conversations": {
+    "title": "Perbualan AI terkini",
+    "hint": "Jawapan sebenar setiap platform — kembangkan baris untuk melihat respons penuh, sumber dan sitasi",
+    "recommended": "disyorkan",
+    "mentioned": "disebut",
+    "notMentioned": "tidak disebut",
+    "competitors": "{count} pesaing",
+    "competitorsLabel": "Pesaing yang disebut:",
+    "sourcesLabel": "Sumber & sitasi:",
+    "projectLabel": "Projek:"
+  },
+  "redeem": {
+    "title": "Tebus kod lifetime anda",
+    "subtitle": "Masukkan kod untuk mengaktifkan akses Sightline sepanjang hayat.",
+    "codeLabel": "Kod penebusan",
+    "activate": "Aktifkan akses lifetime",
+    "activating": "Mengaktifkan…",
+    "activatingFor": "Digunakan untuk {email}",
+    "error": "Berlaku ralat — sila cuba lagi.",
+    "needAccount": "Mula-mula, cipta akaun Sightline percuma (kurang seminit). Kod anda digunakan sejurus selepas itu.",
+    "createAccount": "Cipta akaun & tebus",
+    "successTitle": "Akses lifetime diaktifkan",
+    "successBody": "Selamat datang! Pelan anda aktif — berikut yang termasuk:",
+    "successProjects": "{count} projek aktif",
+    "successPrompts": "{count} prompt dijejaki",
+    "successScans": "{count} imbasan sebulan",
+    "goToDashboard": "Ke papan pemuka"
   }
 }

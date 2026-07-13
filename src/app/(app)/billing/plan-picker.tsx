@@ -21,9 +21,9 @@ const HIGHLIGHTS: Partial<Record<Plan, string[]>> = {
   ],
   pro: [
     "Everything in Starter",
-    "50 prompts · unlimited scans",
+    "50 prompts · 100 scans / month",
     "30 competitors · 8 projects & markets · 10 seats",
-    "API access & white label",
+    "White label reports",
   ],
 };
 

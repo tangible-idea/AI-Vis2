@@ -41,7 +41,9 @@
     "settings": "设置",
     "switchProject": "切换项目",
     "mockMode": "模拟模式 — 设置 POE_API_KEY 以进行真实扫描",
-    "benchmarks": "基准对比"
+    "benchmarks": "基准对比",
+    "prompts": "提示词浏览器",
+    "groupOrganization": "组织"
   },
   "market": {
     "label": "市场",
@@ -91,7 +93,8 @@
     "demoLoading": "加载演示中…",
     "scanTitle": "正在运行首次扫描",
     "scanBody": "正在向 ChatGPT、Claude、Gemini 和 Perplexity 提出买家会问的问题。通常不到一分钟即可完成。",
-    "continueDashboard": "前往仪表盘"
+    "continueDashboard": "前往仪表盘",
+    "manageProjects": "在设置中管理项目"
   },
   "scan": {
     "scanning": "扫描中…",
@@ -206,7 +209,9 @@
     "citedText": "被引用的原文",
     "aiResponse": "AI 回答",
     "whyReferenced": "此来源被引用的原因:",
-    "competitorsNamed": "此回答中提到的竞争对手:"
+    "competitorsNamed": "此回答中提到的竞争对手:",
+    "breakdownTitle": "来源类型",
+    "breakdownHint": "AI 平台信任的来源类型 — 引用占比及与上次扫描的对比趋势"
   },
   "trends": {
     "title": "趋势",
@@ -356,7 +361,15 @@
     "autoScanLabel": "每周定时扫描",
     "autoScanBody": "每周一在您套餐的每月扫描额度内运行。已归档的项目不会被扫描。",
     "monitoringLocked": "定时监测在 Starter 和 Pro 套餐中提供 —",
-    "upgradeToMonitor": "升级以启用。"
+    "upgradeToMonitor": "升级以启用。",
+    "brandLogo": "品牌 Logo URL",
+    "brandLogoHint": "可选 — 显示在项目切换器和报告中；未设置时使用网站图标。",
+    "openExplorer": "打开提示词浏览器",
+    "branding": "报告品牌（白标）",
+    "brandingHint": "导出报告上显示的公司信息 — Logo、名称和网站",
+    "companyName": "公司名称",
+    "companyWebsite": "公司网站",
+    "companyLogo": "公司 Logo URL"
   },
   "summary": {
     "title": "上次扫描摘要",
@@ -467,6 +480,82 @@
     "benchmarkTrends": "基准趋势",
     "benchmarkTrendsHint": "市场可见度随时间的变化",
     "recommendedActions": "推荐行动",
-    "recommendedActionsHint": "市场领先品牌的不同做法"
+    "recommendedActionsHint": "市场领先品牌的不同做法",
+    "promptsAnalyzed": "已分析的买家提示词",
+    "promptsAnalyzedHint": "近期的独立问题数",
+    "answersAnalyzed": "已分析的 AI 回答",
+    "answersAnalyzedHint": "覆盖所有受监测平台",
+    "sourcesAnalyzed": "已分析的来源",
+    "sourcesAnalyzedHint": "从回答中提取的引用",
+    "platformsCovered": "覆盖的 AI 平台",
+    "engineRates": "各 AI 平台的品牌可见度",
+    "engineRatesHint": "整个市场中各平台提及和引用品牌的频率",
+    "sampleData": "示例数据",
+    "liveData": "实时汇总",
+    "mentionShort": "提及 {rate}",
+    "citationShort": "引用 {rate}",
+    "sampleNote": "在匿名市场数据积累期间（少于 {min} 条）显示示例分布。真实汇总数据会自动替换，绝不展示任何客户的具体数据。",
+    "industriesTitle": "行业",
+    "industriesHint": "基准数据涵盖 {count} 个行业",
+    "marketsTitle": "市场",
+    "marketsHint": "基准数据涵盖 {count} 个市场"
+  },
+  "promptExplorer": {
+    "title": "提示词浏览器",
+    "subtitle": "{plan} 套餐 {max} 条中已启用 {count} 条 — 这些是我们向每个 AI 平台提出的问题",
+    "topicTitle": "按主题生成提示词",
+    "topicHint": "输入“数字营销”“CRM”“AI SEO”等主题，我们会草拟买家会问的问题",
+    "topicPlaceholder": "例如：数字营销",
+    "generate": "推荐提示词",
+    "generating": "生成中…",
+    "suggestError": "无法生成推荐 — 请重试。",
+    "noSuggestions": "该主题没有新的提示词 — 可能都已在追踪中。",
+    "reviewHint": "“{topic}”的推荐提示词 — 保存前可接受、编辑或拒绝。只有接受的提示词才会被监测。",
+    "accept": "接受提示词",
+    "reject": "拒绝提示词",
+    "editPrompt": "编辑提示词",
+    "addAccepted": "添加 {count} 条提示词",
+    "discard": "放弃",
+    "saving": "保存中…",
+    "saved": "已添加 {count} 条提示词 — 将纳入下次扫描。",
+    "duplicate": "该提示词已在追踪中。",
+    "manualTitle": "手动添加提示词",
+    "manualHint": "写下买家向 AI 助手提问时的原话",
+    "manualPlaceholder": "例如：最适合创业公司的 CRM",
+    "limitReached": "已达提示词上限（{max} 条启用）。",
+    "generalGroup": "常规",
+    "groupHint": "{total} 条中 {active} 条启用",
+    "paused": "已暂停",
+    "pause": "暂停提示词",
+    "resume": "恢复提示词",
+    "delete": "删除提示词"
+  },
+  "conversations": {
+    "title": "最近的 AI 对话",
+    "hint": "各平台的真实回答 — 展开行可查看完整回复、来源和引用",
+    "recommended": "被推荐",
+    "mentioned": "被提及",
+    "notMentioned": "未提及",
+    "competitors": "{count} 家竞品",
+    "competitorsLabel": "提及的竞品：",
+    "sourcesLabel": "来源与引用：",
+    "projectLabel": "项目："
+  },
+  "redeem": {
+    "title": "兑换终身使用码",
+    "subtitle": "输入兑换码即可激活 Sightline 终身使用权限。",
+    "codeLabel": "兑换码",
+    "activate": "激活终身使用",
+    "activating": "激活中…",
+    "activatingFor": "将应用到 {email}",
+    "error": "出了点问题 — 请重试。",
+    "needAccount": "请先创建免费的 Sightline 账户（不到一分钟），注册后立即应用兑换码。",
+    "createAccount": "创建账户并兑换",
+    "successTitle": "终身使用已激活",
+    "successBody": "欢迎加入！您的套餐已生效 — 包含：",
+    "successProjects": "{count} 个活跃项目",
+    "successPrompts": "{count} 条追踪提示词",
+    "successScans": "每月 {count} 次扫描",
+    "goToDashboard": "前往仪表盘"
   }
 }

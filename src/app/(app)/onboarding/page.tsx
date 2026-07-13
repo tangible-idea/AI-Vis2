@@ -194,6 +194,22 @@ export default function OnboardingPage() {
           )}
 
           {state?.error && <p className="text-sm text-poor">{state.error}</p>}
+          {state?.limitReached && (
+            <div className="flex flex-wrap gap-2">
+              <a
+                href="/settings"
+                className="inline-flex h-8 items-center rounded-lg border border-line-strong bg-surface px-3 text-xs font-medium text-ink hover:bg-hover"
+              >
+                {t("onboarding.manageProjects")}
+              </a>
+              <a
+                href="/billing"
+                className="inline-flex h-8 items-center rounded-lg bg-ink px-3 text-xs font-medium text-paper hover:bg-ink/85"
+              >
+                {t("common.upgrade")}
+              </a>
+            </div>
+          )}
           <Button type="submit" disabled={pending} className="w-full">
             {pending ? t("onboarding.creating") : t("onboarding.continue")}
           </Button>

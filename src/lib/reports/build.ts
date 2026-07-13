@@ -2,22 +2,36 @@ import { engineInfo } from "../ai/engines";
 import { formatDate } from "../utils";
 import type { Project, Snapshot, Recommendation } from "../types";
 
+/** White-label identity (Pro) stamped on exported reports. */
+export interface ReportBranding {
+  name: string;
+  website: string | null;
+  logo_url: string | null;
+}
+
 export interface ReportData {
   project: Project;
   snapshot: Snapshot | null;
   previous: Snapshot | null;
   recommendations: Recommendation[];
   competitors: string[];
+  branding?: ReportBranding | null;
 }
 
 export function buildMarkdownReport(d: ReportData): string {
-  const { project, snapshot, previous, recommendations } = d;
+  const { project, snapshot, previous, recommendations, branding } = d;
   const lines: string[] = [
     `# AI Visibility Report — ${project.name}`,
     ``,
     `Generated ${formatDate(new Date().toISOString())} · ${project.website} · ${project.industry}`,
     ``,
   ];
+  if (branding?.name) {
+    lines.push(
+      `Prepared by ${branding.name}${branding.website ? ` · ${branding.website}` : ""}`,
+      ``
+    );
+  }
 
   if (!snapshot) {
     lines.push(`No scans have completed yet.`);

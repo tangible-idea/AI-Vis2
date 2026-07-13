@@ -41,7 +41,9 @@
     "settings": "Cài đặt",
     "switchProject": "Chuyển dự án",
     "mockMode": "Chế độ giả lập — đặt POE_API_KEY để quét thật",
-    "benchmarks": "Đối chuẩn"
+    "benchmarks": "Đối chuẩn",
+    "prompts": "Trình khám phá Prompt",
+    "groupOrganization": "Tổ chức"
   },
   "market": {
     "label": "Thị trường",
@@ -91,7 +93,8 @@
     "demoLoading": "Đang tải demo…",
     "scanTitle": "Đang chạy lần quét đầu tiên",
     "scanBody": "Đang hỏi ChatGPT, Claude, Gemini và Perplexity những câu hỏi mà người mua của bạn thường hỏi. Thường mất chưa đầy một phút.",
-    "continueDashboard": "Vào bảng điều khiển"
+    "continueDashboard": "Vào bảng điều khiển",
+    "manageProjects": "Quản lý dự án trong Cài đặt"
   },
   "scan": {
     "scanning": "Đang quét…",
@@ -206,7 +209,9 @@
     "citedText": "Đoạn văn được trích dẫn",
     "aiResponse": "Câu trả lời của AI",
     "whyReferenced": "Vì sao nguồn này được trích dẫn:",
-    "competitorsNamed": "Đối thủ được nhắc đến trong câu trả lời này:"
+    "competitorsNamed": "Đối thủ được nhắc đến trong câu trả lời này:",
+    "breakdownTitle": "Loại nguồn",
+    "breakdownHint": "Các loại nguồn mà nền tảng AI tin cậy — tỷ lệ trích dẫn và xu hướng so với lần quét trước"
   },
   "trends": {
     "title": "Xu hướng",
@@ -356,7 +361,15 @@
     "autoScanLabel": "Quét theo lịch hàng tuần",
     "autoScanBody": "Chạy vào thứ Hai hàng tuần trong giới hạn quét hàng tháng của gói. Dự án đã lưu trữ sẽ không bao giờ được quét.",
     "monitoringLocked": "Giám sát theo lịch có trên gói Starter và Pro —",
-    "upgradeToMonitor": "nâng cấp để bật."
+    "upgradeToMonitor": "nâng cấp để bật.",
+    "brandLogo": "URL logo thương hiệu",
+    "brandLogoHint": "Tùy chọn — hiển thị trong trình chuyển dự án và báo cáo; nếu bỏ trống sẽ dùng favicon của trang web.",
+    "openExplorer": "Mở Trình khám phá Prompt",
+    "branding": "Thương hiệu báo cáo (white label)",
+    "brandingHint": "Thông tin công ty của bạn trên báo cáo xuất ra — logo, tên và website",
+    "companyName": "Tên công ty",
+    "companyWebsite": "Website công ty",
+    "companyLogo": "URL logo công ty"
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",
@@ -467,6 +480,82 @@
     "benchmarkTrends": "Xu hướng đối chuẩn",
     "benchmarkTrendsHint": "Mức hiển thị của thị trường thay đổi theo thời gian",
     "recommendedActions": "Hành động đề xuất",
-    "recommendedActionsHint": "Điều các thương hiệu dẫn đầu thị trường làm khác biệt"
+    "recommendedActionsHint": "Điều các thương hiệu dẫn đầu thị trường làm khác biệt",
+    "promptsAnalyzed": "Prompt người mua đã phân tích",
+    "promptsAnalyzedHint": "câu hỏi riêng biệt, giai đoạn gần đây",
+    "answersAnalyzed": "Câu trả lời AI đã phân tích",
+    "answersAnalyzedHint": "trên tất cả nền tảng được theo dõi",
+    "sourcesAnalyzed": "Nguồn đã phân tích",
+    "sourcesAnalyzedHint": "trích dẫn rút ra từ câu trả lời",
+    "platformsCovered": "Nền tảng AI được theo dõi",
+    "engineRates": "Độ hiển thị thương hiệu theo nền tảng AI",
+    "engineRatesHint": "Tần suất thương hiệu được nhắc đến và trích dẫn trên từng nền tảng, trong toàn thị trường",
+    "sampleData": "Dữ liệu minh họa",
+    "liveData": "Tổng hợp thực tế",
+    "mentionShort": "nhắc đến {rate}",
+    "citationShort": "trích dẫn {rate}",
+    "sampleNote": "Hiển thị phân bố minh họa trong khi kho dữ liệu thị trường ẩn danh đang tích lũy (dưới {min} quan sát). Số liệu tổng hợp thực tế sẽ tự động thay thế — không bao giờ hiển thị dữ liệu riêng của khách hàng.",
+    "industriesTitle": "Ngành",
+    "industriesHint": "{count} ngành trong kho dữ liệu chuẩn so sánh",
+    "marketsTitle": "Thị trường",
+    "marketsHint": "{count} thị trường trong kho dữ liệu chuẩn so sánh"
+  },
+  "promptExplorer": {
+    "title": "Trình khám phá Prompt",
+    "subtitle": "{count}/{max} prompt đang hoạt động trong gói {plan} — những câu hỏi chúng tôi gửi đến mọi nền tảng AI",
+    "topicTitle": "Tạo prompt từ chủ đề",
+    "topicHint": "Nhập chủ đề như “Digital Marketing”, “CRM” hoặc “AI SEO” — chúng tôi sẽ soạn các câu hỏi người mua thường đặt",
+    "topicPlaceholder": "vd: Digital Marketing",
+    "generate": "Gợi ý prompt",
+    "generating": "Đang tạo…",
+    "suggestError": "Không tạo được gợi ý — vui lòng thử lại.",
+    "noSuggestions": "Không có prompt mới cho chủ đề này — có thể bạn đã theo dõi tất cả.",
+    "reviewHint": "Prompt gợi ý cho “{topic}” — chấp nhận, chỉnh sửa hoặc từ chối trước khi lưu. Chỉ prompt được chấp nhận mới được theo dõi.",
+    "accept": "Chấp nhận prompt",
+    "reject": "Từ chối prompt",
+    "editPrompt": "Chỉnh sửa prompt",
+    "addAccepted": "Thêm {count} prompt",
+    "discard": "Hủy bỏ",
+    "saving": "Đang lưu…",
+    "saved": "Đã thêm {count} prompt — sẽ được đưa vào lần quét tiếp theo.",
+    "duplicate": "Bạn đã theo dõi prompt này rồi.",
+    "manualTitle": "Thêm prompt thủ công",
+    "manualHint": "Viết đúng câu hỏi mà người mua sẽ hỏi trợ lý AI",
+    "manualPlaceholder": "vd: CRM tốt nhất cho startup",
+    "limitReached": "Đã đạt giới hạn prompt ({max} đang hoạt động).",
+    "generalGroup": "Chung",
+    "groupHint": "{active}/{total} prompt đang hoạt động",
+    "paused": "tạm dừng",
+    "pause": "Tạm dừng prompt",
+    "resume": "Tiếp tục prompt",
+    "delete": "Xóa prompt"
+  },
+  "conversations": {
+    "title": "Hội thoại AI gần đây",
+    "hint": "Câu trả lời thực tế của từng nền tảng — mở rộng hàng để xem toàn bộ phản hồi, nguồn và trích dẫn",
+    "recommended": "được đề xuất",
+    "mentioned": "được nhắc đến",
+    "notMentioned": "không được nhắc",
+    "competitors": "{count} đối thủ",
+    "competitorsLabel": "Đối thủ được nhắc đến:",
+    "sourcesLabel": "Nguồn & trích dẫn:",
+    "projectLabel": "Dự án:"
+  },
+  "redeem": {
+    "title": "Kích hoạt mã trọn đời",
+    "subtitle": "Nhập mã để kích hoạt quyền truy cập Sightline trọn đời.",
+    "codeLabel": "Mã kích hoạt",
+    "activate": "Kích hoạt trọn đời",
+    "activating": "Đang kích hoạt…",
+    "activatingFor": "Áp dụng cho {email}",
+    "error": "Đã xảy ra lỗi — vui lòng thử lại.",
+    "needAccount": "Trước tiên hãy tạo tài khoản Sightline miễn phí (chưa đến một phút). Mã sẽ được áp dụng ngay sau đó.",
+    "createAccount": "Tạo tài khoản & kích hoạt",
+    "successTitle": "Đã kích hoạt quyền trọn đời",
+    "successBody": "Chào mừng bạn! Gói của bạn đã hoạt động — bao gồm:",
+    "successProjects": "{count} dự án hoạt động",
+    "successPrompts": "{count} prompt được theo dõi",
+    "successScans": "{count} lần quét mỗi tháng",
+    "goToDashboard": "Đến bảng điều khiển"
   }
 }

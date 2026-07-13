@@ -41,7 +41,9 @@
     "settings": "Settings",
     "switchProject": "Switch project",
     "mockMode": "Mock mode — set POE_API_KEY for real scans",
-    "benchmarks": "Benchmarks"
+    "benchmarks": "Benchmarks",
+    "prompts": "Prompt Explorer",
+    "groupOrganization": "Organization"
   },
   "market": {
     "label": "Markets",
@@ -91,7 +93,8 @@
     "demoLoading": "Loading demo…",
     "scanTitle": "Running your first scan",
     "scanBody": "Asking ChatGPT, Claude, Gemini and Perplexity the questions your buyers ask. This usually takes under a minute.",
-    "continueDashboard": "Continue to dashboard"
+    "continueDashboard": "Continue to dashboard",
+    "manageProjects": "Manage projects in Settings"
   },
   "scan": {
     "scanning": "Scanning…",
@@ -206,7 +209,9 @@
     "citedText": "Exact cited text",
     "aiResponse": "AI response",
     "whyReferenced": "Why this source was referenced:",
-    "competitorsNamed": "Competitors named in this answer:"
+    "competitorsNamed": "Competitors named in this answer:",
+    "breakdownTitle": "Source types",
+    "breakdownHint": "What kinds of sources AI platforms trust — share of citations and trend vs your previous scan"
   },
   "trends": {
     "title": "Trends",
@@ -356,7 +361,15 @@
     "autoScanLabel": "Weekly scheduled scan",
     "autoScanBody": "Runs every Monday within your plan's monthly scan limit. Archived projects are never scanned.",
     "monitoringLocked": "Scheduled monitoring is available on Starter and Pro —",
-    "upgradeToMonitor": "upgrade to enable it."
+    "upgradeToMonitor": "upgrade to enable it.",
+    "brandLogo": "Brand logo URL",
+    "brandLogoHint": "Optional — shown in the project switcher and on reports; we fall back to your site's favicon.",
+    "openExplorer": "Open Prompt Explorer",
+    "branding": "Report branding (white label)",
+    "brandingHint": "Your company identity on exported reports — logo, name and website",
+    "companyName": "Company name",
+    "companyWebsite": "Company website",
+    "companyLogo": "Company logo URL"
   },
   "summary": {
     "title": "Last scan summary",
@@ -467,6 +480,82 @@
     "benchmarkTrends": "Benchmark Trends",
     "benchmarkTrendsHint": "How your market's visibility shifts over time",
     "recommendedActions": "Recommended Actions",
-    "recommendedActionsHint": "What top performers in your market do differently"
+    "recommendedActionsHint": "What top performers in your market do differently",
+    "promptsAnalyzed": "Buyer prompts analyzed",
+    "promptsAnalyzedHint": "distinct questions, recent window",
+    "answersAnalyzed": "AI answers analyzed",
+    "answersAnalyzedHint": "across all monitored platforms",
+    "sourcesAnalyzed": "Sources analyzed",
+    "sourcesAnalyzedHint": "citations extracted from answers",
+    "platformsCovered": "AI platforms covered",
+    "engineRates": "Brand visibility by AI platform",
+    "engineRatesHint": "How often brands are mentioned and cited per platform, across the whole market",
+    "sampleData": "Illustrative sample",
+    "liveData": "Live aggregate",
+    "mentionShort": "mention {rate}",
+    "citationShort": "cited {rate}",
+    "sampleNote": "Illustrative distribution shown while the anonymized market corpus grows (under {min} observations). Real aggregates replace it automatically — no customer-specific data is ever shown.",
+    "industriesTitle": "Industries",
+    "industriesHint": "{count} industries in the benchmark corpus",
+    "marketsTitle": "Markets",
+    "marketsHint": "{count} markets in the benchmark corpus"
+  },
+  "promptExplorer": {
+    "title": "Prompt Explorer",
+    "subtitle": "{count} of {max} active prompts on your {plan} plan — the questions we ask every AI platform",
+    "topicTitle": "Generate prompts from a topic",
+    "topicHint": "Enter a topic like “Digital Marketing”, “CRM” or “AI SEO” — we'll draft the questions your buyers ask",
+    "topicPlaceholder": "e.g. Digital Marketing",
+    "generate": "Suggest prompts",
+    "generating": "Generating…",
+    "suggestError": "Could not generate suggestions — please try again.",
+    "noSuggestions": "No new prompts for this topic — you may already track them all.",
+    "reviewHint": "Recommended prompts for “{topic}” — accept, edit or reject before saving. Only accepted prompts are monitored.",
+    "accept": "Accept prompt",
+    "reject": "Reject prompt",
+    "editPrompt": "Edit prompt",
+    "addAccepted": "Add {count} prompts",
+    "discard": "Discard",
+    "saving": "Saving…",
+    "saved": "Added {count} prompts — they'll be included in your next scan.",
+    "duplicate": "You're already tracking this prompt.",
+    "manualTitle": "Add a prompt manually",
+    "manualHint": "Write the exact question a buyer would ask an AI assistant",
+    "manualPlaceholder": "e.g. best CRM for startups",
+    "limitReached": "Prompt limit reached ({max} active).",
+    "generalGroup": "General",
+    "groupHint": "{active} active of {total} prompts",
+    "paused": "paused",
+    "pause": "Pause prompt",
+    "resume": "Resume prompt",
+    "delete": "Delete prompt"
+  },
+  "conversations": {
+    "title": "Recent AI conversations",
+    "hint": "What each platform actually answered — expand a row for the full response, sources and citations",
+    "recommended": "recommended",
+    "mentioned": "mentioned",
+    "notMentioned": "not mentioned",
+    "competitors": "{count} competitors",
+    "competitorsLabel": "Competitors mentioned:",
+    "sourcesLabel": "Sources & citations:",
+    "projectLabel": "Project:"
+  },
+  "redeem": {
+    "title": "Redeem your lifetime code",
+    "subtitle": "Enter your code to activate lifetime access to Sightline.",
+    "codeLabel": "Redemption code",
+    "activate": "Activate lifetime access",
+    "activating": "Activating…",
+    "activatingFor": "Activating for {email}",
+    "error": "Something went wrong — please try again.",
+    "needAccount": "First, create your free Sightline account (takes under a minute). Your code is applied right after.",
+    "createAccount": "Create account & redeem",
+    "successTitle": "Lifetime access activated",
+    "successBody": "Welcome aboard! Your plan is active — here's what's included:",
+    "successProjects": "{count} active projects",
+    "successPrompts": "{count} tracked prompts",
+    "successScans": "{count} scans per month",
+    "goToDashboard": "Go to dashboard"
   }
 }

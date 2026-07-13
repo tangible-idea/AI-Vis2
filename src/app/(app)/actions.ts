@@ -17,6 +17,8 @@ export async function switchProject(projectId: string) {
 
 export interface OnboardingState {
   error?: string;
+  /** True when the plan's active-project limit blocks creation (show archive/upgrade CTAs). */
+  limitReached?: boolean;
   scanId?: string;
   projectId?: string;
 }
@@ -57,6 +59,7 @@ export async function createProject(
     .is("archived_at", null);
   if ((projectCount ?? 0) >= limits.maxProjects) {
     return {
+      limitReached: true,
       error: `Your ${limits.label} plan includes ${limits.maxProjects} active project${limits.maxProjects > 1 ? "s" : ""}. Archive or delete a project in Settings, or upgrade to add more brands.`,
     };
   }
@@ -66,6 +69,10 @@ export async function createProject(
     .insert({ user_id: user.id, name, website, industry, country, language, target_market, description })
     .select()
     .single();
+  if (error?.code === "23505") {
+    // a project is one domain + one market — this combination already exists
+    return { error: `You're already monitoring ${website} in ${country}. Switch to that project, or pick a different market.` };
+  }
   if (error || !project) return { error: error?.message ?? "Could not create project" };
 
   let resolvedNames = competitorNames;
@@ -164,6 +171,9 @@ export async function addMarket(projectId: string, country: string): Promise<{ e
     })
     .select()
     .single();
+  if (error?.code === "23505") {
+    return { error: `You're already monitoring ${source.website} in ${country}.` };
+  }
   if (error || !project) return { error: error?.message ?? "Could not create market" };
 
   // carry competitors over; prompts are regenerated for the new country

@@ -1,8 +1,20 @@
 import Link from "next/link";
 import { ArrowRight, Radar, Wand2, TrendingUp, Check } from "lucide-react";
 import { ENGINES } from "@/lib/ai/engines";
+import { getBenchmarkStats, type BenchmarkStats } from "@/lib/benchmarks";
 
-export default function HomePage() {
+// live-monitoring stats refresh hourly (same cadence as the cached aggregate)
+export const revalidate = 3600;
+
+export default async function HomePage() {
+  // aggregated, anonymous monitoring activity — best-effort, page renders without it
+  let stats: BenchmarkStats | null = null;
+  try {
+    stats = await getBenchmarkStats();
+  } catch {
+    stats = null;
+  }
+
   return (
     <main>
       {/* ── hero ─────────────────────────────────────────── */}
@@ -159,6 +171,60 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── live monitoring ──────────────────────────────── */}
+      <section className="relative overflow-hidden bg-night text-paper">
+        <div className="dot-grid-dark absolute inset-0" aria-hidden />
+        <div className="relative mx-auto max-w-5xl px-4 py-16">
+          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-paper/50">
+            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-[#35d07f]" />
+            Monitoring in progress
+          </p>
+          <h2 className="mt-2 text-2xl tracking-tight sm:text-3xl">
+            Sightline is <span className="font-display italic text-[#35d07f]">watching the AI ecosystem</span>{" "}
+            right now
+          </h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-night-line bg-night-soft p-5">
+              <p className="text-[11px] uppercase tracking-wider text-paper/40">
+                AI platforms under monitoring
+              </p>
+              <div className="mt-3 space-y-2.5">
+                {ENGINES.map((e) => (
+                  <div key={e.id} className="flex items-center gap-2.5 text-sm text-paper/80">
+                    <span
+                      className="h-1.5 w-1.5 animate-pulse-dot rounded-full"
+                      style={{ background: e.color }}
+                    />
+                    {e.label}
+                    <span className="ml-auto text-[11px] text-paper/40">
+                      {e.collection === "search-grounded" ? "search-grounded" : "model responses"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                ["Buyer prompts tracked", stats?.distinctPrompts],
+                ["AI answers analyzed", stats?.observations],
+                ["Sources extracted", stats?.sourcesAnalyzed],
+                ["Markets covered", stats?.countries.length],
+              ].map(([label, value]) => (
+                <div key={label as string} className="rounded-2xl border border-night-line bg-night-soft p-5">
+                  <p className="tabular text-3xl text-[#35d07f]">
+                    {typeof value === "number" && value > 0 ? value.toLocaleString() : "—"}
+                  </p>
+                  <p className="mt-1 text-[11px] uppercase tracking-wider text-paper/40">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="mt-4 text-[11px] text-paper/40">
+            Aggregated, anonymous activity from recent scans — refreshed hourly.
+          </p>
+        </div>
+      </section>
+
       {/* ── social proof ─────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-4 py-20">
         <div className="grid gap-4 md:grid-cols-3">
@@ -192,7 +258,7 @@ export default function HomePage() {
           <h2 className="text-2xl tracking-tight sm:text-3xl">Simple pricing</h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
             Free to start. Starter at $49/mo for weekly scans, trends and content generation. Pro at
-            $149/mo for unlimited everything, API and white label.
+            $149/mo for agency-scale capacity and white label reports.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link

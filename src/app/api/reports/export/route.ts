@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { planLimits } from "@/lib/plans";
 import { buildMarkdownReport, buildCsvReport, type ReportData } from "@/lib/reports/build";
 
 /** GET ?projectId=…&format=md|csv → downloads the latest report. */
@@ -34,12 +35,29 @@ export async function GET(request: Request) {
     ]);
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
+  // white-label branding: the workspace owner's plan and organization
+  const { data: ownerProfile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", project.user_id)
+    .maybeSingle();
+  let branding: ReportData["branding"] = null;
+  if (planLimits(ownerProfile?.plan).whiteLabel) {
+    const { data: org } = await supabase
+      .from("organizations")
+      .select("name, website, logo_url")
+      .eq("owner_id", project.user_id)
+      .maybeSingle();
+    if (org?.name) branding = org;
+  }
+
   const data: ReportData = {
     project,
     snapshot: snapshots?.[0] ?? null,
     previous: snapshots?.[1] ?? null,
     recommendations: recs ?? [],
     competitors: (competitors ?? []).map((c) => c.name),
+    branding,
   };
 
   const slug = project.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");

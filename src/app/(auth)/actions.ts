@@ -37,6 +37,9 @@ export async function signup(
   const supabase = await createClient();
   const email = String(formData.get("email"));
   const origin = await siteOrigin();
+  // only allow internal destinations (e.g. /redeem for lifetime activation)
+  const rawNext = String(formData.get("next") ?? "");
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/onboarding";
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -44,8 +47,8 @@ export async function signup(
     options: {
       data: { full_name: String(formData.get("name") ?? "") },
       // Confirmation links land on /auth/callback, which exchanges the code
-      // and forwards the user into onboarding.
-      emailRedirectTo: `${origin}/auth/callback?next=/onboarding`,
+      // and forwards the user onward.
+      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
     },
   });
   if (error) return { error: error.message };
@@ -53,7 +56,7 @@ export async function signup(
   // Email confirmation enabled → no session yet; tell the user to check mail.
   if (!data.session) return { sent: true, email };
 
-  redirect("/onboarding");
+  redirect(next);
 }
 
 export async function logout() {

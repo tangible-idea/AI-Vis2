@@ -41,7 +41,9 @@
     "settings": "Pengaturan",
     "switchProject": "Ganti proyek",
     "mockMode": "Mode simulasi — atur POE_API_KEY untuk pemindaian nyata",
-    "benchmarks": "Tolok Ukur"
+    "benchmarks": "Tolok Ukur",
+    "prompts": "Penjelajah Prompt",
+    "groupOrganization": "Organisasi"
   },
   "market": {
     "label": "Pasar",
@@ -91,7 +93,8 @@
     "demoLoading": "Memuat demo…",
     "scanTitle": "Menjalankan pemindaian pertama Anda",
     "scanBody": "Menanyakan ChatGPT, Claude, Gemini, dan Perplexity pertanyaan yang diajukan pembeli Anda. Biasanya kurang dari satu menit.",
-    "continueDashboard": "Lanjut ke dasbor"
+    "continueDashboard": "Lanjut ke dasbor",
+    "manageProjects": "Kelola proyek di Pengaturan"
   },
   "scan": {
     "scanning": "Memindai…",
@@ -206,7 +209,9 @@
     "citedText": "Teks yang dikutip",
     "aiResponse": "Jawaban AI",
     "whyReferenced": "Mengapa sumber ini dirujuk:",
-    "competitorsNamed": "Pesaing yang disebut dalam jawaban ini:"
+    "competitorsNamed": "Pesaing yang disebut dalam jawaban ini:",
+    "breakdownTitle": "Jenis sumber",
+    "breakdownHint": "Jenis sumber yang dipercaya platform AI — porsi sitasi dan tren dibanding pemindaian sebelumnya"
   },
   "trends": {
     "title": "Tren",
@@ -356,7 +361,15 @@
     "autoScanLabel": "Pemindaian terjadwal mingguan",
     "autoScanBody": "Berjalan setiap Senin dalam batas pemindaian bulanan paket Anda. Proyek yang diarsipkan tidak pernah dipindai.",
     "monitoringLocked": "Pemantauan terjadwal tersedia di Starter dan Pro —",
-    "upgradeToMonitor": "tingkatkan untuk mengaktifkan."
+    "upgradeToMonitor": "tingkatkan untuk mengaktifkan.",
+    "brandLogo": "URL logo merek",
+    "brandLogoHint": "Opsional — ditampilkan di pengalih proyek dan laporan; jika kosong, favicon situs Anda digunakan.",
+    "openExplorer": "Buka Penjelajah Prompt",
+    "branding": "Branding laporan (white label)",
+    "brandingHint": "Identitas perusahaan Anda pada laporan yang diekspor — logo, nama, dan situs web",
+    "companyName": "Nama perusahaan",
+    "companyWebsite": "Situs web perusahaan",
+    "companyLogo": "URL logo perusahaan"
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",
@@ -467,6 +480,82 @@
     "benchmarkTrends": "Tren Tolok Ukur",
     "benchmarkTrendsHint": "Perubahan visibilitas pasar Anda dari waktu ke waktu",
     "recommendedActions": "Tindakan yang Disarankan",
-    "recommendedActionsHint": "Apa yang dilakukan berbeda oleh merek teratas di pasar Anda"
+    "recommendedActionsHint": "Apa yang dilakukan berbeda oleh merek teratas di pasar Anda",
+    "promptsAnalyzed": "Prompt pembeli dianalisis",
+    "promptsAnalyzedHint": "pertanyaan unik, periode terbaru",
+    "answersAnalyzed": "Jawaban AI dianalisis",
+    "answersAnalyzedHint": "di semua platform yang dipantau",
+    "sourcesAnalyzed": "Sumber dianalisis",
+    "sourcesAnalyzedHint": "sitasi yang diekstrak dari jawaban",
+    "platformsCovered": "Platform AI tercakup",
+    "engineRates": "Visibilitas merek per platform AI",
+    "engineRatesHint": "Seberapa sering merek disebut dan disitasi per platform, di seluruh pasar",
+    "sampleData": "Data ilustratif",
+    "liveData": "Agregat langsung",
+    "mentionShort": "disebut {rate}",
+    "citationShort": "disitasi {rate}",
+    "sampleNote": "Distribusi ilustratif ditampilkan selama korpus pasar anonim masih berkembang (di bawah {min} observasi). Agregat nyata menggantikannya secara otomatis — data spesifik pelanggan tidak pernah ditampilkan.",
+    "industriesTitle": "Industri",
+    "industriesHint": "{count} industri dalam korpus benchmark",
+    "marketsTitle": "Pasar",
+    "marketsHint": "{count} pasar dalam korpus benchmark"
+  },
+  "promptExplorer": {
+    "title": "Penjelajah Prompt",
+    "subtitle": "{count} dari {max} prompt aktif pada paket {plan} — pertanyaan yang kami ajukan ke setiap platform AI",
+    "topicTitle": "Buat prompt dari topik",
+    "topicHint": "Masukkan topik seperti “Digital Marketing”, “CRM”, atau “AI SEO” — kami akan menyusun pertanyaan yang diajukan pembeli Anda",
+    "topicPlaceholder": "mis. Digital Marketing",
+    "generate": "Sarankan prompt",
+    "generating": "Membuat…",
+    "suggestError": "Gagal membuat saran — silakan coba lagi.",
+    "noSuggestions": "Tidak ada prompt baru untuk topik ini — mungkin semuanya sudah Anda lacak.",
+    "reviewHint": "Prompt yang direkomendasikan untuk “{topic}” — terima, edit, atau tolak sebelum menyimpan. Hanya prompt yang diterima yang dipantau.",
+    "accept": "Terima prompt",
+    "reject": "Tolak prompt",
+    "editPrompt": "Edit prompt",
+    "addAccepted": "Tambah {count} prompt",
+    "discard": "Buang",
+    "saving": "Menyimpan…",
+    "saved": "{count} prompt ditambahkan — akan disertakan pada pemindaian berikutnya.",
+    "duplicate": "Anda sudah melacak prompt ini.",
+    "manualTitle": "Tambah prompt secara manual",
+    "manualHint": "Tulis pertanyaan persis seperti yang diajukan pembeli kepada asisten AI",
+    "manualPlaceholder": "mis. CRM terbaik untuk startup",
+    "limitReached": "Batas prompt tercapai ({max} aktif).",
+    "generalGroup": "Umum",
+    "groupHint": "{active} aktif dari {total} prompt",
+    "paused": "dijeda",
+    "pause": "Jeda prompt",
+    "resume": "Lanjutkan prompt",
+    "delete": "Hapus prompt"
+  },
+  "conversations": {
+    "title": "Percakapan AI terbaru",
+    "hint": "Jawaban sebenarnya dari tiap platform — perluas baris untuk melihat respons lengkap, sumber, dan sitasi",
+    "recommended": "direkomendasikan",
+    "mentioned": "disebut",
+    "notMentioned": "tidak disebut",
+    "competitors": "{count} kompetitor",
+    "competitorsLabel": "Kompetitor yang disebut:",
+    "sourcesLabel": "Sumber & sitasi:",
+    "projectLabel": "Proyek:"
+  },
+  "redeem": {
+    "title": "Tukarkan kode lifetime Anda",
+    "subtitle": "Masukkan kode untuk mengaktifkan akses Sightline seumur hidup.",
+    "codeLabel": "Kode penukaran",
+    "activate": "Aktifkan akses lifetime",
+    "activating": "Mengaktifkan…",
+    "activatingFor": "Diterapkan ke {email}",
+    "error": "Terjadi kesalahan — silakan coba lagi.",
+    "needAccount": "Pertama, buat akun Sightline gratis (kurang dari satu menit). Kode Anda langsung diterapkan setelahnya.",
+    "createAccount": "Buat akun & tukarkan",
+    "successTitle": "Akses lifetime aktif",
+    "successBody": "Selamat bergabung! Paket Anda aktif — berikut yang termasuk:",
+    "successProjects": "{count} proyek aktif",
+    "successPrompts": "{count} prompt terlacak",
+    "successScans": "{count} pemindaian per bulan",
+    "goToDashboard": "Ke dasbor"
   }
 }

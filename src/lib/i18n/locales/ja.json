@@ -41,7 +41,9 @@
     "settings": "設定",
     "switchProject": "プロジェクト切替",
     "mockMode": "モックモード — 実スキャンには POE_API_KEY を設定してください",
-    "benchmarks": "ベンチマーク"
+    "benchmarks": "ベンチマーク",
+    "prompts": "プロンプトエクスプローラー",
+    "groupOrganization": "組織"
   },
   "market": {
     "label": "マーケット",
@@ -91,7 +93,8 @@
     "demoLoading": "デモを読み込み中…",
     "scanTitle": "初回スキャンを実行中",
     "scanBody": "買い手が尋ねる質問を ChatGPT、Claude、Gemini、Perplexity に問いかけています。通常1分以内に完了します。",
-    "continueDashboard": "ダッシュボードへ進む"
+    "continueDashboard": "ダッシュボードへ進む",
+    "manageProjects": "設定でプロジェクトを管理"
   },
   "scan": {
     "scanning": "スキャン中…",
@@ -206,7 +209,9 @@
     "citedText": "引用された本文",
     "aiResponse": "AIの回答",
     "whyReferenced": "このソースが参照された理由:",
-    "competitorsNamed": "この回答で言及された競合:"
+    "competitorsNamed": "この回答で言及された競合:",
+    "breakdownTitle": "ソースの種類",
+    "breakdownHint": "AIプラットフォームが信頼するソースの種類 — 引用シェアと前回スキャン比の傾向"
   },
   "trends": {
     "title": "トレンド",
@@ -356,7 +361,15 @@
     "autoScanLabel": "週次スケジュールスキャン",
     "autoScanBody": "毎週月曜日、プランの月間スキャン上限内で実行されます。アーカイブ済みプロジェクトはスキャンされません。",
     "monitoringLocked": "スケジュールモニタリングはStarterとProで利用できます —",
-    "upgradeToMonitor": "アップグレードして有効にする。"
+    "upgradeToMonitor": "アップグレードして有効にする。",
+    "brandLogo": "ブランドロゴURL",
+    "brandLogoHint": "任意 — プロジェクト切替とレポートに表示されます。未設定の場合はサイトのファビコンを使用します。",
+    "openExplorer": "プロンプトエクスプローラーを開く",
+    "branding": "レポートブランディング（ホワイトラベル）",
+    "brandingHint": "エクスポートしたレポートに表示される会社情報 — ロゴ、名前、ウェブサイト",
+    "companyName": "会社名",
+    "companyWebsite": "会社ウェブサイト",
+    "companyLogo": "会社ロゴURL"
   },
   "summary": {
     "title": "最終スキャン概要",
@@ -467,6 +480,82 @@
     "benchmarkTrends": "ベンチマークトレンド",
     "benchmarkTrendsHint": "市場の可視性の時間的な変化",
     "recommendedActions": "推奨アクション",
-    "recommendedActionsHint": "市場のトップブランドが行っていること"
+    "recommendedActionsHint": "市場のトップブランドが行っていること",
+    "promptsAnalyzed": "分析したバイヤープロンプト",
+    "promptsAnalyzedHint": "直近期間のユニークな質問数",
+    "answersAnalyzed": "分析したAI回答",
+    "answersAnalyzedHint": "監視中の全プラットフォーム",
+    "sourcesAnalyzed": "分析したソース",
+    "sourcesAnalyzedHint": "回答から抽出した引用",
+    "platformsCovered": "対応AIプラットフォーム",
+    "engineRates": "AIプラットフォーム別ブランド可視性",
+    "engineRatesHint": "市場全体でのプラットフォーム別のブランド言及・引用頻度",
+    "sampleData": "サンプルデータ",
+    "liveData": "ライブ集計",
+    "mentionShort": "言及 {rate}",
+    "citationShort": "引用 {rate}",
+    "sampleNote": "匿名化された市場データが蓄積するまで（{min}件未満）はサンプル分布を表示します。実際の集計に自動で置き換わり、顧客固有のデータが表示されることはありません。",
+    "industriesTitle": "業界",
+    "industriesHint": "ベンチマークデータに含まれる業界 {count}件",
+    "marketsTitle": "市場",
+    "marketsHint": "ベンチマークデータに含まれる市場 {count}件"
+  },
+  "promptExplorer": {
+    "title": "プロンプトエクスプローラー",
+    "subtitle": "{plan}プランで{max}件中{count}件のプロンプトが有効 — 各AIプラットフォームに尋ねる質問です",
+    "topicTitle": "トピックからプロンプトを生成",
+    "topicHint": "「デジタルマーケティング」「CRM」「AI SEO」などのトピックを入力すると、バイヤーが尋ねる質問の下書きを作成します",
+    "topicPlaceholder": "例: デジタルマーケティング",
+    "generate": "プロンプトを提案",
+    "generating": "生成中…",
+    "suggestError": "提案を生成できませんでした — もう一度お試しください。",
+    "noSuggestions": "このトピックの新しいプロンプトはありません — すべて追跡済みの可能性があります。",
+    "reviewHint": "「{topic}」のおすすめプロンプト — 保存前に承認・編集・却下してください。承認したプロンプトのみ監視されます。",
+    "accept": "プロンプトを承認",
+    "reject": "プロンプトを却下",
+    "editPrompt": "プロンプトを編集",
+    "addAccepted": "{count}件のプロンプトを追加",
+    "discard": "破棄",
+    "saving": "保存中…",
+    "saved": "{count}件のプロンプトを追加しました — 次回のスキャンから含まれます。",
+    "duplicate": "このプロンプトはすでに追跡中です。",
+    "manualTitle": "プロンプトを手動で追加",
+    "manualHint": "バイヤーがAIアシスタントに尋ねるままの質問を書いてください",
+    "manualPlaceholder": "例: スタートアップに最適なCRM",
+    "limitReached": "プロンプト上限に達しました（有効{max}件）。",
+    "generalGroup": "一般",
+    "groupHint": "{total}件中{active}件が有効",
+    "paused": "一時停止",
+    "pause": "プロンプトを一時停止",
+    "resume": "プロンプトを再開",
+    "delete": "プロンプトを削除"
+  },
+  "conversations": {
+    "title": "最近のAI会話",
+    "hint": "各プラットフォームの実際の回答 — 行を展開すると全文、ソース、引用を確認できます",
+    "recommended": "推奨",
+    "mentioned": "言及あり",
+    "notMentioned": "言及なし",
+    "competitors": "競合{count}社",
+    "competitorsLabel": "言及された競合:",
+    "sourcesLabel": "ソースと引用:",
+    "projectLabel": "プロジェクト:"
+  },
+  "redeem": {
+    "title": "ライフタイムコードを利用",
+    "subtitle": "コードを入力してSightlineのライフタイムアクセスを有効化します。",
+    "codeLabel": "引き換えコード",
+    "activate": "ライフタイムアクセスを有効化",
+    "activating": "有効化中…",
+    "activatingFor": "{email} に適用されます",
+    "error": "問題が発生しました — もう一度お試しください。",
+    "needAccount": "まず無料のSightlineアカウントを作成してください（1分以内）。登録後すぐにコードが適用されます。",
+    "createAccount": "アカウント作成して利用",
+    "successTitle": "ライフタイムアクセスが有効になりました",
+    "successBody": "ようこそ！プランが有効です — 含まれる内容:",
+    "successProjects": "アクティブプロジェクト{count}件",
+    "successPrompts": "追跡プロンプト{count}件",
+    "successScans": "月{count}回のスキャン",
+    "goToDashboard": "ダッシュボードへ"
   }
 }
