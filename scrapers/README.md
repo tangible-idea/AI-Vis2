@@ -58,8 +58,15 @@ python scrape.py --engine gemini  --prompt "best CRM for startups in 2026" --jso
 여러 질문을 파일로:
 
 ```bash
-python scrape.py --engine chatgpt --prompts-file prompts.txt --json > out.json
+# --out 을 쓰면 프로세스가 중간에 죽어도 결과가 파일로 남습니다 (권장).
+python scrape.py --engine chatgpt --prompts-file prompts.txt --out out.json
 ```
+
+> **`> out.json` 리다이렉트로 받았는데 파일이 비어 있다면?**
+> 결과 출력 전에 예외가 나서 죽은 것입니다(로그·에러는 stderr로 나가고
+> stdout은 비어 리다이렉트 파일이 0바이트가 됨). `--out out.json`을 쓰면
+> `try/finally`로 **항상** 파일에 씁니다. 답변이 빈 경우(셀렉터 변경 등)에는
+> `.userdata/debug/`에 스크린샷을 남기니 그걸로 원인을 확인하세요.
 
 ## 옵션
 
@@ -69,7 +76,8 @@ python scrape.py --engine chatgpt --prompts-file prompts.txt --json > out.json
 | `--prompt "..."` | 질문 1개 |
 | `--prompts-file PATH` | 한 줄에 하나씩 질문 목록 |
 | `--login` | 로그인 전용 모드 (질문 안 보냄) |
-| `--json` | 결과를 JSON으로 출력 |
+| `--json` | 결과를 JSON으로 stdout에 출력 |
+| `--out PATH` | 결과를 파일에 직접 기록 (크래시에도 보존됨, 권장) |
 | `--headless` | 창 숨김 (로그인/챌린지 필요 없을 때만; 권장하지 않음) |
 | `--timeout N` | 답변 대기 최대 초 (기본 120) |
 

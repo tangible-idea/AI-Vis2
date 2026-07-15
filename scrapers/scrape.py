@@ -46,6 +46,7 @@ def main() -> int:
     ap.add_argument("--prompts-file", help="path to a file with one question per line")
     ap.add_argument("--login", action="store_true", help="open the browser to log in, then save the session")
     ap.add_argument("--json", action="store_true", help="emit results as JSON")
+    ap.add_argument("--out", help="write results to this file directly (survives crashes; recommended over shell redirect)")
     ap.add_argument("--headless", action="store_true", help="hide the window (not recommended)")
     ap.add_argument("--timeout", type=int, default=120, help="max seconds to wait for one answer")
     args = ap.parse_args()
@@ -57,50 +58,79 @@ def main() -> int:
         ap.error("provide --prompt, --prompts-file, or --login")
 
     results: list[AnswerResult] = []
+    debug_dir = engine_cls.profile_dir().parent / "debug"
 
-    with sync_playwright() as p:
-        # persistent context = the user's real profile & login, kept between runs.
-        # This uses the user's own session; it does not bypass authentication.
-        context = p.chromium.launch_persistent_context(
-            user_data_dir=str(engine_cls.profile_dir()),
-            headless=args.headless,
-            viewport={"width": 1280, "height": 900},
-            args=["--disable-blink-features=AutomationControlled"],
-        )
-        page = context.pages[0] if context.pages else context.new_page()
-        engine = engine_cls(page, timeout=args.timeout)
-        engine.open()
+    # Whatever happens — clean finish, stale selector, or crash mid-run —
+    # the collected results are written out. An empty out.json almost always
+    # means the process died before this ran; try/finally fixes exactly that.
+    try:
+        with sync_playwright() as p:
+            # persistent context = the user's real profile & login, kept between
+            # runs. Uses the user's own session; does not bypass authentication.
+            context = p.chromium.launch_persistent_context(
+                user_data_dir=str(engine_cls.profile_dir()),
+                headless=args.headless,
+                viewport={"width": 1280, "height": 900},
+                args=["--disable-blink-features=AutomationControlled"],
+            )
+            page = context.pages[0] if context.pages else context.new_page()
+            engine = engine_cls(page, timeout=args.timeout)
+            engine.open()
 
-        if args.login:
-            log(f"[{engine.name}] Log in / clear any challenge in the browser window.")
-            log("[login] When the chat is ready, press Enter here to save the session…")
-            try:
-                input()
-            except EOFError:
-                time.sleep(60)
+            if args.login:
+                log(f"[{engine.name}] Log in / clear any challenge in the browser window.")
+                log("[login] When the chat is ready, press Enter here to save the session…")
+                try:
+                    input()
+                except EOFError:
+                    time.sleep(60)
+                context.close()
+                log("[login] Session saved.")
+                return 0
+
+            # need a ready composer (logged in, past any challenge) before asking
+            if not engine.wait_for_ready(patient=True):
+                log(f"[{engine.name}] prompt box never appeared — log in with --login first.")
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                engine.screenshot(debug_dir / f"{engine.name}-not-ready.png")
+                context.close()
+                return 2
+
+            for i, prompt in enumerate(prompts, 1):
+                log(f"[{engine.name}] ({i}/{len(prompts)}) asking: {prompt!r}")
+                try:
+                    res = engine.ask(prompt)
+                except Exception as e:  # noqa: BLE001 — one bad prompt shouldn't lose the rest
+                    res = AnswerResult(engine.name, prompt, "", False, f"ask crashed: {e}")
+                status = "ok" if res.ok else f"FAILED ({res.error})"
+                log(f"[{engine.name}] -> {status} in {res.elapsed_s}s, {len(res.answer)} chars")
+                # empty answer usually means a stale selector — leave a screenshot
+                if not res.answer:
+                    debug_dir.mkdir(parents=True, exist_ok=True)
+                    shot = debug_dir / f"{engine.name}-{i}-empty.png"
+                    engine.screenshot(shot)
+                    log(f"[{engine.name}] saved debug screenshot: {shot}")
+                results.append(res)
+                if i < len(prompts):
+                    time.sleep(3)  # human-paced; do not hammer the surface
+
             context.close()
-            log("[login] Session saved.")
-            return 0
+    finally:
+        write_output(results, args)
 
-        # need a ready composer (logged in, past any challenge) before asking
-        if not engine.wait_for_ready(patient=True):
-            log(f"[{engine.name}] prompt box never appeared — log in with --login first.")
-            context.close()
-            return 2
+    return 0 if results and all(r.ok for r in results) else 1
 
-        for i, prompt in enumerate(prompts, 1):
-            log(f"[{engine.name}] ({i}/{len(prompts)}) asking: {prompt!r}")
-            res = engine.ask(prompt)
-            status = "ok" if res.ok else f"FAILED ({res.error})"
-            log(f"[{engine.name}] -> {status} in {res.elapsed_s}s, {len(res.answer)} chars")
-            results.append(res)
-            if i < len(prompts):
-                time.sleep(3)  # human-paced; do not hammer the surface
 
-        context.close()
-
-    if args.json:
-        print(json.dumps([r.to_dict() for r in results], ensure_ascii=False, indent=2))
+def write_output(results: list[AnswerResult], args) -> None:
+    """Emit results to --out and/or stdout. Always runs, even on crash."""
+    if args.json or args.out:
+        payload = json.dumps([r.to_dict() for r in results], ensure_ascii=False, indent=2)
+        if args.out:
+            with open(args.out, "w", encoding="utf-8") as f:
+                f.write(payload + "\n")
+            log(f"[out] wrote {len(results)} result(s) to {args.out}")
+        if args.json:
+            print(payload)
     else:
         for r in results:
             print("=" * 70)
@@ -109,8 +139,8 @@ def main() -> int:
             print("-" * 70)
             print(r.answer or f"(no answer — {r.error})")
             print()
-
-    return 0 if all(r.ok for r in results) else 1
+        if not results:
+            print("(no results — see stderr log above)")
 
 
 if __name__ == "__main__":

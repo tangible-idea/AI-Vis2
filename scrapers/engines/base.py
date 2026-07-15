@@ -76,13 +76,18 @@ class Engine:
         self.page.keyboard.press("Enter")
 
     def _answer_count(self) -> int:
-        return self.page.locator(self.answer_selector).count()
+        # DOM can be mid-mutation while streaming; a transient failure here
+        # must never kill the run — treat it as "unknown, retry next tick"
+        try:
+            return self.page.locator(self.answer_selector).count()
+        except Exception:  # noqa: BLE001
+            return 0
 
     def _current_answer_text(self) -> str:
-        loc = self.page.locator(self.answer_selector).last
         try:
-            return (loc.inner_text() or "").strip()
-        except PWTimeout:
+            loc = self.page.locator(self.answer_selector).last
+            return (loc.inner_text(timeout=5000) or "").strip()
+        except Exception:  # noqa: BLE001 — element may detach as React re-renders
             return ""
 
     def _is_streaming(self) -> bool:
@@ -90,8 +95,16 @@ class Engine:
             return False
         try:
             return self.page.locator(self.streaming_selector).first.is_visible()
-        except PWTimeout:
+        except Exception:  # noqa: BLE001
             return False
+
+    def screenshot(self, path) -> None:
+        """Best-effort debug capture — used when an answer comes back empty
+        so stale selectors are easy to spot."""
+        try:
+            self.page.screenshot(path=str(path), full_page=False)
+        except Exception:  # noqa: BLE001
+            pass
 
     def ask(self, prompt: str) -> AnswerResult:
         start = time.time()
