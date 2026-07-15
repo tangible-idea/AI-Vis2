@@ -83,6 +83,65 @@ python scrape.py --engine chatgpt --prompts-file prompts.txt --out out.json
 
 ---
 
+## FastAPI 서버
+
+같은 스크래핑 코어(`runner.py`)를 HTTP로 노출합니다. 호출이 오면 JSON을 돌려줍니다.
+
+```bash
+# 먼저 엔진별 로그인 (1회, CLI로)
+python scrape.py --engine chatgpt --login
+
+# 서버 실행
+uvicorn server:app --host 127.0.0.1 --port 8100
+# 또는: python server.py
+```
+
+호출:
+
+```bash
+curl -s -X POST http://127.0.0.1:8100/scan \
+  -H 'content-type: application/json' \
+  -d '{"engine":"chatgpt","prompts":["best CRM for startups"]}' | jq
+```
+
+요청 본문:
+
+| 필드 | 타입 | 설명 |
+|---|---|---|
+| `engine` | string | `chatgpt` \| `gemini` (필수) |
+| `prompt` | string | 질문 1개 |
+| `prompts` | string[] | 질문 여러 개 |
+| `timeout` | int | 답변당 최대 초 (기본 120, 10–600) |
+| `headless` | bool | 창 숨김 (권장하지 않음) |
+
+응답(JSON):
+
+```json
+{
+  "engine": "chatgpt",
+  "ready": true,
+  "ok": true,
+  "error": null,
+  "results": [
+    { "engine": "chatgpt", "prompt": "...", "answer": "...", "ok": true,
+      "error": null, "elapsed_s": 12.3, "meta": {} }
+  ]
+}
+```
+
+- `GET /health` → `{ ok, engines, busy }` 로 상태·진행 중 여부 확인.
+- 대화형 API 문서: `http://127.0.0.1:8100/docs`
+
+### 서버 동작 특성 (중요)
+
+- **요청은 한 번에 하나씩** 처리됩니다(`asyncio.Lock`). persistent 브라우저
+  프로필은 동시 세션을 공유할 수 없고, 사람 속도 순차 접근이 전제이기 때문입니다.
+  동시에 여러 요청이 오면 뒤 요청은 앞 요청이 끝날 때까지 대기합니다.
+- 로그인이 안 된 상태로 호출하면 `ready:false`, `error`에 안내가 담겨 돌아옵니다.
+  먼저 CLI `--login`으로 세션을 저장하세요.
+- 서버와 CLI를 **동시에 같은 엔진으로 돌리지 마세요**(프로필 충돌). 하나만 쓰세요.
+- 로컬 전용(`127.0.0.1`)으로 두세요. ToS 특성상 외부에 공개 API로 노출하면 안 됩니다.
+
 ## 한계
 
 - 봇 탐지에 걸리면 실패합니다. 이 도구는 **뚫지 않습니다** — 사람이 풉니다.
