@@ -4,7 +4,12 @@ import { PLANS, PLAN_FEATURES } from "@/lib/plans";
 import type { PlanLimits } from "@/lib/plans";
 import type { Plan } from "@/lib/types";
 
-export const metadata = { title: "Pricing" };
+export const metadata = {
+  title: "Pricing",
+  description:
+    "Sightline pricing: start free, upgrade for weekly AI visibility scans, trends, content generation and white label reports. Monitor your brand across ChatGPT, Claude, Gemini and Perplexity.",
+  alternates: { canonical: "/pricing" },
+};
 
 const ORDER: ("free" | "starter" | "pro")[] = ["free", "starter", "pro"];
 

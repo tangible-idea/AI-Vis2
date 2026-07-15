@@ -90,10 +90,10 @@ export default function PreviewPage() {
               </div>
               <div>
                 <Label htmlFor="industry">Industry *</Label>
-                <Select id="industry" name="industry" required defaultValue={INDUSTRIES[0]}>
+                <Select id="industry" name="industry" required defaultValue={INDUSTRIES[0].id}>
                   {INDUSTRIES.map((i) => (
-                    <option key={i} value={i}>
-                      {i}
+                    <option key={i.id} value={i.id}>
+                      {i.label}
                     </option>
                   ))}
                 </Select>

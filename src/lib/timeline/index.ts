@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { industryPhrase } from "../types";
 import { ENGINES, engineInfo } from "../ai/engines";
 import { getTrendsSource } from "../trends";
 import type { Engine, Project, ScanResult, Snapshot } from "../types";
@@ -295,7 +296,7 @@ export async function buildTimeline(
   // ── rising trend nudge (today) ───────────────────────────────
   try {
     const trends = await getTrendsSource().trendingSearches({
-      industry: project.industry,
+      industry: industryPhrase(project.industry),
       country: project.country,
       language: project.language,
       timeframe: "30d",

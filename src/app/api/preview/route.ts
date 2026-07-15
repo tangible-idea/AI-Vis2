@@ -4,6 +4,8 @@ import { ENGINES, ENGINE_IDS } from "@/lib/ai/engines";
 import { mockContextMessage } from "@/lib/ai/mock";
 import { analyzeResponse } from "@/lib/scan/analyzer";
 import { computeScores, type ResultRow } from "@/lib/scan/scoring";
+import { canonicalDomain } from "@/lib/scan/prompts";
+import { industryPhrase } from "@/lib/types";
 import { PREVIEW_COOKIE, PREVIEW_LIMIT, type PreviewResult } from "@/lib/preview";
 
 export const maxDuration = 120;
@@ -18,7 +20,7 @@ const SCAN_SYSTEM_PROMPT =
  * Capped per browser via cookie.
  */
 export async function POST(request: NextRequest) {
-  let body: { brand?: string; industry?: string; description?: string };
+  let body: { brand?: string; domain?: string; industry?: string; description?: string };
   try {
     body = await request.json();
   } catch {
@@ -26,10 +28,12 @@ export async function POST(request: NextRequest) {
   }
 
   const brand = String(body.brand ?? "").trim();
-  const industry = String(body.industry ?? "").trim();
-  if (!brand || !industry) {
+  const rawIndustry = String(body.industry ?? "").trim();
+  const domain = canonicalDomain(String(body.domain ?? "").trim());
+  if (!brand || !rawIndustry) {
     return NextResponse.json({ error: "Brand and industry are required" }, { status: 400 });
   }
+  const industry = industryPhrase(rawIndustry);
 
   const used = parseInt(request.cookies.get(PREVIEW_COOKIE)?.value ?? "0", 10) || 0;
   if (used >= PREVIEW_LIMIT) {
@@ -42,11 +46,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // reduced prompt set — enough signal for a teaser, cheap to run
+  // reduced prompt set — enough signal for a teaser, cheap to run; the
+  // branded prompt is domain-anchored for entity precision
   const prompts = [
     `What are the best ${industry} options right now?`,
     `Which ${industry} provider would you recommend for a small business?`,
-    `Is ${brand} a good choice for ${industry}?`,
+    domain
+      ? `Is ${brand} (${domain}) a good choice for ${industry}?`
+      : `Is ${brand} a good choice for ${industry}?`,
   ];
 
   const provider = getProvider();
@@ -64,7 +71,12 @@ export async function POST(request: NextRequest) {
       ];
       try {
         const text = await provider.complete(engine.poeModel, messages);
-        rows.push({ engine: engine.id, prompt, response_text: text, ...analyzeResponse(text, brand, []) });
+        rows.push({
+          engine: engine.id,
+          prompt,
+          response_text: text,
+          ...analyzeResponse(text, brand, [], { brandWebsite: domain ? `https://${domain}` : null }),
+        });
       } catch (err) {
         console.error(`[preview] ${engine.id} failed:`, err);
       }

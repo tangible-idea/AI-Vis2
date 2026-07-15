@@ -1,7 +1,7 @@
 import { requireProject } from "@/lib/project";
 import { planLimits } from "@/lib/plans";
 import { getTrendsSource } from "@/lib/trends";
-import { CONTENT_LANGUAGES } from "@/lib/types";
+import { CONTENT_LANGUAGES , industryPhrase} from "@/lib/types";
 import { PageHeader, Card, CardHeader, LockedOverlay } from "@/components/ui";
 import { getT } from "@/lib/i18n/server";
 import { TrendsExplorer, TrendRows } from "./explorer";
@@ -17,7 +17,7 @@ export default async function TrendsPage() {
 
   const source = getTrendsSource();
   const query = {
-    industry: project.industry,
+    industry: industryPhrase(project.industry),
     country: project.country,
     language: project.language,
     timeframe: "30d" as const,
@@ -38,7 +38,7 @@ export default async function TrendsPage() {
           <Card>
             <CardHeader
               title={t("trends.trendingSearches")}
-              hint={t("trends.trendingHint", { industry: project.industry })}
+              hint={t("trends.trendingHint", { industry: industryPhrase(project.industry) })}
             />
             <div className="px-5 pb-4">
               <TrendRows results={searches.slice(0, 5)} />

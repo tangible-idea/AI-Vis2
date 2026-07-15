@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, Instrument_Serif, IBM_Plex_Mono } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
 import { LanguageSuggest } from "@/components/language-suggest";
+import { SITE } from "@/lib/seo";
 import "./globals.css";
 
 const instrumentSans = Instrument_Sans({
@@ -24,12 +25,41 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
   title: {
-    default: "Sightline — AI Visibility Intelligence",
-    template: "%s · Sightline",
+    default: SITE.title,
+    template: `%s · ${SITE.name}`,
   },
-  description:
-    "See how your brand shows up across ChatGPT, Claude, Gemini and Perplexity — and get concrete actions to improve it.",
+  description: SITE.description,
+  applicationName: SITE.name,
+  keywords: [
+    "AI visibility monitoring",
+    "AI search optimization",
+    "AEO",
+    "GEO",
+    "brand visibility in AI",
+    "ChatGPT brand monitoring",
+    "AI SEO",
+    "competitive AI visibility",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: SITE.name,
+    title: SITE.title,
+    description: SITE.description,
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.title,
+    description: SITE.description,
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: SITE.themeColor,
 };
 
 export default async function RootLayout({

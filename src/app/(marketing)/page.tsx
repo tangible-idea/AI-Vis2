@@ -2,9 +2,76 @@ import Link from "next/link";
 import { ArrowRight, Radar, Wand2, TrendingUp, Check } from "lucide-react";
 import { ENGINES } from "@/lib/ai/engines";
 import { getBenchmarkStats, type BenchmarkStats } from "@/lib/benchmarks";
+import { jsonLd, SITE } from "@/lib/seo";
+import { PLANS } from "@/lib/plans";
 
 // live-monitoring stats refresh hourly (same cadence as the cached aggregate)
 export const revalidate = 3600;
+
+export const metadata = {
+  alternates: { canonical: "/" },
+};
+
+// rendered in the FAQ section and mirrored as FAQPage structured data
+const FAQS: [string, string][] = [
+  [
+    "How is this different from an SEO tool?",
+    "SEO tools measure Google rankings. Sightline measures whether AI assistants mention and recommend you when buyers ask — a different index, different sources, and different fixes (llms.txt, Q&A structure, comparison pages).",
+  ],
+  [
+    "Which AI engines do you cover?",
+    "ChatGPT, Claude, Gemini and Perplexity today, with Google AI Overviews next. Engines are pluggable, so coverage grows without re-architecture.",
+  ],
+  [
+    "How fast do I see results?",
+    "Your first scan completes minutes after signup. Visibility improvements typically show within 2–6 weeks of shipping the recommended content, depending on how often engines refresh.",
+  ],
+  [
+    "Do you support languages besides English?",
+    "Yes — content generation supports English, Korean, Japanese, Chinese, Thai, Vietnamese, Indonesian and Malay.",
+  ],
+  [
+    "Can I share reports with clients?",
+    "Starter and Pro include read-only share links with expiry dates, plus Markdown/CSV export and a print-clean report layout.",
+  ],
+];
+
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE.url}/#organization`,
+      name: SITE.name,
+      url: SITE.url,
+      logo: `${SITE.url}/icon.svg`,
+      description: SITE.description,
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: SITE.name,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: SITE.url,
+      description: SITE.description,
+      publisher: { "@id": `${SITE.url}/#organization` },
+      offers: (["free", "starter", "pro"] as const).map((p) => ({
+        "@type": "Offer",
+        name: `${PLANS[p].label} plan`,
+        price: PLANS[p].price.replace("$", ""),
+        priceCurrency: "USD",
+      })),
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQS.map(([q, a]) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    },
+  ],
+};
 
 export default async function HomePage() {
   // aggregated, anonymous monitoring activity — best-effort, page renders without it
@@ -17,6 +84,10 @@ export default async function HomePage() {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(STRUCTURED_DATA) }}
+      />
       {/* ── hero ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-night text-paper">
         <div className="dot-grid-dark absolute inset-0" aria-hidden />
@@ -281,28 +352,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-2xl px-4 py-20">
         <h2 className="text-center text-2xl tracking-tight">Questions</h2>
         <div className="mt-8 divide-y divide-line">
-          {[
-            [
-              "How is this different from an SEO tool?",
-              "SEO tools measure Google rankings. Sightline measures whether AI assistants mention and recommend you when buyers ask — a different index, different sources, and different fixes (llms.txt, Q&A structure, comparison pages).",
-            ],
-            [
-              "Which AI engines do you cover?",
-              "ChatGPT, Claude, Gemini and Perplexity today, with Google AI Overviews next. Engines are pluggable, so coverage grows without re-architecture.",
-            ],
-            [
-              "How fast do I see results?",
-              "Your first scan completes minutes after signup. Visibility improvements typically show within 2–6 weeks of shipping the recommended content, depending on how often engines refresh.",
-            ],
-            [
-              "Do you support languages besides English?",
-              "Yes — content generation supports English, Korean, Japanese, Chinese, Thai, Vietnamese, Indonesian and Malay.",
-            ],
-            [
-              "Can I share reports with clients?",
-              "Starter and Pro include read-only share links with expiry dates, plus Markdown/CSV export and a print-clean report layout.",
-            ],
-          ].map(([q, a]) => (
+          {FAQS.map(([q, a]) => (
             <details key={q} className="group py-4">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-medium">
                 {q}

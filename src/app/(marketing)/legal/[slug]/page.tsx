@@ -11,7 +11,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const doc = LEGAL_DOCS.find((d) => d.slug === slug);
-  return { title: doc?.title ?? "Legal" };
+  return {
+    title: doc?.title ?? "Legal",
+    description: doc ? `Sightline ${doc.title.toLowerCase()} — last updated ${doc.updated}.` : undefined,
+    alternates: { canonical: `/legal/${slug}` },
+  };
 }
 
 export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {

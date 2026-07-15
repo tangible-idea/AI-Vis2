@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { industryPhrase } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
 import { getProvider, type ChatMessage } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL, engineInfo } from "@/lib/ai/engines";
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
             .join(", ")
         : "no scan yet";
       context = [
-        `Project: ${project.name} (${project.website}) — ${project.industry}, ${project.country}.`,
+        `Project: ${project.name} (${project.website}) — ${industryPhrase(project.industry)}, ${project.country}.`,
         snapshot
           ? `Latest scan — Visibility Score ${snapshot.overall_score}/100. Engine scores: ${engineLine}. Mention rate ${Math.round(snapshot.mention_rate * 100)}%, recommendation rate ${Math.round(snapshot.recommendation_rate * 100)}%, avg position ${snapshot.avg_position?.toFixed(1) ?? "n/a"}.`
           : "No scans have run yet.",

@@ -26,6 +26,16 @@ export function promptHash(text: string): string {
 }
 
 /**
+ * Near-duplicate identity for an engine answer: case-, whitespace- and
+ * markdown-emphasis-insensitive, so trivially reformatted repeats of the
+ * same answer collapse to one hash.
+ */
+export function responseHash(text: string): string {
+  const normalized = text.toLowerCase().replace(/[*_`#>]/g, "").replace(/\s+/g, " ").trim();
+  return createHash("sha256").update(normalized).digest("hex");
+}
+
+/**
  * Executes a scan end-to-end: queries every engine with every active prompt,
  * analyzes responses, stores results, snapshots scores and refreshes
  * recommendations. Designed to run inside a single serverless invocation.
@@ -147,6 +157,21 @@ export async function runScan(scanId: string): Promise<void> {
     });
 
     if (!rows.length) throw new Error("All engine calls failed");
+
+    // data quality: when an engine returns the same (normalized) answer for
+    // several prompts — canned/generic output or a provider artifact — the
+    // duplicates keep their mention analysis but lose citations, so repeated
+    // sources never inflate citation counts, the Sources page or trends.
+    const seenResponses = new Set<string>();
+    for (const r of rows) {
+      const key = `${r.engine}|${responseHash(r.response_text)}`;
+      if (seenResponses.has(key)) {
+        r.sources = [];
+        r.cited = false;
+      } else {
+        seenResponses.add(key);
+      }
+    }
 
     await db.from("scan_results").insert(
       rows.map((r) => ({

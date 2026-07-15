@@ -3,7 +3,7 @@ import { requireProject } from "@/lib/project";
 import { planLimits } from "@/lib/plans";
 import { getBenchmarkStats, MIN_SAMPLE, SAMPLE_ENGINE_BENCHMARKS } from "@/lib/benchmarks";
 import { ENGINES, engineInfo } from "@/lib/ai/engines";
-import { COUNTRIES, INDUSTRIES } from "@/lib/types";
+import { COUNTRIES, INDUSTRIES, industryLabel } from "@/lib/types";
 import { pct } from "@/lib/utils";
 import { Card, CardHeader, PageHeader, Badge, ButtonLink } from "@/components/ui";
 import { StatTile } from "@/components/charts";
@@ -58,7 +58,7 @@ export default async function BenchmarksPage() {
     <>
       <PageHeader
         title={t("benchmarks.title")}
-        subtitle={t("benchmarks.subtitle", { industry: project.industry, country: project.country })}
+        subtitle={t("benchmarks.subtitle", { industry: industryLabel(project.industry), country: project.country })}
       />
       <div className="stagger space-y-4">
         <p className="rounded-xl border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-ink-soft shadow-card">
@@ -149,9 +149,9 @@ export default async function BenchmarksPage() {
               })}
             />
             <div className="flex flex-wrap gap-1.5 px-5 pb-5">
-              {(stats.industries.length ? stats.industries : [...INDUSTRIES]).map((i) => (
+              {(stats.industries.length ? stats.industries : INDUSTRIES.map((i) => i.id)).map((i) => (
                 <Badge key={i} tone={i === project.industry ? "accent" : "neutral"}>
-                  {i}
+                  {industryLabel(i)}
                 </Badge>
               ))}
             </div>

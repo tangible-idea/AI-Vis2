@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { PROJECT_COOKIE } from "@/lib/project";
-import { generateDefaultPrompts } from "@/lib/scan/prompts";
+import { canonicalDomain, generateDefaultPrompts } from "@/lib/scan/prompts";
 import { planLimits } from "@/lib/plans";
 import { resolveCompetitorInput } from "@/lib/competitors";
 
@@ -39,7 +39,6 @@ export async function createProject(
   const industry = String(formData.get("industry") ?? "").trim();
   const country = String(formData.get("country") ?? "US");
   const language = String(formData.get("language") ?? "en");
-  const target_market = String(formData.get("target_market") ?? "").trim() || null;
   const description = String(formData.get("description") ?? "").trim() || null;
   const competitorNames = [1, 2, 3]
     .map((i) => String(formData.get(`competitor${i}`) ?? "").trim())
@@ -66,7 +65,7 @@ export async function createProject(
 
   const { data: project, error } = await supabase
     .from("projects")
-    .insert({ user_id: user.id, name, website, industry, country, language, target_market, description })
+    .insert({ user_id: user.id, name, website, industry, country, language, description })
     .select()
     .single();
   if (error?.code === "23505") {
@@ -93,9 +92,11 @@ export async function createProject(
   }
 
   const prompts = generateDefaultPrompts({
+    domain: canonicalDomain(website),
     brand: name,
     industry,
     country,
+    language,
     competitors: resolvedNames,
   });
   await supabase.from("prompts").insert(
@@ -166,7 +167,6 @@ export async function addMarket(projectId: string, country: string): Promise<{ e
       industry: source.industry,
       country,
       language: source.language,
-      target_market: source.target_market,
       description: source.description,
     })
     .select()
@@ -189,9 +189,11 @@ export async function addMarket(projectId: string, country: string): Promise<{ e
   }
 
   const prompts = generateDefaultPrompts({
+    domain: canonicalDomain(source.website),
     brand: source.name,
     industry: source.industry,
     country,
+    language: source.language,
     competitors: (competitors ?? []).map((c) => c.name),
   });
   await supabase.from("prompts").insert(

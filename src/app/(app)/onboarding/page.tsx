@@ -116,11 +116,11 @@ export default function OnboardingPage() {
               id="industry"
               name="industry"
               required
-              defaultValue={prefill?.industry ?? INDUSTRIES[0]}
+              defaultValue={prefill?.industry ?? INDUSTRIES[0].id}
             >
               {INDUSTRIES.map((i) => (
-                <option key={i} value={i}>
-                  {i}
+                <option key={i.id} value={i.id}>
+                  {i.label}
                 </option>
               ))}
             </Select>
@@ -158,7 +158,7 @@ export default function OnboardingPage() {
 
           {moreOpen && (
             <div className="space-y-4 rounded-lg bg-hover/50 p-3">
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="country">{t("common.country")}</Label>
                   <Select id="country" name="country" defaultValue="US">
@@ -176,10 +176,6 @@ export default function OnboardingPage() {
                       </option>
                     ))}
                   </Select>
-                </div>
-                <div>
-                  <Label htmlFor="target_market">{t("onboarding.targetMarket")}</Label>
-                  <Input id="target_market" name="target_market" placeholder="SMBs" />
                 </div>
               </div>
               <div>

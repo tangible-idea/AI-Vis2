@@ -1,0 +1,23 @@
+# Sightline
+
+> Sightline is an AI visibility monitoring and AI search optimization (AEO/GEO) platform. It shows brands how they appear in answers from ChatGPT, Claude, Gemini, Perplexity and Google AI Overviews, benchmarks them against competitors, and generates the content that improves how AI assistants recommend them.
+
+Sightline monitors AI platforms with the real questions buyers ask, measures brand mentions, positions, recommendations and citations, and turns gaps into ready-to-publish deliverables (FAQ pages, comparison pages, JSON-LD schema, llms.txt files, metadata). Content generation supports English, Korean, Japanese, Chinese, Thai, Vietnamese, Indonesian and Malay.
+
+## Product
+
+- [Homepage](/): What Sightline does and how AI visibility monitoring works
+- [Free preview scan](/preview): Check how AI mentions a brand — no account needed
+- [Pricing](/pricing): Free, Starter and Pro plans
+
+## Key concepts
+
+- AI Visibility Score: a 0–100 measure of how often and how favorably AI platforms mention a brand
+- Projects: one monitored website per target market (domain + country)
+- Prompt Explorer: manage the buyer questions asked to every AI platform
+- Sources: which domains AI platforms cite when talking about a market
+
+## Legal
+
+- [Privacy policy](/legal/privacy)
+- [Terms of service](/legal/terms)

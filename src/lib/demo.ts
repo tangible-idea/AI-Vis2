@@ -27,10 +27,9 @@ export async function seedDemoProject(userId: string): Promise<string> {
       user_id: userId,
       name: brand,
       website: "https://acmebookings.example",
-      industry: "restaurant reservation software",
+      industry: "saas",
       country: "US",
       language: "en",
-      target_market: "independent restaurants",
       is_demo: true,
     })
     .select()
@@ -46,10 +45,14 @@ export async function seedDemoProject(userId: string): Promise<string> {
     }))
   );
 
+  // industry passes the demo's specific niche phrase (legacy free text flows
+  // through industryPhrase unchanged) so prompts stay lifelike
   const promptDrafts = generateDefaultPrompts({
+    domain: "acmebookings.example",
     brand,
     industry: "restaurant reservation software",
     country: "US",
+    language: "en",
     competitors: competitorNames,
   });
   const { data: prompts } = await db

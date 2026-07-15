@@ -39,8 +39,11 @@ export function analyzeResponse(
   ctx: AnalyzerContext = {}
 ): AnalyzedResponse {
   const lower = text.toLowerCase();
-  const brandRe = nameRegex(brand);
-  const brand_mentioned = brandRe.test(text);
+  // the tracked domain is the canonical entity identifier — a domain
+  // mention counts as a brand mention even when the name isn't spelled out
+  const brandHost = hostOf(ctx.brandWebsite);
+  const brand_mentioned =
+    nameRegex(brand).test(text) || (!!brandHost && lower.includes(brandHost));
 
   // position: order of first appearance among brand + competitors,
   // preferring explicit numbered-list rank when present
@@ -49,13 +52,14 @@ export function analyzeResponse(
     brand_position = listRank(text, brand) ?? appearanceRank(text, brand, competitors);
   }
 
-  // recommended: brand appears near recommendation language (same sentence/line)
+  // recommended: brand (by name or domain) appears near recommendation
+  // language (same sentence/line)
   let recommended = false;
   if (brand_mentioned) {
     const segments = text.split(/(?<=[.!?])\s+|\n/);
     recommended = segments.some(
       (s) =>
-        nameRegex(brand).test(s) &&
+        (nameRegex(brand).test(s) || (!!brandHost && s.toLowerCase().includes(brandHost))) &&
         RECOMMEND_PATTERNS.some((p) => s.toLowerCase().includes(p))
     );
     // rank 1 in a list counts as an implicit recommendation

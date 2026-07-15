@@ -26,7 +26,6 @@ export async function updateProject(formData: FormData) {
       industry: String(formData.get("industry") ?? "").trim(),
       country: String(formData.get("country") ?? "US"),
       language: String(formData.get("language") ?? "en"),
-      target_market: String(formData.get("target_market") ?? "").trim() || null,
       logo_url: String(formData.get("logo_url") ?? "").trim() || null,
     })
     .eq("id", projectId);

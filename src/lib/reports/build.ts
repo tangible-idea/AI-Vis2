@@ -1,4 +1,5 @@
 import { engineInfo } from "../ai/engines";
+import { industryLabel } from "../types";
 import { formatDate } from "../utils";
 import type { Project, Snapshot, Recommendation } from "../types";
 
@@ -23,7 +24,7 @@ export function buildMarkdownReport(d: ReportData): string {
   const lines: string[] = [
     `# AI Visibility Report — ${project.name}`,
     ``,
-    `Generated ${formatDate(new Date().toISOString())} · ${project.website} · ${project.industry}`,
+    `Generated ${formatDate(new Date().toISOString())} · ${project.website} · ${industryLabel(project.industry)}`,
     ``,
   ];
   if (branding?.name) {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { industryLabel } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, pct } from "@/lib/utils";
@@ -65,7 +66,7 @@ export default async function SharedReportPage({
             </p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight">{project.name}</h1>
             <p className="mt-1 text-sm text-ink-faint">
-              {project.website} · {project.industry} · {formatDate(latest?.created_at)}
+              {project.website} · {industryLabel(project.industry)} · {formatDate(latest?.created_at)}
             </p>
           </div>
           <span className="font-display text-lg text-ink-faint">Sightline</span>

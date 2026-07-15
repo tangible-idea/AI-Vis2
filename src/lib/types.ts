@@ -66,16 +66,21 @@ export interface Organization {
   created_at: string;
 }
 
+/**
+ * A Project's canonical identity is its primary domain (`website`) plus the
+ * market (country + language); brand name and industry are supporting
+ * context. Monitoring anchors on the domain to maximize entity precision.
+ */
 export interface Project {
   id: string;
   user_id: string;
   org_id: string | null;
   name: string;
   website: string;
+  /** Normalized industry id (see INDUSTRIES); legacy rows may hold free text. */
   industry: string;
   country: string;
   language: string;
-  target_market: string | null;
   description: string | null;
   logo_url: string | null;
   /** Archived projects keep their data but don't count toward plan limits. */
@@ -224,30 +229,45 @@ export interface ShareLink {
 export const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", "VN", "ID", "MY"] as const;
 
 /**
- * Generic industry options for onboarding / preview. Phrased the way buyers
- * describe a category, so they read naturally inside generated scan prompts
- * ("best travel & hospitality options…").
+ * Normalized industry taxonomy — stored as the `id` slug so values stay
+ * stable for benchmarking while labels/phrases can evolve. New industries
+ * are added by appending entries; no data migration needed. `phrase` is the
+ * lowercase wording used inside generated scan prompts ("best {phrase}
+ * solutions…"); `label` is what the UI shows.
  */
-export const INDUSTRIES = [
-  "SaaS & software",
-  "e-commerce & retail",
-  "marketing & advertising",
-  "finance & fintech",
-  "healthcare & wellness",
-  "education & e-learning",
-  "travel & hospitality",
-  "food & beverage",
-  "real estate",
-  "legal & professional services",
-  "consulting & agencies",
-  "manufacturing & industrial",
-  "media & entertainment",
-  "beauty & fashion",
-  "fitness & sports",
-  "automotive",
-  "home & local services",
-  "other",
-] as const;
+export interface Industry {
+  id: string;
+  label: string;
+  phrase: string;
+}
+
+export const INDUSTRIES: Industry[] = [
+  { id: "saas", label: "SaaS", phrase: "SaaS" },
+  { id: "tech_b2b", label: "Technology (B2B)", phrase: "B2B technology" },
+  { id: "tech_b2c", label: "Technology (B2C)", phrase: "consumer technology" },
+  { id: "mobile_apps", label: "Mobile Apps", phrase: "mobile app" },
+  { id: "retail_ecommerce", label: "Retail & E-commerce", phrase: "retail & e-commerce" },
+  { id: "financial_services", label: "Financial Services", phrase: "financial services" },
+  { id: "healthcare", label: "Healthcare & Life Sciences", phrase: "healthcare" },
+  { id: "education", label: "Education", phrase: "education" },
+  { id: "travel_hospitality", label: "Travel & Hospitality", phrase: "travel & hospitality" },
+  { id: "media_entertainment", label: "Media & Entertainment", phrase: "media & entertainment" },
+  { id: "manufacturing", label: "Manufacturing & Industrial", phrase: "manufacturing" },
+  { id: "logistics", label: "Logistics & Transportation", phrase: "logistics" },
+  { id: "real_estate_construction", label: "Real Estate & Construction", phrase: "real estate" },
+  { id: "professional_services", label: "Professional Services", phrase: "professional services" },
+  { id: "government_nonprofit", label: "Government & Non-profit", phrase: "public sector" },
+];
+
+/** UI label for a stored industry value; legacy free-text rows pass through. */
+export function industryLabel(value: string): string {
+  return INDUSTRIES.find((i) => i.id === value)?.label ?? value;
+}
+
+/** In-sentence phrasing for prompt/content generation; legacy values pass through. */
+export function industryPhrase(value: string): string {
+  return INDUSTRIES.find((i) => i.id === value)?.phrase ?? value;
+}
 
 export const CONTENT_LANGUAGES = [
   { code: "en", label: "English" },

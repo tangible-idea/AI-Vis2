@@ -5,6 +5,7 @@ import { getTrendsSource } from "@/lib/trends";
 import { planLimits } from "@/lib/plans";
 import { engineInfo, ENGINE_IDS } from "@/lib/ai/engines";
 import { formatDate, timeAgo, cn } from "@/lib/utils";
+import { industryPhrase } from "@/lib/types";
 import { Card, CardHeader, EmptyState, PageHeader, Badge, LockedOverlay } from "@/components/ui";
 import { VisibilityHeatmap } from "@/components/charts";
 import { ScanButton } from "@/components/scan-button";
@@ -53,7 +54,7 @@ export default async function MonitorPage() {
   }));
 
   const trends = await getTrendsSource().trendingSearches({
-    industry: project.industry,
+    industry: industryPhrase(project.industry),
     country: project.country,
     language: project.language,
     timeframe: "30d",
@@ -188,7 +189,7 @@ export default async function MonitorPage() {
           <Card>
             <CardHeader
               title={t("monitor.trendingSearches")}
-              hint={t("monitor.trendingHint", { industry: project.industry })}
+              hint={t("monitor.trendingHint", { industry: industryPhrase(project.industry) })}
               action={
                 <Link href="/trends" className="text-xs text-accent-strong hover:underline">
                   {t("common.explore")}
@@ -222,7 +223,7 @@ export default async function MonitorPage() {
             <Card>
               <CardHeader
                 title={t("monitor.trendingSearches")}
-                hint={t("monitor.trendingHint", { industry: project.industry })}
+                hint={t("monitor.trendingHint", { industry: industryPhrase(project.industry) })}
               />
               <div className="space-y-3 px-5 pb-5">
                 {trends.slice(0, 3).map((t) => (

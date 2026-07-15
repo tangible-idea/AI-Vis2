@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { industryPhrase } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { getTrendsSource, TIMEFRAMES, type Timeframe } from "@/lib/trends";
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
 
   const source = getTrendsSource();
   const query = {
-    industry: project.industry,
+    industry: industryPhrase(project.industry),
     country: project.country,
     language: project.language,
     timeframe,

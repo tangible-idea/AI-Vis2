@@ -13,6 +13,7 @@ import { LastScanSummary, type ActivityItem } from "./last-scan-summary";
 import { PlatformCards, type PlatformCardData } from "./platform-cards";
 import { RecentConversations, type ConversationItem } from "./recent-conversations";
 import { getT } from "@/lib/i18n/server";
+import { industryLabel, industryPhrase } from "@/lib/types";
 import type { Engine, Prompt, Recommendation, ScanResult, ShareLink, Snapshot } from "@/lib/types";
 
 export const metadata = { title: "Dashboard" };
@@ -191,7 +192,7 @@ export default async function DashboardPage() {
 
   const trends = limits.trends
     ? await getTrendsSource().trendingSearches({
-        industry: project.industry,
+        industry: industryPhrase(project.industry),
         country: project.country,
         language: project.language,
         timeframe: "30d",
@@ -206,7 +207,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={project.name}
-        subtitle={`${t("dashboard.lastScan", { time: timeAgo(lastDone?.completed_at ?? latest.created_at) })} · ${project.industry}`}
+        subtitle={`${t("dashboard.lastScan", { time: timeAgo(lastDone?.completed_at ?? latest.created_at) })} · ${industryLabel(project.industry)}`}
         action={<ScanButton projectId={project.id} />}
       />
 
