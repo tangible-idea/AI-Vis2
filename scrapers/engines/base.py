@@ -39,6 +39,10 @@ class Engine:
     answer_selector: str = ""  # matches every assistant turn; last one is current
     # the "stop generating" control is present only while streaming
     streaming_selector: str = ""
+    # interstitial popups to dismiss whenever they appear (e.g. ChatGPT's
+    # "log in to continue" nudge → click "Stay logged out"). Each is a
+    # selector we click if visible; checked periodically, never required.
+    dismiss_selectors: list[str] = []
 
     def __init__(self, page: Page, timeout: int = 120):
         self.page = page
@@ -54,11 +58,28 @@ class Engine:
     def open(self) -> None:
         self.page.goto(self.url, wait_until="domcontentloaded")
 
+    def dismiss_popups(self) -> bool:
+        """Click away any known interstitial popup (login nudge, etc.).
+        Returns True if something was dismissed. Best-effort and silent —
+        a missing/invisible popup is the normal case."""
+        dismissed = False
+        for sel in self.dismiss_selectors:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.is_visible():
+                    loc.click(timeout=2000)
+                    dismissed = True
+            except Exception:  # noqa: BLE001 — popup vanished or selector drifted
+                continue
+        return dismissed
+
     def wait_for_ready(self, patient: bool = True) -> bool:
         """True once the prompt box is present (i.e. logged in, past any
         challenge). `patient` gives the human time to log in / solve."""
         deadline = time.time() + (300 if patient else 20)
         while time.time() < deadline:
+            # a login nudge can sit on top of the composer — clear it first
+            self.dismiss_popups()
             try:
                 if self.page.locator(self.input_selector).first.is_visible():
                     return True
@@ -108,15 +129,19 @@ class Engine:
 
     def ask(self, prompt: str) -> AnswerResult:
         start = time.time()
+        # a popup may be covering the composer before we even type
+        self.dismiss_popups()
         before = self._answer_count()
         try:
             self.submit_prompt(prompt)
         except Exception as e:  # noqa: BLE001 — report, don't crash the batch
             return AnswerResult(self.name, prompt, "", False, f"submit failed: {e}")
 
-        # wait for a NEW assistant turn to appear
+        # wait for a NEW assistant turn to appear — a login nudge can fire
+        # right after submit, so keep clearing it while we wait
         appear_deadline = time.time() + 30
         while time.time() < appear_deadline:
+            self.dismiss_popups()
             if self._answer_count() > before:
                 break
             time.sleep(1.0)
@@ -130,6 +155,9 @@ class Engine:
         last_change = time.time()
         hard_deadline = start + self.timeout
         while time.time() < hard_deadline:
+            # ChatGPT can throw the "log in to continue" popup mid-stream —
+            # dismiss it every tick so it never blocks reading the answer
+            self.dismiss_popups()
             text = self._current_answer_text()
             if text != last_text:
                 last_text = text

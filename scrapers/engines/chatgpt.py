@@ -19,6 +19,15 @@ class ChatGPTEngine(Engine):
     answer_selector = '[data-message-author-role="assistant"]'
     # visible only while a response is streaming
     streaming_selector = 'button[data-testid="stop-button"], button[aria-label*="Stop"]'
+    # the "log in to continue" nudge — click "Stay logged out" to dismiss.
+    # Multiple forms are tried (link vs button, wording variants); the first
+    # visible match wins. Checked periodically during the answer flow.
+    dismiss_selectors = [
+        'a:has-text("Stay logged out")',
+        'button:has-text("Stay logged out")',
+        '[data-testid="stay-logged-out"]',
+        'text="Stay logged out"',
+    ]
 
     def submit_prompt(self, prompt: str) -> None:
         box = self.page.locator(self.input_selector).first
