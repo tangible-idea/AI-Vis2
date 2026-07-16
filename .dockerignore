@@ -1,0 +1,19 @@
+# Docker builds use the repo root as context (see scrapers/Dockerfile).
+# Keep the context small and never ship secrets or login sessions.
+.git/
+.env*
+node_modules/
+.next/
+public/
+src/
+docs/
+supabase/
+tsconfig.tsbuildinfo
+pnpm-lock.yaml
+
+# scraper-local artifacts
+scrapers/.userdata/
+scrapers/.venv/
+**/__pycache__/
+**/*.pyc
+out.json

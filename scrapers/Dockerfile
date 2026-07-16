@@ -1,10 +1,11 @@
 # AI Visibility Scraper — FastAPI + Playwright in one image.
 #
-# Build (from the scrapers/ directory):
-#   docker build -t ai-vis-scraper .
+# Build context is the REPO ROOT (matches cloud builders that run
+# `docker build -f scrapers/Dockerfile .`). From the repo root:
+#   docker build -f scrapers/Dockerfile -t ai-vis-scraper .
 #
 # Run — mount .userdata so login sessions persist across containers:
-#   docker run -p 8100:8100 -v "$PWD/.userdata:/app/.userdata" ai-vis-scraper
+#   docker run -p 8100:8100 -v "$PWD/scrapers/.userdata:/app/.userdata" ai-vis-scraper
 #
 # Login must be done OUTSIDE the container (the browser window has to be
 # visible): run `python scrape.py --engine chatgpt --login` on the host,
@@ -17,7 +18,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY scrapers/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Chromium + its OS deps, plus xvfb: the scraper prefers a headed browser
@@ -28,7 +29,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . .
+COPY scrapers/ .
 
 # Chromium won't run sandboxed as root — use an unprivileged user.
 RUN useradd -m scraper \
