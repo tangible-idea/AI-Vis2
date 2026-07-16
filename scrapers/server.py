@@ -26,13 +26,19 @@ import logging
 import sys
 import time
 import uuid
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
 
 from engines import ENGINES
+from engines.base import USERDATA_ROOT
 from runner import run_scrape
+
+# runner saves failure screenshots here (e.g. chatgpt-not-ready.png)
+DEBUG_DIR = USERDATA_ROOT / "debug"
 
 # Scrape progress goes to stdout via logging — cloud log collectors often
 # drop or buffer bare stderr prints, which is where runner's default log goes.
@@ -178,6 +184,32 @@ async def scan(req: ScanRequest) -> dict:
     asyncio.create_task(_run_job(job_id, req, prompts))
     logger.info("[job %s] queued: engine=%s prompts=%d", job_id, req.engine, len(prompts))
     return {"job_id": job_id, "status": "queued", "poll": f"/scan/{job_id}"}
+
+
+@app.get("/debug/screenshots")
+async def list_screenshots() -> dict:
+    """Debug screenshots the runner saved on failures, newest first."""
+    if not DEBUG_DIR.is_dir():
+        return {"screenshots": []}
+    shots = sorted(DEBUG_DIR.glob("*.png"), key=lambda p: p.stat().st_mtime, reverse=True)
+    return {"screenshots": [
+        {
+            "name": s.name,
+            "url": f"/debug/screenshots/{s.name}",
+            "size": s.stat().st_size,
+            "modified": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(s.stat().st_mtime)) + "Z",
+        }
+        for s in shots
+    ]}
+
+
+@app.get("/debug/screenshots/{name}")
+async def get_screenshot(name: str) -> FileResponse:
+    # allow plain filenames only — no path separators or traversal
+    path = DEBUG_DIR / name
+    if Path(name).name != name or path.suffix != ".png" or not path.is_file():
+        raise HTTPException(status_code=404, detail="no such screenshot — list them at /debug/screenshots")
+    return FileResponse(path, media_type="image/png")
 
 
 @app.get("/scan/{job_id}")
