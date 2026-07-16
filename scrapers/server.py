@@ -43,6 +43,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger("scraper")
 
+
+class _HealthAccessFilter(logging.Filter):
+    """Drop access-log lines for health probes — the platform and the Docker
+    HEALTHCHECK poll every few seconds and drown out the real traffic."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        msg = record.getMessage()
+        return "/health" not in msg and '"GET / ' not in msg
+
+
+logging.getLogger("uvicorn.access").addFilter(_HealthAccessFilter())
+
 app = FastAPI(title="AI Visibility Scraper", version="0.1.0")
 
 # One scrape at a time: the persistent browser profile can't be shared across

@@ -41,7 +41,7 @@ USER scraper
 VOLUME ["/app/.userdata"]
 EXPOSE 8100
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/health')" || exit 1
 
 CMD ["./docker-entrypoint.sh"]
