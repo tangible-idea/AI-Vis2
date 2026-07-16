@@ -20,6 +20,8 @@ Log in first (interactive, once per engine) with the CLI:
 from __future__ import annotations
 
 import asyncio
+import logging
+import sys
 
 from fastapi import FastAPI
 from fastapi.concurrency import run_in_threadpool
@@ -27,6 +29,15 @@ from pydantic import BaseModel, Field, field_validator
 
 from engines import ENGINES
 from runner import run_scrape
+
+# Scrape progress goes to stdout via logging — cloud log collectors often
+# drop or buffer bare stderr prints, which is where runner's default log goes.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout,
+)
+logger = logging.getLogger("scraper")
 
 app = FastAPI(title="AI Visibility Scraper", version="0.1.0")
 
@@ -72,6 +83,7 @@ async def scan(req: ScanRequest) -> dict:
         return {"engine": req.engine, "ready": False, "ok": False,
                 "error": "provide 'prompt' or 'prompts'", "results": []}
 
+    logger.info("scan requested: engine=%s prompts=%d timeout=%ds", req.engine, len(prompts), req.timeout)
     async with _scrape_lock:
         # Playwright sync API needs a thread with no running event loop —
         # run_in_threadpool gives exactly that.
@@ -81,7 +93,9 @@ async def scan(req: ScanRequest) -> dict:
             prompts,
             timeout=req.timeout,
             headless=req.headless,
+            on_log=logger.info,
         )
+    logger.info("scan finished: engine=%s ok=%s error=%s", req.engine, outcome.ok, outcome.error)
     return outcome.to_dict()
 
 
