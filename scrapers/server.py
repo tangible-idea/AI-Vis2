@@ -8,10 +8,12 @@ Run:
     uvicorn server:app --host 127.0.0.1 --port 8100
     # or: python server.py
 
-Call:
+Call (async — a scrape takes minutes, far longer than any gateway timeout):
     curl -s -X POST http://127.0.0.1:8100/scan \\
       -H 'content-type: application/json' \\
       -d '{"engine":"chatgpt","prompts":["best CRM for startups"]}' | jq
+    # -> {"job_id": "...", "status": "queued", "poll": "/scan/<job_id>"}
+    curl -s http://127.0.0.1:8100/scan/<job_id> | jq   # until status is "done"
 
 Log in first (interactive, once per engine) with the CLI:
     python scrape.py --engine chatgpt --login
@@ -22,8 +24,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
+import time
+import uuid
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field, field_validator
 
@@ -74,29 +78,75 @@ async def health() -> dict:
     return {"ok": True, "engines": list(ENGINES), "busy": _scrape_lock.locked()}
 
 
+# In-memory job store. Jobs survive only as long as the process — fine for a
+# single-container deployment; poll reasonably soon after submitting.
+_jobs: dict[str, dict] = {}
+_MAX_JOBS = 100
+
+
+def _prune_jobs() -> None:
+    while len(_jobs) > _MAX_JOBS:
+        oldest = min(_jobs, key=lambda k: _jobs[k]["created_at"])
+        del _jobs[oldest]
+
+
+async def _run_job(job_id: str, req: ScanRequest, prompts: list[str]) -> None:
+    job = _jobs[job_id]
+    async with _scrape_lock:
+        job["status"] = "running"
+        logger.info("[job %s] scan started: engine=%s prompts=%d timeout=%ds",
+                    job_id, req.engine, len(prompts), req.timeout)
+        try:
+            # Playwright sync API needs a thread with no running event loop —
+            # run_in_threadpool gives exactly that.
+            outcome = await run_in_threadpool(
+                run_scrape,
+                req.engine,
+                prompts,
+                timeout=req.timeout,
+                headless=req.headless,
+                on_log=lambda msg: logger.info("[job %s] %s", job_id, msg),
+            )
+            job["result"] = outcome.to_dict()
+            job["status"] = "done"
+            logger.info("[job %s] scan finished: ok=%s error=%s", job_id, outcome.ok, outcome.error)
+        except Exception as e:  # noqa: BLE001 — a crashed job must still report
+            job["status"] = "failed"
+            job["error"] = str(e)
+            logger.exception("[job %s] scan crashed", job_id)
+
+
 @app.post("/scan")
 async def scan(req: ScanRequest) -> dict:
-    """Run one scrape and return its JSON. Serialized: if a scrape is already
-    running, this awaits the lock before starting (no concurrent sessions)."""
+    """Queue one scrape and return immediately — a scrape takes minutes, which
+    no HTTP gateway tolerates. Jobs run one at a time (see _scrape_lock);
+    poll GET /scan/{job_id} for the result."""
     prompts = req.prompt_list()
     if not prompts:
-        return {"engine": req.engine, "ready": False, "ok": False,
-                "error": "provide 'prompt' or 'prompts'", "results": []}
+        raise HTTPException(status_code=400, detail="provide 'prompt' or 'prompts'")
 
-    logger.info("scan requested: engine=%s prompts=%d timeout=%ds", req.engine, len(prompts), req.timeout)
-    async with _scrape_lock:
-        # Playwright sync API needs a thread with no running event loop —
-        # run_in_threadpool gives exactly that.
-        outcome = await run_in_threadpool(
-            run_scrape,
-            req.engine,
-            prompts,
-            timeout=req.timeout,
-            headless=req.headless,
-            on_log=logger.info,
-        )
-    logger.info("scan finished: engine=%s ok=%s error=%s", req.engine, outcome.ok, outcome.error)
-    return outcome.to_dict()
+    job_id = uuid.uuid4().hex[:12]
+    _jobs[job_id] = {
+        "job_id": job_id,
+        "status": "queued",
+        "engine": req.engine,
+        "prompts": prompts,
+        "created_at": time.time(),
+        "result": None,
+        "error": None,
+    }
+    _prune_jobs()
+    asyncio.create_task(_run_job(job_id, req, prompts))
+    logger.info("[job %s] queued: engine=%s prompts=%d", job_id, req.engine, len(prompts))
+    return {"job_id": job_id, "status": "queued", "poll": f"/scan/{job_id}"}
+
+
+@app.get("/scan/{job_id}")
+async def scan_status(job_id: str) -> dict:
+    job = _jobs.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="unknown job_id")
+    return job
 
 
 if __name__ == "__main__":
