@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Chromium + its OS deps, plus xvfb: the scraper prefers a headed browser
 # (headless=False), which needs a display — xvfb-run provides a virtual one.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends xvfb \
+    && apt-get install -y --no-install-recommends xvfb xauth \
     && playwright install --with-deps chromium \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
