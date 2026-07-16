@@ -57,6 +57,7 @@ class ScanRequest(BaseModel):
         return [p.strip() for p in items if p and p.strip()]
 
 
+@app.get("/")
 @app.get("/health")
 async def health() -> dict:
     return {"ok": True, "engines": list(ENGINES), "busy": _scrape_lock.locked()}

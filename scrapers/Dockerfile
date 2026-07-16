@@ -22,9 +22,9 @@ COPY scrapers/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Chromium + its OS deps, plus xvfb: the scraper prefers a headed browser
-# (headless=False), which needs a display — xvfb-run provides a virtual one.
+# (headless=False), which needs a display — Xvfb provides a virtual one.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends xvfb xauth \
+    && apt-get install -y --no-install-recommends xvfb \
     && playwright install --with-deps chromium \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -32,7 +32,8 @@ RUN apt-get update \
 COPY scrapers/ .
 
 # Chromium won't run sandboxed as root — use an unprivileged user.
-RUN useradd -m scraper \
+RUN chmod +x docker-entrypoint.sh \
+    && useradd -m scraper \
     && mkdir -p /app/.userdata \
     && chown -R scraper:scraper /app ${PLAYWRIGHT_BROWSERS_PATH}
 USER scraper
@@ -43,4 +44,4 @@ EXPOSE 8100
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/health')" || exit 1
 
-CMD ["xvfb-run", "-a", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8100"]
+CMD ["./docker-entrypoint.sh"]
