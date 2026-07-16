@@ -4,6 +4,9 @@
 set -e
 
 echo "[entrypoint] container is up (uid=$(id -u))"
+if [ -r /sys/fs/cgroup/memory.max ]; then
+    echo "[entrypoint] memory limit: $(cat /sys/fs/cgroup/memory.max)"
+fi
 
 echo "[entrypoint] starting Xvfb on :99"
 Xvfb :99 -screen 0 1280x900x24 -nolisten tcp &

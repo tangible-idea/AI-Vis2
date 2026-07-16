@@ -102,6 +102,25 @@ def _prune_jobs() -> None:
         del _jobs[oldest]
 
 
+# Error fragments that mean the browser process died under us — on a small
+# container that is almost always the OOM killer or an exhausted /dev/shm.
+_CRASH_SIGNATURES = ("crash", "browser has been closed", "browser closed",
+                     "out of memory", "oom", "sigkill", "page closed")
+_CRASH_HINT = ("browser died mid-scrape — on small containers this is usually "
+               "out-of-memory; give the container >=2GB RAM")
+
+
+def _classify_failure(job: dict, error: str) -> None:
+    """Mark the job failed and, when the error looks like a browser crash,
+    attach and log a resource hint."""
+    job["status"] = "failed"
+    job["error"] = error
+    low = error.lower()
+    if any(sig in low for sig in _CRASH_SIGNATURES):
+        job["hint"] = _CRASH_HINT
+        logger.error("[job %s] %s", job["job_id"], _CRASH_HINT)
+
+
 async def _run_job(job_id: str, req: ScanRequest, prompts: list[str]) -> None:
     job = _jobs[job_id]
     async with _scrape_lock:
@@ -120,11 +139,18 @@ async def _run_job(job_id: str, req: ScanRequest, prompts: list[str]) -> None:
                 on_log=lambda msg: logger.info("[job %s] %s", job_id, msg),
             )
             job["result"] = outcome.to_dict()
-            job["status"] = "done"
-            logger.info("[job %s] scan finished: ok=%s error=%s", job_id, outcome.ok, outcome.error)
+            if outcome.ok:
+                job["status"] = "done"
+                logger.info("[job %s] scan finished: ok=True", job_id)
+            else:
+                # run_scrape never raises — session/prompt failures come back
+                # inside the outcome, so surface them as a failed job.
+                per_prompt = [r.error for r in outcome.results if r.error]
+                error = outcome.error or (per_prompt[0] if per_prompt else "no answers collected")
+                _classify_failure(job, error)
+                logger.error("[job %s] scan failed: %s", job_id, error)
         except Exception as e:  # noqa: BLE001 — a crashed job must still report
-            job["status"] = "failed"
-            job["error"] = str(e)
+            _classify_failure(job, str(e))
             logger.exception("[job %s] scan crashed", job_id)
 
 
@@ -146,6 +172,7 @@ async def scan(req: ScanRequest) -> dict:
         "created_at": time.time(),
         "result": None,
         "error": None,
+        "hint": None,
     }
     _prune_jobs()
     asyncio.create_task(_run_job(job_id, req, prompts))
@@ -157,7 +184,14 @@ async def scan(req: ScanRequest) -> dict:
 async def scan_status(job_id: str) -> dict:
     job = _jobs.get(job_id)
     if job is None:
-        raise HTTPException(status_code=404, detail="unknown job_id")
+        # Jobs live in memory only — a missing id right after submitting one
+        # usually means the container restarted (OOM-killed mid-scrape).
+        raise HTTPException(
+            status_code=404,
+            detail="unknown job_id — if you just submitted it, the server "
+                   "likely restarted (check runtime logs for a boot marker; "
+                   "a restart mid-scrape usually means out-of-memory)",
+        )
     return job
 
 

@@ -72,7 +72,10 @@ def run_scrape(
                 user_data_dir=str(engine_cls.profile_dir()),
                 headless=headless,
                 viewport={"width": 1280, "height": 900},
-                args=["--disable-blink-features=AutomationControlled"],
+                # --disable-dev-shm-usage: containers cap /dev/shm at 64MB,
+                # which crashes Chromium mid-render; harmless outside Docker.
+                args=["--disable-blink-features=AutomationControlled",
+                      "--disable-dev-shm-usage"],
             )
             try:
                 page = context.pages[0] if context.pages else context.new_page()
