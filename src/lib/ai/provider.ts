@@ -17,14 +17,20 @@ export interface AIProvider {
 
 import { PoeProvider } from "./poe";
 import { MockProvider } from "./mock";
+import { ScraperProvider } from "./scraper";
 
 let cached: AIProvider | null = null;
 
 export function getProvider(): AIProvider {
   if (cached) return cached;
-  cached = process.env.POE_API_KEY
+  const base: AIProvider = process.env.POE_API_KEY
     ? new PoeProvider(process.env.POE_API_KEY)
     : new MockProvider();
+  // scraper handles the engines it implements (chatgpt, gemini) against the
+  // real consumer UIs; everything else falls through to `base`
+  cached = process.env.SCRAPER_API_URL
+    ? new ScraperProvider(process.env.SCRAPER_API_URL, base)
+    : base;
   return cached;
 }
 
