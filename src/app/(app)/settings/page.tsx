@@ -215,14 +215,22 @@ export default async function SettingsPage() {
                       className="max-w-xs"
                       required
                     />
-                    <Select name="role" defaultValue="member" className="w-28">
-                      <option value="member">{t("common.member")}</option>
-                      <option value="viewer">{t("common.viewer")}</option>
-                    </Select>
+                    {limits.memberSeats ? (
+                      <Select name="role" defaultValue="member" className="w-28">
+                        <option value="member">{t("common.member")}</option>
+                        <option value="viewer">{t("common.viewer")}</option>
+                      </Select>
+                    ) : (
+                      // Starter seats are viewer-only — enforced server-side too
+                      <input type="hidden" name="role" value="viewer" />
+                    )}
                     <Button type="submit" variant="secondary" size="sm" className="h-9.5">
                       {t("common.invite")}
                     </Button>
                   </form>
+                )}
+                {!limits.memberSeats && (
+                  <p className="text-xs text-ink-faint">{t("settings.viewerOnlyNote")}</p>
                 )}
                 {memberList.some((m) => !m.accepted_at) && (
                   <p className="text-xs text-ink-faint">{t("settings.pendingInvites")}</p>

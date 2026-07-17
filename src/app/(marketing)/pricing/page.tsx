@@ -1,22 +1,10 @@
-import Link from "next/link";
-import { Check, Minus } from "lucide-react";
-import { PLANS, PLAN_FEATURES } from "@/lib/plans";
-import type { PlanLimits } from "@/lib/plans";
-import type { Plan } from "@/lib/types";
+import { PlanComparison } from "@/components/plan-comparison";
 
 export const metadata = {
   title: "Pricing",
   description:
     "Sightline pricing: start free, upgrade for weekly AI visibility scans, trends, content generation and white label reports. Monitor your brand across ChatGPT, Claude, Gemini and Perplexity.",
   alternates: { canonical: "/pricing" },
-};
-
-const ORDER: ("free" | "starter" | "pro")[] = ["free", "starter", "pro"];
-
-const TAGLINES: Record<(typeof ORDER)[number], string> = {
-  free: "See where you stand",
-  starter: "Measure, improve and report — weekly",
-  pro: "Everything in Starter, at agency scale",
 };
 
 export default function PricingPage() {
@@ -30,94 +18,14 @@ export default function PricingPage() {
         trends and content generation for one focused price. No credit card required.
       </p>
 
-      <div className="mt-12 overflow-x-auto">
-        <table className="w-full min-w-[560px] border-separate" style={{ borderSpacing: 0 }}>
-          <thead>
-            <tr>
-              <th className="w-1/3" />
-              {ORDER.map((plan) => (
-                <th
-                  key={plan}
-                  className={`rounded-t-xl px-4 pb-4 pt-5 text-center align-top ${plan === "starter" ? "bg-accent-soft" : ""}`}
-                >
-                  {plan === "starter" && (
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-accent-strong">
-                      Most popular
-                    </p>
-                  )}
-                  <p className="text-sm font-semibold">{PLANS[plan].label}</p>
-                  <p className="mt-1">
-                    <span className="tabular text-2xl font-medium">{PLANS[plan].price}</span>
-                    <span className="ml-1 text-xs font-normal text-ink-faint">
-                      {PLANS[plan].priceNote}
-                    </span>
-                  </p>
-                  <p className="mt-1 text-[11px] font-normal leading-snug text-ink-faint">
-                    {TAGLINES[plan]}
-                  </p>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {PLAN_FEATURES.map((row, i) => (
-              <tr key={row.label}>
-                <td className="border-t border-line py-2.5 pr-4 text-[13px] text-ink-soft">
-                  {row.group && (
-                    <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-widest text-ink-faint">
-                      {row.group}
-                    </span>
-                  )}
-                  {row.label}
-                </td>
-                {ORDER.map((plan) => {
-                  const content = row.values
-                    ? row.values[ORDER.indexOf(plan)]
-                    : PLANS[plan][row.key as keyof PlanLimits];
-                  return (
-                    <td
-                      key={plan}
-                      className={`border-t border-line px-4 py-2.5 text-center text-[13px] ${plan === "starter" ? "bg-accent-soft" : ""} ${i === PLAN_FEATURES.length - 1 && plan === "starter" ? "rounded-b-none" : ""}`}
-                    >
-                      {typeof content === "boolean" ? (
-                        content ? (
-                          <Check className="mx-auto h-4 w-4 text-accent" />
-                        ) : (
-                          <Minus className="mx-auto h-3.5 w-3.5 text-line-strong" />
-                        )
-                      ) : (
-                        <span className="tabular">{content}</span>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-            <tr>
-              <td className="pt-5" />
-              {ORDER.map((plan) => (
-                <td key={plan} className={`px-4 pt-5 text-center ${plan === "starter" ? "bg-accent-soft rounded-b-xl pb-5" : ""}`}>
-                  <Link
-                    href="/signup"
-                    className={`inline-flex h-9 w-full max-w-36 items-center justify-center rounded-lg text-sm font-medium ${
-                      plan === "starter"
-                        ? "bg-ink text-paper hover:bg-ink/85"
-                        : "border border-line-strong hover:bg-hover"
-                    }`}
-                  >
-                    Start {plan === "free" ? "free" : `with ${PLANS[plan as Plan].label}`}
-                  </Link>
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
+      <div className="mt-12">
+        <PlanComparison />
       </div>
 
       <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink-faint">
         Pro includes everything in Starter, plus more capacity and white label reports.
         Cancel anytime — your plan stays active until the end of the billing period.
-        <br />* Fair-use limits apply. Annual billing (2 months free) coming soon.
+        <br />Annual billing (2 months free) coming soon.
       </p>
     </main>
   );

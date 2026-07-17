@@ -22,7 +22,10 @@
     "priorityMedium": "우선순위 중간",
     "priorityLow": "우선순위 낮음",
     "yes": "예",
-    "no": "아니요"
+    "no": "아니요",
+    "howItWorks": "작동 방식",
+    "howCalculated": "어떻게 계산되나요?",
+    "whyCitations": "이 인용은 왜 보이나요?"
   },
   "nav": {
     "groupMeasure": "측정",
@@ -312,7 +315,18 @@
     "switching": "전환 중…",
     "switchTo": "{plan}(으)로 전환",
     "lifetimeNote": "Lifetime 플랜(AppSumo)을 사용 중입니다 — 주간 스캔, 트렌드, 공유가 평생 포함됩니다. 더 많은 용량이 필요할 때만 업그레이드하세요.",
-    "planError": "플랜을 변경할 수 없습니다"
+    "planError": "플랜을 변경할 수 없습니다",
+    "currentPlanHeading": "현재 플랜",
+    "usageProjects": "활성 프로젝트",
+    "usageScans": "AI 가시성 스캔",
+    "usageContent": "콘텐츠 생성",
+    "usageThisMonth": "이번 달",
+    "usageLifetime": "누적",
+    "perProjectHint": "프로젝트당 매월 최대 {count}회",
+    "unlimitedNote": "공정 사용, 이번 달",
+    "comparePlans": "플랜 비교",
+    "comparePlansHint": "로그인 전에 보던 플랜·가격과 동일합니다",
+    "billingNote": "결제는 설정 시 Polar.sh로 처리되며, 그전까지는 데모로 즉시 전환됩니다."
   },
   "settings": {
     "title": "설정",
@@ -367,7 +381,8 @@
     "brandingHint": "내보낸 리포트에 표시되는 회사 아이덴티티 — 로고, 이름, 웹사이트",
     "companyName": "회사명",
     "companyWebsite": "회사 웹사이트",
-    "companyLogo": "회사 로고 URL"
+    "companyLogo": "회사 로고 URL",
+    "viewerOnlyNote": "현재 플랜에서는 초대한 팀원이 뷰어(리포트 보기 전용)로 참여합니다. 편집 멤버를 추가하려면 Pro로 업그레이드하세요."
   },
   "summary": {
     "title": "마지막 스캔 요약",

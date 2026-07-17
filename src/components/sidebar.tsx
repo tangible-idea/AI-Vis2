@@ -17,6 +17,7 @@ import {
   History,
   BarChart3,
   MessagesSquare,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Plan, Project } from "@/lib/types";
@@ -178,6 +179,12 @@ export function Sidebar({
             {active.website}
           </p>
         )}
+        <Link
+          href="/how-it-works"
+          className="flex items-center gap-1.5 border-t border-line px-4 py-2 text-[10px] text-ink-faint hover:text-ink"
+        >
+          <HelpCircle className="h-3 w-3" /> {t("common.howItWorks")}
+        </Link>
         <LegalLinks className="border-t border-line px-4 py-2 text-[10px] text-ink-faint" />
       </aside>
 

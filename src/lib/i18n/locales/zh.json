@@ -22,7 +22,10 @@
     "priorityMedium": "中优先级",
     "priorityLow": "低优先级",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "howItWorks": "工作原理",
+    "howCalculated": "这是如何计算的？",
+    "whyCitations": "为什么会看到这些引用？"
   },
   "nav": {
     "groupMeasure": "衡量",
@@ -312,7 +315,18 @@
     "switching": "切换中…",
     "switchTo": "切换到 {plan}",
     "lifetimeNote": "你正在使用 Lifetime 方案（AppSumo）— 永久包含每周扫描、趋势和分享。仅在需要更多容量时才升级。",
-    "planError": "无法更改方案"
+    "planError": "无法更改方案",
+    "currentPlanHeading": "当前套餐",
+    "usageProjects": "活跃项目",
+    "usageScans": "AI 可见度扫描",
+    "usageContent": "内容生成",
+    "usageThisMonth": "本月",
+    "usageLifetime": "累计",
+    "perProjectHint": "每个项目每月最多 {count} 次",
+    "unlimitedNote": "合理使用，本月",
+    "comparePlans": "套餐对比",
+    "comparePlansHint": "与登录前看到的套餐和价格一致",
+    "billingNote": "配置后由 Polar.sh 处理计费；在此之前套餐将作为演示即时切换。"
   },
   "settings": {
     "title": "设置",
@@ -367,7 +381,8 @@
     "brandingHint": "导出报告上显示的公司信息 — Logo、名称和网站",
     "companyName": "公司名称",
     "companyWebsite": "公司网站",
-    "companyLogo": "公司 Logo URL"
+    "companyLogo": "公司 Logo URL",
+    "viewerOnlyNote": "在您当前的套餐中，受邀成员以查看者身份加入（仅查看报告）。升级到 Pro 可添加可编辑成员。"
   },
   "summary": {
     "title": "上次扫描摘要",

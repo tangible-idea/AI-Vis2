@@ -15,6 +15,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           </Link>
           <nav className="flex items-center gap-1 sm:gap-4">
             <Link
+              href="/how-it-works"
+              className="hidden rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:text-ink sm:inline-flex"
+            >
+              How it works
+            </Link>
+            <Link
               href="/preview"
               className="rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
             >
@@ -48,6 +54,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <span className="font-display text-sm text-ink-soft">Sightline</span>
           <span>AI Visibility Intelligence · © 2026</span>
           <div className="flex flex-wrap items-center gap-4">
+            <Link href="/how-it-works" className="hover:text-ink">
+              How it works
+            </Link>
             <Link href="/pricing" className="hover:text-ink">
               Pricing
             </Link>

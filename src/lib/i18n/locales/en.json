@@ -22,7 +22,10 @@
     "priorityMedium": "medium priority",
     "priorityLow": "low priority",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "howItWorks": "How it works",
+    "howCalculated": "How is this calculated?",
+    "whyCitations": "Why am I seeing these citations?"
   },
   "nav": {
     "groupMeasure": "Measure",
@@ -312,7 +315,18 @@
     "switching": "Switching…",
     "switchTo": "Switch to {plan}",
     "lifetimeNote": "You're on the Lifetime plan (AppSumo) — weekly scans, trends and sharing included forever. Upgrade below only if you need more capacity.",
-    "planError": "Could not change plan"
+    "planError": "Could not change plan",
+    "currentPlanHeading": "Current plan",
+    "usageProjects": "Active projects",
+    "usageScans": "AI visibility scans",
+    "usageContent": "Content generations",
+    "usageThisMonth": "this month",
+    "usageLifetime": "lifetime",
+    "perProjectHint": "Up to {count} per project each month",
+    "unlimitedNote": "Fair-use, this month",
+    "comparePlans": "Compare plans",
+    "comparePlansHint": "The same plans and pricing you see before signing in",
+    "billingNote": "Billing runs on Polar.sh once configured; until then plans switch instantly as a demo."
   },
   "settings": {
     "title": "Settings",
@@ -367,7 +381,8 @@
     "brandingHint": "Your company identity on exported reports — logo, name and website",
     "companyName": "Company name",
     "companyWebsite": "Company website",
-    "companyLogo": "Company logo URL"
+    "companyLogo": "Company logo URL",
+    "viewerOnlyNote": "On your plan, invited teammates join as viewers (reports only). Upgrade to Pro to add editing members."
   },
   "summary": {
     "title": "Last scan summary",

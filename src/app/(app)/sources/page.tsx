@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
@@ -262,7 +263,15 @@ export default async function SourcesPage() {
         )}
 
         <Card>
-          <CardHeader title={t("sources.citedSources")} hint={t("sources.citedSourcesHint")} />
+          <CardHeader
+            title={t("sources.citedSources")}
+            hint={t("sources.citedSourcesHint")}
+            action={
+              <Link href="/how-it-works" className="text-xs text-accent-strong hover:underline">
+                {t("common.whyCitations")}
+              </Link>
+            }
+          />
           <div className="px-5 pb-4">
             {rows.length === 0 ? (
               <EmptyState title={t("sources.emptyTitle")} body={t("sources.emptyBody")} />

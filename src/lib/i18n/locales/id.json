@@ -22,7 +22,10 @@
     "priorityMedium": "prioritas sedang",
     "priorityLow": "prioritas rendah",
     "yes": "Ya",
-    "no": "Tidak"
+    "no": "Tidak",
+    "howItWorks": "Cara kerjanya",
+    "howCalculated": "Bagaimana ini dihitung?",
+    "whyCitations": "Mengapa saya melihat kutipan ini?"
   },
   "nav": {
     "groupMeasure": "Ukur",
@@ -312,7 +315,18 @@
     "switching": "Beralih…",
     "switchTo": "Beralih ke {plan}",
     "lifetimeNote": "Anda menggunakan paket Lifetime (AppSumo) — pemindaian mingguan, tren, dan berbagi termasuk selamanya. Upgrade hanya jika butuh kapasitas lebih.",
-    "planError": "Tidak dapat mengubah paket"
+    "planError": "Tidak dapat mengubah paket",
+    "currentPlanHeading": "Paket saat ini",
+    "usageProjects": "Proyek aktif",
+    "usageScans": "Pemindaian visibilitas AI",
+    "usageContent": "Pembuatan konten",
+    "usageThisMonth": "bulan ini",
+    "usageLifetime": "seumur hidup",
+    "perProjectHint": "Hingga {count} per proyek setiap bulan",
+    "unlimitedNote": "Penggunaan wajar, bulan ini",
+    "comparePlans": "Bandingkan paket",
+    "comparePlansHint": "Paket dan harga yang sama seperti sebelum masuk",
+    "billingNote": "Penagihan berjalan di Polar.sh setelah dikonfigurasi; sampai saat itu paket beralih seketika sebagai demo."
   },
   "settings": {
     "title": "Pengaturan",
@@ -367,7 +381,8 @@
     "brandingHint": "Identitas perusahaan Anda pada laporan yang diekspor — logo, nama, dan situs web",
     "companyName": "Nama perusahaan",
     "companyWebsite": "Situs web perusahaan",
-    "companyLogo": "URL logo perusahaan"
+    "companyLogo": "URL logo perusahaan",
+    "viewerOnlyNote": "Pada paket Anda, rekan tim yang diundang bergabung sebagai penonton (hanya laporan). Tingkatkan ke Pro untuk menambah anggota yang dapat mengedit."
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",

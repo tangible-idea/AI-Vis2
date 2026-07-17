@@ -14,6 +14,8 @@ export interface PlanLimits {
   contentGenerations: number;
   /** Team seats besides the owner (0 = no collaboration). */
   maxTeamMembers: number;
+  /** Whether invited teammates can be editing members (false = viewers only). */
+  memberSeats: boolean;
   /** Days of history shown in trends/timeline; null = unlimited. */
   historyDays: number | null;
   trends: boolean;
@@ -36,8 +38,9 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxCompetitors: 2,
     scansPerMonth: 5,
     totalScans: 5,
-    contentGenerations: 3,
+    contentGenerations: 5,
     maxTeamMembers: 0,
+    memberSeats: false,
     historyDays: null,
     trends: false,
     benchmarks: false,
@@ -49,15 +52,17 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
   },
   starter: {
     label: "Starter",
-    price: "$49",
+    price: "$59",
     priceNote: "per month",
     maxProjects: 3,
     maxPrompts: 20,
     maxCompetitors: 10,
     scansPerMonth: 30,
     totalScans: null,
-    contentGenerations: 40,
-    maxTeamMembers: 3,
+    contentGenerations: 30,
+    maxTeamMembers: 2,
+    // Starter seats are viewer-only; editing collaborators start on Pro
+    memberSeats: false,
     historyDays: null,
     trends: true,
     benchmarks: true,
@@ -69,15 +74,16 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
   },
   pro: {
     label: "Pro",
-    price: "$149",
+    price: "$169",
     priceNote: "per month",
     maxProjects: 8,
     maxPrompts: 50,
     maxCompetitors: 30,
-    scansPerMonth: 100,
+    scansPerMonth: 60,
     totalScans: null,
-    contentGenerations: 1000,
-    maxTeamMembers: 10,
+    contentGenerations: 60,
+    maxTeamMembers: 5,
+    memberSeats: true,
     historyDays: null,
     trends: true,
     benchmarks: true,
@@ -102,6 +108,7 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     totalScans: null,
     contentGenerations: 15,
     maxTeamMembers: 2,
+    memberSeats: true,
     historyDays: 180,
     trends: true,
     benchmarks: true,
@@ -148,16 +155,26 @@ export function historyCutoffIso(limits: PlanLimits): string | null {
 }
 
 /** Feature list rows for the pricing page / billing comparison (MECE: usage → features → Pro-only). */
+/**
+ * Feature comparison rows — the single source of truth behind BOTH the public
+ * pricing page and the in-app billing page (they must stay consistent to avoid
+ * confusion). Ordered buyer-first: what you can do, then what's included.
+ * `values` are [free, starter, pro]; `key` renders a check/dash from PLANS.
+ */
 export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; values?: [string, string, string]; group?: string }[] = [
-  { group: "Usage", label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
-  { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "100 / month"] },
+  { group: "Usage", label: "Brand projects (websites)", key: null, values: ["1", "3", "8"] },
+  { label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
+  { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "60 / month"] },
   { label: "Competitors tracked", key: null, values: ["2", "10", "30"] },
-  { label: "Brand projects & markets", key: null, values: ["1", "3", "8"] },
-  { label: "Content generations (pages, schema, llms.txt)", key: null, values: ["3", "40 / month", "Unlimited*"] },
-  { group: "Features", label: "Trending topics", key: "trends" },
+  { label: "Content generations (pages, schema, llms.txt, summaries)", key: null, values: ["5", "30 / month", "60 / month"] },
+  { group: "Included", label: "Trending topics", key: "trends" },
   { label: "Market benchmarks", key: "benchmarks" },
   { label: "Weekly email reports", key: "weeklyReports" },
   { label: "Shareable report links", key: "shareLinks" },
-  { label: "Team collaboration", key: null, values: ["—", "3 seats", "10 seats"] },
+  { label: "Team collaboration (seats)", key: null, values: ["—", "2 (viewer)", "5 seats"] },
   { group: "Pro only", label: "White label reports", key: "whiteLabel" },
 ];
+
+/** Footnote clarifying member vs viewer collaboration on the comparison. */
+export const TEAM_ROLES_NOTE =
+  "Members can run scans and generate content; viewers see reports only. Starter seats are viewer-only; Pro seats can be members or viewers.";

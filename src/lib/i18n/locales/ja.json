@@ -22,7 +22,10 @@
     "priorityMedium": "優先度 中",
     "priorityLow": "優先度 低",
     "yes": "はい",
-    "no": "いいえ"
+    "no": "いいえ",
+    "howItWorks": "仕組み",
+    "howCalculated": "どのように算出されますか？",
+    "whyCitations": "この引用が表示される理由は？"
   },
   "nav": {
     "groupMeasure": "計測",
@@ -312,7 +315,18 @@
     "switching": "切替中…",
     "switchTo": "{plan} に切り替え",
     "lifetimeNote": "Lifetime プラン（AppSumo）をご利用中です — 週次スキャン、トレンド、共有が永久に含まれます。さらに容量が必要な場合のみアップグレードしてください。",
-    "planError": "プランを変更できませんでした"
+    "planError": "プランを変更できませんでした",
+    "currentPlanHeading": "現在のプラン",
+    "usageProjects": "アクティブなプロジェクト",
+    "usageScans": "AI可視性スキャン",
+    "usageContent": "コンテンツ生成",
+    "usageThisMonth": "今月",
+    "usageLifetime": "累計",
+    "perProjectHint": "プロジェクトごとに毎月最大{count}回",
+    "unlimitedNote": "フェアユース、今月",
+    "comparePlans": "プランを比較",
+    "comparePlansHint": "ログイン前に表示されるプラン・価格と同じです",
+    "billingNote": "請求は設定後Polar.shで処理されます。それまではデモとして即時に切り替わります。"
   },
   "settings": {
     "title": "設定",
@@ -367,7 +381,8 @@
     "brandingHint": "エクスポートしたレポートに表示される会社情報 — ロゴ、名前、ウェブサイト",
     "companyName": "会社名",
     "companyWebsite": "会社ウェブサイト",
-    "companyLogo": "会社ロゴURL"
+    "companyLogo": "会社ロゴURL",
+    "viewerOnlyNote": "現在のプランでは、招待したメンバーはビューア（レポート閲覧のみ）として参加します。編集メンバーを追加するにはProにアップグレードしてください。"
   },
   "summary": {
     "title": "最終スキャン概要",

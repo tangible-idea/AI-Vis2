@@ -22,7 +22,10 @@
     "priorityMedium": "ưu tiên trung bình",
     "priorityLow": "ưu tiên thấp",
     "yes": "Có",
-    "no": "Không"
+    "no": "Không",
+    "howItWorks": "Cách hoạt động",
+    "howCalculated": "Điều này được tính như thế nào?",
+    "whyCitations": "Vì sao tôi thấy các trích dẫn này?"
   },
   "nav": {
     "groupMeasure": "Đo lường",
@@ -312,7 +315,18 @@
     "switching": "Đang chuyển…",
     "switchTo": "Chuyển sang {plan}",
     "lifetimeNote": "Bạn đang dùng gói Lifetime (AppSumo) — quét hằng tuần, xu hướng và chia sẻ trọn đời. Chỉ nâng cấp nếu cần thêm dung lượng.",
-    "planError": "Không thể đổi gói"
+    "planError": "Không thể đổi gói",
+    "currentPlanHeading": "Gói hiện tại",
+    "usageProjects": "Dự án đang hoạt động",
+    "usageScans": "Lượt quét hiển thị AI",
+    "usageContent": "Lượt tạo nội dung",
+    "usageThisMonth": "tháng này",
+    "usageLifetime": "trọn đời",
+    "perProjectHint": "Tối đa {count} mỗi dự án mỗi tháng",
+    "unlimitedNote": "Sử dụng hợp lý, tháng này",
+    "comparePlans": "So sánh các gói",
+    "comparePlansHint": "Cùng các gói và giá bạn thấy trước khi đăng nhập",
+    "billingNote": "Thanh toán chạy trên Polar.sh khi được cấu hình; trước đó các gói chuyển đổi tức thì như bản demo."
   },
   "settings": {
     "title": "Cài đặt",
@@ -367,7 +381,8 @@
     "brandingHint": "Thông tin công ty của bạn trên báo cáo xuất ra — logo, tên và website",
     "companyName": "Tên công ty",
     "companyWebsite": "Website công ty",
-    "companyLogo": "URL logo công ty"
+    "companyLogo": "URL logo công ty",
+    "viewerOnlyNote": "Ở gói của bạn, đồng đội được mời tham gia với vai trò người xem (chỉ xem báo cáo). Nâng cấp lên Pro để thêm thành viên có quyền chỉnh sửa."
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",

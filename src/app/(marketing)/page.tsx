@@ -328,8 +328,8 @@ export default async function HomePage() {
         <div className="mx-auto max-w-5xl px-4 py-20 text-center">
           <h2 className="text-2xl tracking-tight sm:text-3xl">Simple pricing</h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
-            Free to start. Starter at $49/mo for weekly scans, trends and content generation. Pro at
-            $149/mo for agency-scale capacity and white label reports.
+            Free to start. Starter at {PLANS.starter.price}/mo for weekly scans, trends and content
+            generation. Pro at {PLANS.pro.price}/mo for agency-scale capacity and white label reports.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link

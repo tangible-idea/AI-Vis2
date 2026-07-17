@@ -22,7 +22,10 @@
     "priorityMedium": "keutamaan sederhana",
     "priorityLow": "keutamaan rendah",
     "yes": "Ya",
-    "no": "Tidak"
+    "no": "Tidak",
+    "howItWorks": "Cara ia berfungsi",
+    "howCalculated": "Bagaimana ini dikira?",
+    "whyCitations": "Mengapa saya melihat petikan ini?"
   },
   "nav": {
     "groupMeasure": "Ukur",
@@ -312,7 +315,18 @@
     "switching": "Menukar…",
     "switchTo": "Tukar kepada {plan}",
     "lifetimeNote": "Anda menggunakan pelan Lifetime (AppSumo) — imbasan mingguan, trend dan perkongsian termasuk selamanya. Naik taraf hanya jika perlukan kapasiti lebih.",
-    "planError": "Tidak dapat menukar pelan"
+    "planError": "Tidak dapat menukar pelan",
+    "currentPlanHeading": "Pelan semasa",
+    "usageProjects": "Projek aktif",
+    "usageScans": "Imbasan keterlihatan AI",
+    "usageContent": "Penjanaan kandungan",
+    "usageThisMonth": "bulan ini",
+    "usageLifetime": "seumur hidup",
+    "perProjectHint": "Sehingga {count} setiap projek setiap bulan",
+    "unlimitedNote": "Penggunaan saksama, bulan ini",
+    "comparePlans": "Bandingkan pelan",
+    "comparePlansHint": "Pelan dan harga yang sama seperti sebelum log masuk",
+    "billingNote": "Pengebilan berjalan di Polar.sh setelah dikonfigurasi; sehingga itu pelan bertukar serta-merta sebagai demo."
   },
   "settings": {
     "title": "Tetapan",
@@ -367,7 +381,8 @@
     "brandingHint": "Identiti syarikat anda pada laporan yang dieksport — logo, nama dan laman web",
     "companyName": "Nama syarikat",
     "companyWebsite": "Laman web syarikat",
-    "companyLogo": "URL logo syarikat"
+    "companyLogo": "URL logo syarikat",
+    "viewerOnlyNote": "Pada pelan anda, rakan sepasukan yang dijemput menyertai sebagai penonton (laporan sahaja). Naik taraf ke Pro untuk menambah ahli yang boleh menyunting."
   },
   "summary": {
     "title": "Ringkasan imbasan terakhir",

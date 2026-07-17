@@ -147,7 +147,7 @@ export async function inviteMember(formData: FormData) {
   const { supabase, user } = await requireUser();
   const projectId = String(formData.get("projectId"));
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const role = String(formData.get("role")) === "viewer" ? "viewer" : "member";
+  const requestedRole = String(formData.get("role")) === "viewer" ? "viewer" : "member";
   if (!email || !email.includes("@")) return;
 
   const [{ data: profile }, { count }] = await Promise.all([
@@ -159,6 +159,9 @@ export async function inviteMember(formData: FormData) {
   ]);
   const limits = planLimits(profile?.plan);
   if (!limits.team || (count ?? 0) >= limits.maxTeamMembers) return;
+
+  // plans without editing seats (e.g. Starter) can only invite viewers
+  const role = limits.memberSeats ? requestedRole : "viewer";
 
   // RLS restricts inserts to the workspace owner
   await supabase.from("project_members").insert({
