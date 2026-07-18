@@ -173,9 +173,9 @@
     "title": "Nguồn trích dẫn",
     "subtitleScanned": "Vì sao AI nhắc đến bạn — các engine lấy thông tin từ đâu, theo lần quét {time}",
     "subtitleEmpty": "Vì sao AI nhắc đến bạn — chạy quét để xem engine lấy thông tin từ đâu",
-    "citedDomains": "Tên miền được trích dẫn",
-    "yourProperties": "Trang của bạn",
-    "competitorSites": "Trang đối thủ",
+    "citedDomains": "Nguồn được trích dẫn",
+    "yourProperties": "Trang của bạn được trích dẫn",
+    "competitorSites": "Nguồn đối thủ",
     "citedSources": "Nguồn được trích dẫn",
     "citedSourcesHint": "Mọi tên miền các AI đã tham chiếu — mở rộng để xem chính xác các câu trả lời đã trích dẫn",
     "emptyTitle": "Chưa phát hiện nguồn nào",
@@ -213,7 +213,10 @@
     "whyReferenced": "Vì sao nguồn này được trích dẫn:",
     "competitorsNamed": "Đối thủ được nhắc đến trong câu trả lời này:",
     "breakdownTitle": "Loại nguồn",
-    "breakdownHint": "Các loại nguồn mà nền tảng AI tin cậy — tỷ lệ trích dẫn và xu hướng so với lần quét trước"
+    "breakdownHint": "Các loại nguồn mà nền tảng AI tin cậy — tỷ lệ trích dẫn và xu hướng so với lần quét trước",
+    "citedDomainsTip": "Số website riêng biệt mà trợ lý AI trích dẫn khi trả lời câu hỏi trong thị trường của bạn.",
+    "yourPropertiesTip": "Bao nhiêu nguồn trích dẫn là trang của chính bạn — nội dung AI tin tưởng và trích dẫn trực tiếp.",
+    "competitorSitesTip": "Các nguồn trích dẫn thuộc về đối thủ và định hình cách AI mô tả họ."
   },
   "trends": {
     "title": "Xu hướng",

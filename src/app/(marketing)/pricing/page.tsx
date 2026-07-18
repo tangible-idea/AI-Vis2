@@ -23,8 +23,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink-faint">
-        Pro includes everything in Starter, plus more capacity and white label reports.
-        Cancel anytime — your plan stays active until the end of the billing period.
+        Cancel anytime — your plan remains active until the end of the current billing period.
         <br />Annual billing (2 months free) coming soon.
       </p>
     </main>

@@ -173,9 +173,9 @@
     "title": "Sources",
     "subtitleScanned": "Why AI mentions you — where engines got their information, from the scan {time}",
     "subtitleEmpty": "Why AI mentions you — run a scan to see where engines get their information",
-    "citedDomains": "Cited domains",
-    "yourProperties": "Your properties",
-    "competitorSites": "Competitor sites",
+    "citedDomains": "Sources cited",
+    "yourProperties": "Your sites cited",
+    "competitorSites": "Competitor sources",
     "citedSources": "Cited sources",
     "citedSourcesHint": "Every domain AI engines referenced — expand a source to see the exact answers that cited it",
     "emptyTitle": "No sources detected yet",
@@ -213,7 +213,10 @@
     "whyReferenced": "Why this source was referenced:",
     "competitorsNamed": "Competitors named in this answer:",
     "breakdownTitle": "Source types",
-    "breakdownHint": "What kinds of sources AI platforms trust — share of citations and trend vs your previous scan"
+    "breakdownHint": "What kinds of sources AI platforms trust — share of citations and trend vs your previous scan",
+    "citedDomainsTip": "The unique websites AI assistants pointed to when answering questions in your market.",
+    "yourPropertiesTip": "How many cited sources are your own pages — content AI trusts and quotes directly.",
+    "competitorSitesTip": "Cited sources that belong to your competitors and shape how AI describes them."
   },
   "trends": {
     "title": "Trends",

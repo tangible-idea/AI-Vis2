@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { resolveCompetitorInput } from "@/lib/competitors";
+import { normalizeIndustry } from "@/lib/types";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -23,7 +24,7 @@ export async function updateProject(formData: FormData) {
     .update({
       name: String(formData.get("name") ?? "").trim(),
       website: String(formData.get("website") ?? "").trim(),
-      industry: String(formData.get("industry") ?? "").trim(),
+      industry: normalizeIndustry(String(formData.get("industry") ?? "").trim()),
       country: String(formData.get("country") ?? "US"),
       language: String(formData.get("language") ?? "en"),
       logo_url: String(formData.get("logo_url") ?? "").trim() || null,

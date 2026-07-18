@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Minus } from "lucide-react";
-import { PLANS, PLAN_FEATURES, TEAM_ROLES_NOTE } from "@/lib/plans";
+import { PLANS, PLAN_FEATURES } from "@/lib/plans";
 import type { PlanLimits } from "@/lib/plans";
 import type { Plan } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ const ORDER: ("free" | "starter" | "pro")[] = ["free", "starter", "pro"];
 const TAGLINES: Record<(typeof ORDER)[number], string> = {
   free: "See where you stand",
   starter: "Measure, improve and report — weekly",
-  pro: "Everything in Starter, at agency scale",
+  pro: "Everything in Starter, plus higher limits & white label",
 };
 
 /**
@@ -86,6 +86,12 @@ export function PlanComparison({
                 ) : (
                   <p className="mt-1 text-[11px] font-normal leading-snug text-ink-faint">{TAGLINES[plan]}</p>
                 )}
+                {/* surface the Pro value in-table (not only in notes below) */}
+                {plan === "pro" && (
+                  <p className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium text-accent-strong">
+                    <Check className="h-3 w-3" /> Includes everything in Starter
+                  </p>
+                )}
               </th>
             ))}
           </tr>
@@ -100,6 +106,9 @@ export function PlanComparison({
                   </span>
                 )}
                 {row.label}
+                {row.note && (
+                  <span className="mt-0.5 block text-[11px] italic leading-snug text-ink-faint">{row.note}</span>
+                )}
               </td>
               {ORDER.map((plan) => {
                 const content = row.values
@@ -161,7 +170,6 @@ export function PlanComparison({
           </tr>
         </tbody>
       </table>
-      <p className="mt-4 text-xs leading-relaxed text-ink-faint">{TEAM_ROLES_NOTE}</p>
     </div>
   );
 }

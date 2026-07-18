@@ -1,12 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, Radar, Wand2, TrendingUp, Check } from "lucide-react";
 import { ENGINES } from "@/lib/ai/engines";
-import { getBenchmarkStats, type BenchmarkStats } from "@/lib/benchmarks";
+import { LiveMonitorFeed } from "@/components/live-monitor-feed";
 import { jsonLd, SITE } from "@/lib/seo";
 import { PLANS } from "@/lib/plans";
-
-// live-monitoring stats refresh hourly (same cadence as the cached aggregate)
-export const revalidate = 3600;
 
 export const metadata = {
   alternates: { canonical: "/" },
@@ -73,15 +70,7 @@ const STRUCTURED_DATA = {
   ],
 };
 
-export default async function HomePage() {
-  // aggregated, anonymous monitoring activity — best-effort, page renders without it
-  let stats: BenchmarkStats | null = null;
-  try {
-    stats = await getBenchmarkStats();
-  } catch {
-    stats = null;
-  }
-
+export default function HomePage() {
   return (
     <main>
       <script
@@ -274,24 +263,10 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                ["Buyer prompts tracked", stats?.distinctPrompts],
-                ["AI answers analyzed", stats?.observations],
-                ["Sources extracted", stats?.sourcesAnalyzed],
-                ["Markets covered", stats?.countries.length],
-              ].map(([label, value]) => (
-                <div key={label as string} className="rounded-2xl border border-night-line bg-night-soft p-5">
-                  <p className="tabular text-3xl text-[#35d07f]">
-                    {typeof value === "number" && value > 0 ? value.toLocaleString() : "—"}
-                  </p>
-                  <p className="mt-1 text-[11px] uppercase tracking-wider text-paper/40">{label}</p>
-                </div>
-              ))}
-            </div>
+            <LiveMonitorFeed />
           </div>
           <p className="mt-4 text-[11px] text-paper/40">
-            Aggregated, anonymous activity from recent scans — refreshed hourly.
+            Continuously analyzing how AI assistants answer buyer questions across markets.
           </p>
         </div>
       </section>

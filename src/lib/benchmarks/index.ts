@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createAdminClient } from "../supabase/server";
+import { normalizeIndustry } from "../types";
 
 /**
  * Aggregated market benchmark statistics, built from the anonymous
@@ -51,7 +52,9 @@ async function computeStats(): Promise<BenchmarkStats> {
 
   for (const r of list) {
     prompts.add(r.prompt_hash);
-    if (r.industry) industries.add(r.industry);
+    // fold legacy industry ids into the current MECE taxonomy so benchmarks
+    // group consistently with what the frontend now stores
+    if (r.industry) industries.add(normalizeIndustry(r.industry));
     if (r.country) countries.add(r.country);
     sources += Array.isArray(r.source_domains) ? r.source_domains.length : 0;
     const e = perEngine.get(r.engine) ?? { mentioned: 0, cited: 0, total: 0 };

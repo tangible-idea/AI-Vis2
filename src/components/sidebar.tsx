@@ -181,6 +181,8 @@ export function Sidebar({
         )}
         <Link
           href="/how-it-works"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-1.5 border-t border-line px-4 py-2 text-[10px] text-ink-faint hover:text-ink"
         >
           <HelpCircle className="h-3 w-3" /> {t("common.howItWorks")}

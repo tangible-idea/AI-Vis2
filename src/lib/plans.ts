@@ -154,14 +154,20 @@ export function historyCutoffIso(limits: PlanLimits): string | null {
   return new Date(Date.now() - limits.historyDays * 86_400_000).toISOString();
 }
 
-/** Feature list rows for the pricing page / billing comparison (MECE: usage → features → Pro-only). */
 /**
  * Feature comparison rows — the single source of truth behind BOTH the public
  * pricing page and the in-app billing page (they must stay consistent to avoid
  * confusion). Ordered buyer-first: what you can do, then what's included.
  * `values` are [free, starter, pro]; `key` renders a check/dash from PLANS.
+ * `note` renders as small italic sub-text under the feature name.
  */
-export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; values?: [string, string, string]; group?: string }[] = [
+export const PLAN_FEATURES: {
+  label: string;
+  key: keyof PlanLimits | null;
+  values?: [string, string, string];
+  group?: string;
+  note?: string;
+}[] = [
   { group: "Usage", label: "Brand projects (websites)", key: null, values: ["1", "3", "8"] },
   { label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
   { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "60 / month"] },
@@ -171,10 +177,11 @@ export const PLAN_FEATURES: { label: string; key: keyof PlanLimits | null; value
   { label: "Market benchmarks", key: "benchmarks" },
   { label: "Weekly email reports", key: "weeklyReports" },
   { label: "Shareable report links", key: "shareLinks" },
-  { label: "Team collaboration (seats)", key: null, values: ["—", "2 (viewer)", "5 seats"] },
+  {
+    label: "Team collaboration (seats)",
+    key: null,
+    values: ["—", "2 (viewer)", "5 seats"],
+    note: "Members can run scans and generate content. Viewers have read-only access.",
+  },
   { group: "Pro only", label: "White label reports", key: "whiteLabel" },
 ];
-
-/** Footnote clarifying member vs viewer collaboration on the comparison. */
-export const TEAM_ROLES_NOTE =
-  "Members can run scans and generate content; viewers see reports only. Starter seats are viewer-only; Pro seats can be members or viewers.";

@@ -238,35 +238,66 @@ export const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", 
 export interface Industry {
   id: string;
   label: string;
+  /** In-sentence phrasing for prompt/content generation. */
   phrase: string;
+  /** Short helper shown under the Industry field, per selection. */
+  helper: string;
 }
 
+/**
+ * MECE industry taxonomy — one row per category, shared verbatim by the
+ * frontend selectors and the backend (validation + benchmark grouping) so
+ * benchmarks stay consistent and unambiguous. Keep IDs stable.
+ */
 export const INDUSTRIES: Industry[] = [
-  { id: "saas", label: "SaaS", phrase: "SaaS" },
-  { id: "tech_b2b", label: "Technology (B2B)", phrase: "B2B technology" },
-  { id: "tech_b2c", label: "Technology (B2C)", phrase: "consumer technology" },
-  { id: "mobile_apps", label: "Mobile Apps", phrase: "mobile app" },
-  { id: "retail_ecommerce", label: "Retail & E-commerce", phrase: "retail & e-commerce" },
-  { id: "financial_services", label: "Financial Services", phrase: "financial services" },
-  { id: "healthcare", label: "Healthcare & Life Sciences", phrase: "healthcare" },
-  { id: "education", label: "Education", phrase: "education" },
-  { id: "travel_hospitality", label: "Travel & Hospitality", phrase: "travel & hospitality" },
-  { id: "media_entertainment", label: "Media & Entertainment", phrase: "media & entertainment" },
-  { id: "manufacturing", label: "Manufacturing & Industrial", phrase: "manufacturing" },
-  { id: "logistics", label: "Logistics & Transportation", phrase: "logistics" },
-  { id: "real_estate_construction", label: "Real Estate & Construction", phrase: "real estate" },
-  { id: "professional_services", label: "Professional Services", phrase: "professional services" },
-  { id: "government_nonprofit", label: "Government & Non-profit", phrase: "public sector" },
+  { id: "software_saas", label: "Software & SaaS", phrase: "software & SaaS", helper: "B2B software, cloud platforms, enterprise solutions." },
+  { id: "consumer_technology", label: "Consumer Technology", phrase: "consumer technology", helper: "Mobile apps, consumer products, electronics." },
+  { id: "professional_services", label: "Professional Services", phrase: "professional services", helper: "Agencies, consulting, legal, accounting." },
+  { id: "ecommerce_retail", label: "E-Commerce & Retail", phrase: "e-commerce & retail", helper: "Online stores, marketplaces, retail brands." },
+  { id: "financial_services", label: "Financial Services", phrase: "financial services", helper: "Banking, fintech, insurance, wealth management." },
+  { id: "healthcare_life_sciences", label: "Healthcare & Life Sciences", phrase: "healthcare & life sciences", helper: "Healthcare, pharma, biotech, healthtech." },
+  { id: "education", label: "Education", phrase: "education", helper: "EdTech, schools, universities, training." },
+  { id: "government_nonprofit", label: "Government & Non-Profit", phrase: "public sector", helper: "Public sector, NGOs, charities." },
+  { id: "other", label: "Other Industries", phrase: "other industries", helper: "Manufacturing, real estate, travel, logistics, media, energy and other sectors." },
 ];
 
-/** UI label for a stored industry value; legacy free-text rows pass through. */
-export function industryLabel(value: string): string {
-  return INDUSTRIES.find((i) => i.id === value)?.label ?? value;
+/**
+ * Legacy industry ids (and earlier free-text values) → current taxonomy ids,
+ * so existing projects and stored observations fold into the new MECE
+ * categories for display and benchmark grouping. Unknown values fall through.
+ */
+const LEGACY_INDUSTRY_MAP: Record<string, string> = {
+  saas: "software_saas",
+  tech_b2b: "software_saas",
+  tech_b2c: "consumer_technology",
+  mobile_apps: "consumer_technology",
+  retail_ecommerce: "ecommerce_retail",
+  healthcare: "healthcare_life_sciences",
+  travel_hospitality: "other",
+  media_entertainment: "other",
+  manufacturing: "other",
+  logistics: "other",
+  real_estate_construction: "other",
+  // unchanged ids (financial_services, professional_services, education,
+  // government_nonprofit) already match the new taxonomy
+};
+
+/** Maps any stored industry value to a current taxonomy id (best effort). */
+export function normalizeIndustry(value: string): string {
+  if (INDUSTRIES.some((i) => i.id === value)) return value;
+  return LEGACY_INDUSTRY_MAP[value] ?? value;
 }
 
-/** In-sentence phrasing for prompt/content generation; legacy values pass through. */
+/** UI label for a stored industry value; legacy values map forward. */
+export function industryLabel(value: string): string {
+  const id = normalizeIndustry(value);
+  return INDUSTRIES.find((i) => i.id === id)?.label ?? value;
+}
+
+/** In-sentence phrasing for prompt/content generation; legacy values map forward. */
 export function industryPhrase(value: string): string {
-  return INDUSTRIES.find((i) => i.id === value)?.phrase ?? value;
+  const id = normalizeIndustry(value);
+  return INDUSTRIES.find((i) => i.id === id)?.phrase ?? value;
 }
 
 export const CONTENT_LANGUAGES = [

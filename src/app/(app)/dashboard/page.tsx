@@ -225,7 +225,12 @@ export default async function DashboardPage() {
           </div>
           <p className="mt-3 max-w-xl text-xs leading-relaxed text-ink-faint">
             {t("dashboard.scoreExplanation")}{" "}
-            <Link href="/how-it-works" className="text-accent-strong hover:underline">
+            <Link
+              href="/how-it-works"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent-strong hover:underline"
+            >
               {t("common.howCalculated")}
             </Link>
           </p>

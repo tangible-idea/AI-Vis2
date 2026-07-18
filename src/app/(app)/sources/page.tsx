@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { InfoTip } from "@/components/info-tip";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { engineInfo } from "@/lib/ai/engines";
@@ -211,15 +212,24 @@ export default async function SourcesPage() {
         {rows.length > 0 && (
           <div className="grid grid-cols-3 gap-4">
             <div className="rounded-xl border border-line bg-surface p-4 shadow-card">
-              <p className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">{t("sources.citedDomains")}</p>
+              <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-ink-faint">
+                {t("sources.citedDomains")}
+                <InfoTip label={t("sources.citedDomainsTip")} />
+              </p>
               <p className="tabular mt-1.5 text-2xl font-medium text-ink">{rows.length}</p>
             </div>
             <div className="rounded-xl border border-line bg-surface p-4 shadow-card">
-              <p className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">{t("sources.yourProperties")}</p>
+              <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-ink-faint">
+                {t("sources.yourProperties")}
+                <InfoTip label={t("sources.yourPropertiesTip")} />
+              </p>
               <p className="tabular mt-1.5 text-2xl font-medium text-good">{officialCount}</p>
             </div>
             <div className="rounded-xl border border-line bg-surface p-4 shadow-card">
-              <p className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">{t("sources.competitorSites")}</p>
+              <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-ink-faint">
+                {t("sources.competitorSites")}
+                <InfoTip label={t("sources.competitorSitesTip")} />
+              </p>
               <p className="tabular mt-1.5 text-2xl font-medium text-poor">{competitorCount}</p>
             </div>
           </div>
@@ -267,7 +277,12 @@ export default async function SourcesPage() {
             title={t("sources.citedSources")}
             hint={t("sources.citedSourcesHint")}
             action={
-              <Link href="/how-it-works" className="text-xs text-accent-strong hover:underline">
+              <Link
+                href="/how-it-works"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-accent-strong hover:underline"
+              >
                 {t("common.whyCitations")}
               </Link>
             }

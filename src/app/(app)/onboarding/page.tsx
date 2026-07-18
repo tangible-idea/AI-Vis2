@@ -6,7 +6,8 @@ import { ChevronDown, Sparkles } from "lucide-react";
 import { createProject, type OnboardingState } from "../actions";
 import { useScan } from "@/lib/use-scan";
 import { Button, Card, Input, Label, Select } from "@/components/ui";
-import { CONTENT_LANGUAGES, COUNTRIES, INDUSTRIES } from "@/lib/types";
+import { IndustrySelect } from "@/components/industry-select";
+import { CONTENT_LANGUAGES, COUNTRIES } from "@/lib/types";
 import { PREVIEW_STORAGE_KEY, type PreviewInputs } from "@/lib/preview";
 import { useT } from "@/lib/i18n";
 
@@ -112,18 +113,7 @@ export default function OnboardingPage() {
           </div>
           <div>
             <Label htmlFor="industry">{t("onboarding.industry")}</Label>
-            <Select
-              id="industry"
-              name="industry"
-              required
-              defaultValue={prefill?.industry ?? INDUSTRIES[0].id}
-            >
-              {INDUSTRIES.map((i) => (
-                <option key={i.id} value={i.id}>
-                  {i.label}
-                </option>
-              ))}
-            </Select>
+            <IndustrySelect id="industry" name="industry" required defaultValue={prefill?.industry} />
           </div>
           <div>
             <Label htmlFor="description">

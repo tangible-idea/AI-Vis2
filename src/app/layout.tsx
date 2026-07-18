@@ -3,6 +3,7 @@ import { Instrument_Sans, Instrument_Serif, IBM_Plex_Mono } from "next/font/goog
 import { I18nProvider } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
 import { LanguageSuggest } from "@/components/language-suggest";
+import { CookieConsent } from "@/components/cookie-consent";
 import { SITE } from "@/lib/seo";
 import "./globals.css";
 
@@ -74,6 +75,7 @@ export default async function RootLayout({
         <I18nProvider locale={locale}>
           {children}
           <LanguageSuggest />
+          <CookieConsent />
         </I18nProvider>
       </body>
     </html>

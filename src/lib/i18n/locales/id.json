@@ -173,9 +173,9 @@
     "title": "Sumber",
     "subtitleScanned": "Mengapa AI menyebut Anda — dari mana mesin mendapat informasinya, dari pemindaian {time}",
     "subtitleEmpty": "Mengapa AI menyebut Anda — jalankan pemindaian untuk melihat sumber informasi mesin",
-    "citedDomains": "Domain yang dikutip",
-    "yourProperties": "Properti Anda",
-    "competitorSites": "Situs kompetitor",
+    "citedDomains": "Sumber yang dikutip",
+    "yourProperties": "Situs Anda yang dikutip",
+    "competitorSites": "Sumber pesaing",
     "citedSources": "Sumber yang dikutip",
     "citedSourcesHint": "Setiap domain yang dirujuk mesin AI — buka untuk melihat jawaban yang mengutipnya",
     "emptyTitle": "Belum ada sumber terdeteksi",
@@ -213,7 +213,10 @@
     "whyReferenced": "Mengapa sumber ini dirujuk:",
     "competitorsNamed": "Pesaing yang disebut dalam jawaban ini:",
     "breakdownTitle": "Jenis sumber",
-    "breakdownHint": "Jenis sumber yang dipercaya platform AI — porsi sitasi dan tren dibanding pemindaian sebelumnya"
+    "breakdownHint": "Jenis sumber yang dipercaya platform AI — porsi sitasi dan tren dibanding pemindaian sebelumnya",
+    "citedDomainsTip": "Jumlah situs web unik yang dirujuk asisten AI saat menjawab pertanyaan di pasar Anda.",
+    "yourPropertiesTip": "Berapa banyak sumber kutipan yang merupakan halaman Anda sendiri — konten yang dipercaya dan dikutip AI secara langsung.",
+    "competitorSitesTip": "Sumber kutipan milik pesaing yang membentuk cara AI mendeskripsikan mereka."
   },
   "trends": {
     "title": "Tren",

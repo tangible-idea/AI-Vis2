@@ -173,9 +173,9 @@
     "title": "ソース",
     "subtitleScanned": "AIがあなたに言及する理由 — エンジンの情報源、{time} のスキャンより",
     "subtitleEmpty": "AIがあなたに言及する理由 — スキャンを実行して情報源を確認しましょう",
-    "citedDomains": "引用ドメイン",
-    "yourProperties": "自社プロパティ",
-    "competitorSites": "競合サイト",
+    "citedDomains": "引用されたソース",
+    "yourProperties": "自社サイトの引用",
+    "competitorSites": "競合のソース",
     "citedSources": "引用ソース",
     "citedSourcesHint": "AIエンジンが参照した全ドメイン — 展開すると引用元の回答を確認できます",
     "emptyTitle": "ソースはまだ検出されていません",
@@ -213,7 +213,10 @@
     "whyReferenced": "このソースが参照された理由:",
     "competitorsNamed": "この回答で言及された競合:",
     "breakdownTitle": "ソースの種類",
-    "breakdownHint": "AIプラットフォームが信頼するソースの種類 — 引用シェアと前回スキャン比の傾向"
+    "breakdownHint": "AIプラットフォームが信頼するソースの種類 — 引用シェアと前回スキャン比の傾向",
+    "citedDomainsTip": "AIアシスタントが市場の質問に答える際に参照した固有のWebサイトの数です。",
+    "yourPropertiesTip": "引用ソースのうち自社ページの数 — AIが直接信頼して引用するコンテンツです。",
+    "competitorSitesTip": "競合が所有する引用ソースで、AIによる競合の説明に影響します。"
   },
   "trends": {
     "title": "トレンド",

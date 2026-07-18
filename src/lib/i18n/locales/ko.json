@@ -173,9 +173,9 @@
     "title": "소스",
     "subtitleScanned": "AI가 당신을 언급하는 이유 — 엔진이 정보를 얻은 곳, {time} 스캔 기준",
     "subtitleEmpty": "AI가 당신을 언급하는 이유 — 스캔을 실행해 엔진의 정보 출처를 확인하세요",
-    "citedDomains": "인용된 도메인",
-    "yourProperties": "내 소유 사이트",
-    "competitorSites": "경쟁사 사이트",
+    "citedDomains": "인용된 소스",
+    "yourProperties": "내 사이트 인용",
+    "competitorSites": "경쟁사 소스",
     "citedSources": "인용된 소스",
     "citedSourcesHint": "AI 엔진이 참조한 모든 도메인 — 소스를 펼치면 실제 인용한 답변을 볼 수 있습니다",
     "emptyTitle": "아직 감지된 소스가 없습니다",
@@ -213,7 +213,10 @@
     "whyReferenced": "이 소스가 인용된 이유:",
     "competitorsNamed": "이 답변에 언급된 경쟁사:",
     "breakdownTitle": "출처 유형",
-    "breakdownHint": "AI 플랫폼이 신뢰하는 출처 유형 — 인용 비중과 이전 스캔 대비 추세"
+    "breakdownHint": "AI 플랫폼이 신뢰하는 출처 유형 — 인용 비중과 이전 스캔 대비 추세",
+    "citedDomainsTip": "AI 어시스턴트가 시장 내 질문에 답하며 참조한 고유 웹사이트 수입니다.",
+    "yourPropertiesTip": "인용된 소스 중 내 소유 페이지의 수 — AI가 직접 신뢰하고 인용하는 콘텐츠입니다.",
+    "competitorSitesTip": "경쟁사 소유의 인용 소스로, AI가 경쟁사를 설명하는 방식에 영향을 줍니다."
   },
   "trends": {
     "title": "트렌드",

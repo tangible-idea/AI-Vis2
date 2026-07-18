@@ -3,7 +3,8 @@ import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
-import { CONTENT_LANGUAGES, COUNTRIES, INDUSTRIES, type Competitor, type Prompt } from "@/lib/types";
+import { IndustrySelect } from "@/components/industry-select";
+import { CONTENT_LANGUAGES, COUNTRIES, type Competitor, type Prompt } from "@/lib/types";
 import { updateProject, addCompetitor, addPrompt, inviteMember, updateBranding } from "./actions";
 import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
@@ -74,17 +75,7 @@ export default async function SettingsPage() {
             </div>
             <div>
               <Label htmlFor="s-industry">{t("settings.industry")}</Label>
-              <Select id="s-industry" name="industry" defaultValue={project.industry} required>
-                {/* legacy free-text value stays selectable until the user picks a normalized one */}
-                {!INDUSTRIES.some((i) => i.id === project.industry) && (
-                  <option value={project.industry}>{project.industry}</option>
-                )}
-                {INDUSTRIES.map((i) => (
-                  <option key={i.id} value={i.id}>
-                    {i.label}
-                  </option>
-                ))}
-              </Select>
+              <IndustrySelect id="s-industry" name="industry" defaultValue={project.industry} required />
             </div>
             <div>
               <Label htmlFor="s-logo">{t("settings.brandLogo")}</Label>

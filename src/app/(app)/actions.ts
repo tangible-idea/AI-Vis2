@@ -8,6 +8,7 @@ import { PROJECT_COOKIE } from "@/lib/project";
 import { canonicalDomain, generateDefaultPrompts } from "@/lib/scan/prompts";
 import { planLimits } from "@/lib/plans";
 import { resolveCompetitorInput } from "@/lib/competitors";
+import { normalizeIndustry } from "@/lib/types";
 
 export async function switchProject(projectId: string) {
   const cookieStore = await cookies();
@@ -36,7 +37,7 @@ export async function createProject(
   const name = String(formData.get("name") ?? "").trim();
   const rawWebsite = String(formData.get("website") ?? "").trim();
   const website = rawWebsite && !/^https?:\/\//i.test(rawWebsite) ? `https://${rawWebsite}` : rawWebsite;
-  const industry = String(formData.get("industry") ?? "").trim();
+  const industry = normalizeIndustry(String(formData.get("industry") ?? "").trim());
   const country = String(formData.get("country") ?? "US");
   const language = String(formData.get("language") ?? "en");
   const description = String(formData.get("description") ?? "").trim() || null;

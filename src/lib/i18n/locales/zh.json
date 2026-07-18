@@ -173,9 +173,9 @@
     "title": "来源",
     "subtitleScanned": "AI 为什么提到你 — 引擎的信息来源，来自 {time} 的扫描",
     "subtitleEmpty": "AI 为什么提到你 — 运行扫描查看引擎的信息来源",
-    "citedDomains": "被引用域名",
-    "yourProperties": "自有站点",
-    "competitorSites": "竞品站点",
+    "citedDomains": "被引用来源",
+    "yourProperties": "你的站点被引用",
+    "competitorSites": "竞争对手来源",
     "citedSources": "引用来源",
     "citedSourcesHint": "AI 引擎引用过的所有域名 — 展开可查看引用它的具体回答",
     "emptyTitle": "尚未检测到来源",
@@ -213,7 +213,10 @@
     "whyReferenced": "此来源被引用的原因:",
     "competitorsNamed": "此回答中提到的竞争对手:",
     "breakdownTitle": "来源类型",
-    "breakdownHint": "AI 平台信任的来源类型 — 引用占比及与上次扫描的对比趋势"
+    "breakdownHint": "AI 平台信任的来源类型 — 引用占比及与上次扫描的对比趋势",
+    "citedDomainsTip": "AI 助手在回答你所在市场问题时引用的唯一网站数量。",
+    "yourPropertiesTip": "被引用来源中属于你自己页面的数量——AI 直接信任并引用的内容。",
+    "competitorSitesTip": "属于竞争对手的被引用来源，会影响 AI 对他们的描述。"
   },
   "trends": {
     "title": "趋势",

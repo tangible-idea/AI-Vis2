@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Lock, Radar, Sparkles } from "lucide-react";
-import { Button, Card, Input, Label, Select } from "@/components/ui";
-import { INDUSTRIES } from "@/lib/types";
+import { Button, Card, Input, Label } from "@/components/ui";
+import { IndustrySelect } from "@/components/industry-select";
 import { PREVIEW_STORAGE_KEY, type PreviewInputs, type PreviewResult } from "@/lib/preview";
 
 const LOCKED_INSIGHTS = [
@@ -90,13 +90,7 @@ export default function PreviewPage() {
               </div>
               <div>
                 <Label htmlFor="industry">Industry *</Label>
-                <Select id="industry" name="industry" required defaultValue={INDUSTRIES[0].id}>
-                  {INDUSTRIES.map((i) => (
-                    <option key={i.id} value={i.id}>
-                      {i.label}
-                    </option>
-                  ))}
-                </Select>
+                <IndustrySelect id="industry" name="industry" required />
               </div>
               <div>
                 <Label htmlFor="description">
