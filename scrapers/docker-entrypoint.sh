@@ -12,5 +12,8 @@ echo "[entrypoint] starting Xvfb on :99"
 Xvfb :99 -screen 0 1280x900x24 -nolisten tcp &
 export DISPLAY=:99
 
-echo "[entrypoint] starting uvicorn on 0.0.0.0:8100"
-exec uvicorn server:app --host 0.0.0.0 --port 8100
+# Honor a platform-injected $PORT (Cloud Run, Render, Railway, App Runner…),
+# falling back to 8100 for plain `docker run`.
+PORT="${PORT:-8100}"
+echo "[entrypoint] starting uvicorn on 0.0.0.0:${PORT}"
+exec uvicorn server:app --host 0.0.0.0 --port "${PORT}"

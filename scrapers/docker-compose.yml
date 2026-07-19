@@ -1,0 +1,25 @@
+# Deploy the scraper as a single always-on container.
+#
+#   cd scrapers
+#   docker compose up -d --build
+#   curl -s localhost:8100/health
+#
+# Log in on the HOST first (needs a visible browser), then the mounted
+# .userdata carries the session into the container:
+#   python scrape.py --engine chatgpt --login
+#
+# NOTE: consumer AI UIs block datacenter IPs — see README. On a cloud VM this
+# will likely hit a challenge wall (reported as detect_challenge failures).
+services:
+  scraper:
+    build:
+      context: ..                      # repo root — Dockerfile COPYs scrapers/
+      dockerfile: scrapers/Dockerfile
+    image: ai-vis-scraper
+    restart: unless-stopped
+    # bind to loopback only; put a reverse proxy / auth in front if exposing
+    ports:
+      - "127.0.0.1:8100:8100"
+    shm_size: "1gb"                     # headroom for Chromium
+    volumes:
+      - ./.userdata:/app/.userdata      # persist login sessions (not in image)
