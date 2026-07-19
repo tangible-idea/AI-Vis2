@@ -20,8 +20,5 @@ class GeminiEngine(Engine):
     # the stop control shows while streaming
     streaming_selector = "button[aria-label*='Stop'], .stop-icon"
 
-    def submit_prompt(self, prompt: str) -> None:
-        box = self.page.locator(self.input_selector).first
-        box.click()
-        box.type(prompt, delay=8)
-        self.page.keyboard.press("Enter")
+    # Gemini uses the shared human-typing flow (type_prompt) + Enter to submit;
+    # it has no persistent logged-out nudge, so no auth_dialog_* needed.

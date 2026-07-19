@@ -142,6 +142,30 @@ curl -s -X POST http://127.0.0.1:8100/scan \
 - 서버와 CLI를 **동시에 같은 엔진으로 돌리지 마세요**(프로필 충돌). 하나만 쓰세요.
 - 로컬 전용(`127.0.0.1`)으로 두세요. ToS 특성상 외부에 공개 API로 노출하면 안 됩니다.
 
+## 견고성 (OneGlanse 오픈소스에서 이식, MIT)
+
+로그인 넛지가 반복해서 뜨는 문제를 줄이기 위해 [OneGlanse](https://github.com/aryamantodkar/oneglanse) 에이전트의 패턴을 이식했습니다:
+
+- **생명주기 훅 dismiss** — 팝업을 한 번이 아니라 `before_prompt / after_typing / before_submit / after_submit` + 응답 대기 루프의 매 틱마다 닫습니다(`engines/base.py`).
+- **다이얼로그 스코프 셀렉터** — 전역 텍스트 검색 대신 `[role="dialog"][data-state="open"]` + 텍스트(`Thanks for trying ChatGPT` / `Log in or sign up`)로 모달을 특정하고 그 안의 "Stay logged out"만 클릭(`engines/chatgpt.py`).
+- **사람형 입력** — 청크 단위 지연 타이핑 + 마우스를 움직여 클릭(`type_like_user` / `click_like_user`).
+- **안정화 기반 완료 감지** — 응답 텍스트가 일정 시간 변하지 않고 스트리밍 인디케이터가 사라지면 완료(장기 정체 시 force-exit).
+- **인용 소스 추출** — 응답 텍스트 정규식이 아니라 UI의 소스 패널에서 실제 인용 링크(`url` / `domain` / `title` / `cited_text`)를 읽습니다. ChatGPT 추출기는 OneGlanse `extractSources.ts`를 그대로 포팅. 결과 JSON의 `sources[]`에 담깁니다.
+- **챌린지/하드월 감지** — dismiss로 못 넘는 전면 봇/로그인 벽("Just a moment" 등)을 감지해 무한 대기 대신 명확한 사유로 실패 처리.
+- **제출 폴백** — Enter로 전송이 안 되면 send 버튼 클릭으로 폴백.
+- **프롬프트 간 리셋** — 각 프롬프트를 **새 대화**에서 실행해 이전 스레드에 오염되지 않게 함(스캔 독립성).
+
+> **이식하지 않은 것**: Camoufox 스텔스 브라우저·주거용 프록시 회전(핑거프린트/탐지 우회). 그래서 ChatGPT의 **익명 하드월**은 이 도구로 못 뚫습니다 — 그때는 로그인(세션 유지)이 정답입니다.
+
+## 더 큰 그림: OneGlanse self-host
+
+이 프로토타입은 "경량 로컬 실험"용입니다. 신뢰할 수 있는 스캔 엔진이 필요하면 **OneGlanse를 self-host**하는 편이 유지보수 면에서 낫습니다(Camoufox·프록시·프로바이더별 생명주기·소스 추출이 이미 포함, MIT):
+
+- **로컬 모드**는 프록시 없이 Docker로 구동, `pnpm auth`로 내 로그인 세션 캡처 → 위 문제들이 상당 부분 해결됨.
+- VPS 배포 시엔 **주거용 프록시가 필수**(데이터센터 IP 차단).
+- 결과는 본인 소유 Postgres/ClickHouse에 저장되므로 Sightline이 그 DB를 읽어 스캔 엔진으로 삼는 것도 가능.
+- 문서: https://docs.oneglanse.com/self-hosted-setup
+
 ## 한계
 
 - 봇 탐지에 걸리면 실패합니다. 이 도구는 **뚫지 않습니다** — 사람이 풉니다.

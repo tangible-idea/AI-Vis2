@@ -83,7 +83,8 @@ def run_scrape(
                 engine.open()
 
                 if not engine.wait_for_ready(patient=True):
-                    outcome.error = "prompt box never appeared — run the CLI with --login first"
+                    reason = engine.detect_challenge()
+                    outcome.error = reason or "prompt box never appeared — run the CLI with --login first"
                     log(f"[{engine_name}] {outcome.error}")
                     if debug:
                         debug_dir.mkdir(parents=True, exist_ok=True)
@@ -92,6 +93,10 @@ def run_scrape(
                 outcome.ready = True
 
                 for i, prompt in enumerate(prompts, 1):
+                    # each prompt runs in a fresh conversation so answers are
+                    # independent (not primed by the previous thread)
+                    if i > 1:
+                        engine.reset()
                     log(f"[{engine_name}] ({i}/{len(prompts)}) asking: {prompt!r}")
                     try:
                         res = engine.ask(prompt)
