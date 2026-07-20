@@ -14,7 +14,7 @@ export type CollectionMethod = "model-emulation" | "search-grounded" | "consumer
 export interface EngineInfo {
   id: Engine;
   label: string;
-  /** Poe model name (https://poe.com — OpenAI-compatible API). */
+  /** Poe model name (https://poe.com — OpenAI-compatible API) used for scans. */
   poeModel: string;
   color: string;
   collection: CollectionMethod;
@@ -34,5 +34,10 @@ export function engineInfo(id: Engine | string): EngineInfo {
   return ENGINES.find((e) => e.id === id) ?? ENGINES[0];
 }
 
-/** Model used for the platform's own reasoning (analysis, content, assistant). */
+/**
+ * Model used for the platform's own reasoning (analysis, content, assistant).
+ * Generation now runs on z.ai GLM (see getGenerationProvider), which ignores
+ * this string; it stays a valid Poe model so generation still works if GLM is
+ * unconfigured and falls back to the scan provider.
+ */
 export const WORKHORSE_MODEL = "Claude-Sonnet-4.5";

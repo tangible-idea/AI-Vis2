@@ -16,26 +16,51 @@ export interface AIProvider {
 }
 
 import { PoeProvider } from "./poe";
+import { GlmProvider } from "./glm";
 import { MockProvider } from "./mock";
 import { ScraperProvider } from "./scraper";
 
 let cached: AIProvider | null = null;
 
+/**
+ * SCAN provider — queries the engines. Poe answers the API-model engines; when
+ * SCRAPER_API_URL is set the self-hosted scraper handles chatgpt/gemini against
+ * the real consumer UIs. Falls back to a realistic mock without a Poe key.
+ */
 export function getProvider(): AIProvider {
   if (cached) return cached;
   const base: AIProvider = process.env.POE_API_KEY
     ? new PoeProvider(process.env.POE_API_KEY)
     : new MockProvider();
-  // scraper handles the engines it implements (chatgpt, gemini) against the
-  // real consumer UIs; everything else falls through to `base`
   cached = process.env.SCRAPER_API_URL
     ? new ScraperProvider(process.env.SCRAPER_API_URL, base)
     : base;
   return cached;
 }
 
+let cachedGen: AIProvider | null = null;
+
+/**
+ * GENERATION provider — content generation, the assistant and prompt
+ * suggestions (not scans). Uses z.ai GLM (glm-4.7-flash, free) when GLM_API_KEY
+ * is set; otherwise falls back to the scan provider so generation still works.
+ */
+export function getGenerationProvider(): AIProvider {
+  if (cachedGen) return cachedGen;
+  cachedGen = process.env.GLM_API_KEY
+    ? new GlmProvider(process.env.GLM_API_KEY)
+    : getProvider();
+  return cachedGen;
+}
+
+/** True when SCANS run against the mock (no Poe key). */
 export function isMockMode() {
   return !process.env.POE_API_KEY;
+}
+
+/** True when GENERATION runs against the mock (neither GLM nor Poe configured). */
+export function isGenerationMockMode() {
+  return !process.env.GLM_API_KEY && !process.env.POE_API_KEY;
 }
 
 /**

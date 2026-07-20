@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getProvider } from "@/lib/ai/provider";
+import { getGenerationProvider } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL } from "@/lib/ai/engines";
 import { buildContentMessages, CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
 import { planLimits } from "@/lib/plans";
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     instructions,
   });
 
-  const provider = getProvider();
+  const provider = getGenerationProvider();
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { industryPhrase } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
-import { getProvider, type ChatMessage } from "@/lib/ai/provider";
+import { getGenerationProvider, type ChatMessage } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL, engineInfo } from "@/lib/ai/engines";
 
 export const maxDuration = 60;
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     ].join("\n"),
   };
 
-  const provider = getProvider();
+  const provider = getGenerationProvider();
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {

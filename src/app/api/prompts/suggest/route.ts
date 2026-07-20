@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getProvider, isMockMode } from "@/lib/ai/provider";
+import { getGenerationProvider, isGenerationMockMode } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL } from "@/lib/ai/engines";
 import { canonicalDomain, generateTopicPrompts } from "@/lib/scan/prompts";
 import { promptHash } from "@/lib/scan/runner";
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
   const competitorNames = (competitors ?? []).map((c) => c.name);
   const domain = canonicalDomain(project.website);
-  let suggestions = isMockMode()
+  let suggestions = isGenerationMockMode()
     ? null
     : await generateWithModel(topic, project.name, domain, project.country, competitorNames);
   if (!suggestions?.length) {
@@ -79,7 +79,7 @@ async function generateWithModel(
   competitors: string[]
 ): Promise<{ text: string; category: PromptCategory }[] | null> {
   try {
-    const raw = await getProvider().complete(WORKHORSE_MODEL, [
+    const raw = await getGenerationProvider().complete(WORKHORSE_MODEL, [
       {
         role: "system",
         content:
