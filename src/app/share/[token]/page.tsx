@@ -2,6 +2,7 @@ import Link from "next/link";
 import { industryLabel } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
+import { planLimits } from "@/lib/plans";
 import { formatDate, pct } from "@/lib/utils";
 import { Card, CardHeader, Badge } from "@/components/ui";
 import { LegalLinks } from "@/components/legal-links";
@@ -42,6 +43,22 @@ export default async function SharedReportPage({
   ]);
   if (!project) notFound();
 
+  // white-label branding (Pro): otherwise the report carries the Sightline identity
+  const { data: ownerProfile } = await db
+    .from("profiles")
+    .select("plan")
+    .eq("id", project.user_id)
+    .maybeSingle();
+  let branding: { name: string; website: string | null; logo_url: string | null } | null = null;
+  if (planLimits(ownerProfile?.plan).whiteLabel) {
+    const { data: org } = await db
+      .from("organizations")
+      .select("name, website, logo_url")
+      .eq("owner_id", project.user_id)
+      .maybeSingle();
+    if (org?.name) branding = org;
+  }
+
   const history = (snapshots ?? []) as Snapshot[];
   const latest = history.at(-1);
   const previous = history.at(-2);
@@ -69,7 +86,13 @@ export default async function SharedReportPage({
               {project.website} · {industryLabel(project.industry)} · {formatDate(latest?.created_at)}
             </p>
           </div>
-          <span className="font-display text-lg text-ink-faint">Sightline</span>
+          <span className="flex items-center gap-2 font-display text-lg text-ink-faint">
+            {branding?.logo_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={branding.logo_url} alt="" className="h-7 w-7 shrink-0 rounded object-contain" />
+            )}
+            {branding?.name ?? "Sightline"}
+          </span>
         </header>
 
         {!latest ? (
@@ -178,12 +201,30 @@ export default async function SharedReportPage({
         )}
 
         <footer className="mt-10 space-y-2 text-center text-xs text-ink-faint">
-          <p>
-            Generated with Sightline ·{" "}
-            <Link href="/" className="text-accent-strong hover:underline">
-              Run your free AI Visibility Scan
-            </Link>
-          </p>
+          {branding ? (
+            <p>
+              Prepared by{" "}
+              {branding.website ? (
+                <a
+                  href={branding.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-strong hover:underline"
+                >
+                  {branding.name}
+                </a>
+              ) : (
+                branding.name
+              )}
+            </p>
+          ) : (
+            <p>
+              Generated with Sightline ·{" "}
+              <Link href="/" className="text-accent-strong hover:underline">
+                Run your free AI Visibility Scan
+              </Link>
+            </p>
+          )}
           <LegalLinks className="justify-center" />
         </footer>
       </div>

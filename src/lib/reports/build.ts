@@ -27,12 +27,12 @@ export function buildMarkdownReport(d: ReportData): string {
     `Generated ${formatDate(new Date().toISOString())} · ${project.website} · ${industryLabel(project.industry)}`,
     ``,
   ];
-  if (branding?.name) {
-    lines.push(
-      `Prepared by ${branding.name}${branding.website ? ` · ${branding.website}` : ""}`,
-      ``
-    );
-  }
+  // white-label identity (Pro); everyone else gets the default Sightline label
+  const brand = branding?.name ? branding : { name: "Sightline", website: null };
+  lines.push(
+    `Prepared by ${brand.name}${brand.website ? ` · ${brand.website}` : ""}`,
+    ``
+  );
 
   if (!snapshot) {
     lines.push(`No scans have completed yet.`);
