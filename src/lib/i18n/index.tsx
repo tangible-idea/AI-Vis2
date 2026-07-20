@@ -51,7 +51,17 @@ export function I18nProvider({
   );
 
   const value = useMemo(() => ({ locale, setLocale, pending }), [locale, setLocale, pending]);
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return (
+    <I18nContext.Provider value={value}>
+      {children}
+      {pending && (
+        <div
+          aria-hidden
+          className="fixed inset-0 z-[60] animate-fade cursor-wait bg-paper/60 backdrop-blur-[2px]"
+        />
+      )}
+    </I18nContext.Provider>
+  );
 }
 
 export function useLocale(): I18nContextValue {
