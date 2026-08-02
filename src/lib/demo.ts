@@ -1,6 +1,7 @@
 import { createAdminClient } from "./supabase/server";
 import { ENGINE_IDS } from "./ai/engines";
 import { generateDefaultPrompts } from "./scan/prompts";
+import { buildBrandContext } from "./brand";
 
 /**
  * Seeds a fully-populated demo project (6 weeks of history, one complete
@@ -47,14 +48,23 @@ export async function seedDemoProject(userId: string): Promise<string> {
 
   // industry passes the demo's specific niche phrase (legacy free text flows
   // through industryPhrase unchanged) so prompts stay lifelike
-  const promptDrafts = generateDefaultPrompts({
-    domain: "acmebookings.example",
-    brand,
-    industry: "restaurant reservation software",
-    country: "US",
-    language: "en",
-    competitors: competitorNames,
-  });
+  const promptDrafts = generateDefaultPrompts(
+    buildBrandContext({
+      projectId: project.id,
+      company: brand,
+      website: "https://acmebookings.example",
+      logoUrl: null,
+      industry: "restaurant reservation software",
+      market: "US",
+      language: "en",
+      description: null,
+      competitors: competitorNames.map((name) => ({
+        name,
+        website: `https://${name.toLowerCase()}.example`,
+      })),
+      trendsGeo: null,
+    })
+  );
   const { data: prompts } = await db
     .from("prompts")
     .insert(

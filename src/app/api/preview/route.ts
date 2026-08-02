@@ -4,7 +4,7 @@ import { ENGINES, ENGINE_IDS } from "@/lib/ai/engines";
 import { mockContextMessage } from "@/lib/ai/mock";
 import { analyzeResponse } from "@/lib/scan/analyzer";
 import { computeScores, type ResultRow } from "@/lib/scan/scoring";
-import { canonicalDomain } from "@/lib/scan/prompts";
+import { brandRef, buildBrandContext, canonicalDomain } from "@/lib/brand";
 import { industryPhrase } from "@/lib/types";
 import { PREVIEW_COOKIE, PREVIEW_LIMIT, type PreviewResult } from "@/lib/preview";
 
@@ -46,14 +46,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // the anonymous preview has no project, but it still runs on a real Brand
+  // Context so its matching is identical to a signed-in scan
+  const ctx = buildBrandContext({
+    projectId: "",
+    company: brand,
+    website: domain ? `https://${domain}` : "",
+    logoUrl: null,
+    industry: rawIndustry,
+    market: "US",
+    language: "en",
+    description: String(body.description ?? "").trim() || null,
+    competitors: [],
+    trendsGeo: null,
+  });
+
   // reduced prompt set — enough signal for a teaser, cheap to run; the
   // branded prompt is domain-anchored for entity precision
   const prompts = [
     `What are the best ${industry} options right now?`,
     `Which ${industry} provider would you recommend for a small business?`,
-    domain
-      ? `Is ${brand} (${domain}) a good choice for ${industry}?`
-      : `Is ${brand} a good choice for ${industry}?`,
+    `Is ${brandRef(ctx)} a good choice for ${industry}?`,
   ];
 
   const provider = getProvider();
@@ -75,7 +88,7 @@ export async function POST(request: NextRequest) {
           engine: engine.id,
           prompt,
           response_text: text,
-          ...analyzeResponse(text, brand, [], { brandWebsite: domain ? `https://${domain}` : null }),
+          ...analyzeResponse(text, ctx),
         });
       } catch (err) {
         console.error(`[preview] ${engine.id} failed:`, err);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { buildMarkdownReport, buildCsvReport, type ReportData } from "@/lib/reports/build";
+import { brandContextFor } from "@/lib/brand";
 
 /** GET ?projectId=…&format=md|csv → downloads the latest report. */
 export async function GET(request: Request) {
@@ -31,7 +32,11 @@ export async function GET(request: Request) {
         .eq("project_id", projectId)
         .order("created_at", { ascending: false })
         .limit(10),
-      supabase.from("competitors").select("name").eq("project_id", projectId),
+      supabase
+        .from("competitors")
+        .select("name, website")
+        .eq("project_id", projectId)
+        .order("position"),
     ]);
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
@@ -52,11 +57,10 @@ export async function GET(request: Request) {
   }
 
   const data: ReportData = {
-    project,
+    brand: brandContextFor(project, competitors ?? []),
     snapshot: snapshots?.[0] ?? null,
     previous: snapshots?.[1] ?? null,
     recommendations: recs ?? [],
-    competitors: (competitors ?? []).map((c) => c.name),
     branding,
   };
 

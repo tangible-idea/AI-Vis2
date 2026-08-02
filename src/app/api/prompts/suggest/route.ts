@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getGenerationProvider, isGenerationMockMode } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL } from "@/lib/ai/engines";
-import { canonicalDomain, generateTopicPrompts } from "@/lib/scan/prompts";
+import { generateTopicPrompts } from "@/lib/scan/prompts";
 import { promptHash } from "@/lib/scan/runner";
-import { PROMPT_CATEGORIES, type PromptCategory } from "@/lib/types";
+import { brandContextFor, brandIdentityLabel, brandRef, type BrandContext } from "@/lib/brand";
+import { PROMPT_CATEGORIES, type Project, type PromptCategory } from "@/lib/types";
 
 export const maxDuration = 60;
 
@@ -36,25 +37,20 @@ export async function POST(request: Request) {
   const [{ data: project }, { data: existing }, { data: competitors }] = await Promise.all([
     supabase.from("projects").select("*").eq("id", projectId).single(),
     supabase.from("prompts").select("text").eq("project_id", projectId),
-    supabase.from("competitors").select("name").eq("project_id", projectId).order("position"),
+    supabase
+      .from("competitors")
+      .select("name, website")
+      .eq("project_id", projectId)
+      .order("position"),
   ]);
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-  const competitorNames = (competitors ?? []).map((c) => c.name);
-  const domain = canonicalDomain(project.website);
-  let suggestions = isGenerationMockMode()
-    ? null
-    : await generateWithModel(topic, project.name, domain, project.country, competitorNames);
+  // the Prompt Explorer inherits the Brand Context — no separate notion of
+  // who the brand is, and no extra lookups beyond the ones above
+  const ctx = brandContextFor(project as Project, competitors ?? []);
+  let suggestions = isGenerationMockMode() ? null : await generateWithModel(topic, ctx);
   if (!suggestions?.length) {
-    suggestions = generateTopicPrompts({
-      topic,
-      domain,
-      brand: project.name,
-      industry: project.industry,
-      country: project.country,
-      language: project.language,
-      competitors: competitorNames,
-    });
+    suggestions = generateTopicPrompts(ctx, topic);
   }
 
   // never suggest a prompt the project already tracks (whitespace/case-insensitive)
@@ -71,13 +67,17 @@ export async function POST(request: Request) {
 
 const VALID_CATEGORIES = new Set(PROMPT_CATEGORIES.map((c) => c.id));
 
+/**
+ * Model-generated suggestions, briefed entirely from the Brand Context so the
+ * questions land on the right entity — company, domain/app, industry, market,
+ * language, description and competitors all come from the shared object.
+ */
 async function generateWithModel(
   topic: string,
-  brand: string,
-  domain: string,
-  country: string,
-  competitors: string[]
+  ctx: BrandContext
 ): Promise<{ text: string; category: PromptCategory }[] | null> {
+  const competitors = ctx.competitors.map((c) => c.name);
+  const country = ctx.market;
   try {
     const raw = await getGenerationProvider().complete(WORKHORSE_MODEL, [
       {
@@ -90,10 +90,13 @@ async function generateWithModel(
         content: [
           `Topic: ${topic}`,
           `Market: ${country}`,
-          `Brand being monitored: ${brand} — official website ${domain} (the domain is the canonical identifier for the brand)`,
+          `Language: ${ctx.language}`,
+          `Industry: ${ctx.industryPhrase}`,
+          `Brand being monitored: ${ctx.brand} — ${brandIdentityLabel(ctx)} (this is the canonical identifier for the brand)`,
+          ctx.description ? `What the business does: ${ctx.description}` : "",
           competitors.length ? `Known competitors: ${competitors.join(", ")}` : "",
           "",
-          `Write ${MAX_SUGGESTIONS} short, natural buyer questions about this topic. Spread them across intents: category discovery ("best X"), purchase, informational, comparison, local (${country}), and problem-solving. Mention the monitored brand in at most one branded question — and when you do, anchor it to the domain, e.g. "Is ${brand} (${domain}) a good choice for …". All other questions must not mention the brand.`,
+          `Write ${MAX_SUGGESTIONS} short, natural buyer questions about this topic. Spread them across intents: category discovery ("best X"), purchase, informational, comparison, local (${country}), and problem-solving. Mention the monitored brand in at most one branded question — and when you do, anchor it to its canonical identifier, e.g. "Is ${brandRef(ctx)} a good choice for …". All other questions must not mention the brand.`,
           `Return JSON: [{"text": "...", "category": "branded|category|informational|comparison|purchase|local|problem"}]`,
         ]
           .filter(Boolean)

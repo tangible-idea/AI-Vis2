@@ -25,7 +25,10 @@
     "no": "Không",
     "howItWorks": "Cách hoạt động",
     "howCalculated": "Điều này được tính như thế nào?",
-    "whyCitations": "Vì sao tôi thấy các trích dẫn này?"
+    "whyCitations": "Vì sao tôi thấy các trích dẫn này?",
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "saving": "Đang lưu…"
   },
   "nav": {
     "groupMeasure": "Đo lường",
@@ -241,7 +244,10 @@
     "topQueriesHint": "Những gì thị trường của bạn tìm kiếm nhiều nhất",
     "risingQueriesTitle": "Truy vấn đang tăng",
     "trendingNow": "Đang thịnh hành",
-    "trendingNowHint": "Các chủ đề rộng hơn đang thu hút sự chú ý trong thị trường của bạn"
+    "trendingNowHint": "Các chủ đề rộng hơn đang thu hút sự chú ý trong thị trường của bạn",
+    "geo": "Khu vực Google Trends",
+    "worldwide": "Toàn cầu",
+    "geoMarket": "thị trường"
   },
   "optimize": {
     "title": "Tối ưu",
@@ -385,7 +391,9 @@
     "companyName": "Tên công ty",
     "companyWebsite": "Website công ty",
     "companyLogo": "URL logo công ty",
-    "viewerOnlyNote": "Ở gói của bạn, đồng đội được mời tham gia với vai trò người xem (chỉ xem báo cáo). Nâng cấp lên Pro để thêm thành viên có quyền chỉnh sửa."
+    "viewerOnlyNote": "Ở gói của bạn, đồng đội được mời tham gia với vai trò người xem (chỉ xem báo cáo). Nâng cấp lên Pro để thêm thành viên có quyền chỉnh sửa.",
+    "businessDescription": "Mô tả doanh nghiệp",
+    "businessDescriptionHint": "Dùng để phân biệt thương hiệu của bạn với các công ty trùng tên trong câu trả lời của AI."
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",
@@ -573,5 +581,14 @@
     "successPrompts": "{count} prompt được theo dõi",
     "successScans": "{count} lần quét mỗi tháng",
     "goToDashboard": "Đến bảng điều khiển"
+  },
+  "relevance": {
+    "question": "Những kết quả này có liên quan đến thương hiệu của bạn không?",
+    "yes": "Có",
+    "improve": "Cải thiện kết quả",
+    "improveTitle": "Tinh chỉnh hồ sơ thương hiệu",
+    "improveHint": "Chỉ các trường ảnh hưởng đến việc nhận diện thương hiệu; phần còn lại giữ nguyên.",
+    "descriptionHint": "Một câu mô tả công việc giúp loại trừ các công ty trùng tên.",
+    "save": "Lưu và áp dụng"
   }
 }

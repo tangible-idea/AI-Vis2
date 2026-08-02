@@ -16,6 +16,11 @@ async function requireUser() {
   return { supabase, user };
 }
 
+/**
+ * Saves the Brand Profile — the single source of truth every feature's Brand
+ * Context is derived from. Nothing else needs updating: the context is
+ * recomputed from these fields on the next request.
+ */
 export async function updateProject(formData: FormData) {
   const { supabase } = await requireUser();
   const projectId = String(formData.get("projectId"));
@@ -27,6 +32,7 @@ export async function updateProject(formData: FormData) {
       industry: normalizeIndustry(String(formData.get("industry") ?? "").trim()),
       country: String(formData.get("country") ?? "US"),
       language: String(formData.get("language") ?? "en"),
+      description: String(formData.get("description") ?? "").trim().slice(0, 500) || null,
       logo_url: String(formData.get("logo_url") ?? "").trim() || null,
     })
     .eq("id", projectId);

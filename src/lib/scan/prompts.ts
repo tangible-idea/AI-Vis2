@@ -1,9 +1,10 @@
-import { industryPhrase, type PromptCategory } from "../types";
+import { brandRef, type BrandContext } from "../brand";
+import type { PromptCategory } from "../types";
 
 /**
- * Reusable prompt-template infrastructure. Every generated prompt draws on
- * the Project's canonical identity — primary domain first, brand name and
- * other metadata as supporting context.
+ * Reusable prompt-template infrastructure. Every generated prompt draws on the
+ * shared Brand Context — primary domain first, brand name and other metadata as
+ * supporting context. There is no separate prompt-side notion of the brand.
  *
  * Domain-first anchoring: any prompt that references the brand names the
  * tracked domain ("Acme (acme.com)", "the company whose official website is
@@ -12,50 +13,38 @@ import { industryPhrase, type PromptCategory } from "../types";
  * brand-free on purpose — they measure unaided visibility, so anchoring
  * them to the domain would invalidate the measurement.
  */
-export interface PromptContext {
-  /** Canonical identifier: the tracked domain, e.g. "acme.com". */
-  domain: string;
-  brand: string;
-  /** Normalized industry id (or legacy free text — both phrase cleanly). */
-  industry: string;
-  country: string;
-  language?: string;
-  competitors: string[];
-}
 
 export interface PromptDraft {
   text: string;
   category: PromptCategory;
 }
 
-/** "https://www.acme.com/x" | "acme.com" → "acme.com" (canonical form). */
-export function canonicalDomain(website: string): string {
-  try {
-    const url = new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`);
-    return url.hostname.replace(/^www\./, "").toLowerCase();
-  } catch {
-    return website.replace(/^https?:\/\//i, "").replace(/^www\./, "").split("/")[0].toLowerCase();
-  }
-}
+export { canonicalDomain } from "../brand";
 
-/** "Acme (acme.com)" — the standard brand reference inside prompts. */
-function brandRef(ctx: Pick<PromptContext, "brand" | "domain">): string {
-  return ctx.domain ? `${ctx.brand} (${ctx.domain})` : ctx.brand;
+/** "acme.com" for web projects; the store listing for app projects. */
+function identity(ctx: BrandContext): string {
+  if (ctx.domain) return ctx.domain;
+  if (ctx.app) return `${ctx.brand} on the ${ctx.app.platform === "ios" ? "iOS App Store" : "Google Play Store"}`;
+  return ctx.brand;
 }
 
 /**
- * Default scan prompt set from onboarding inputs, spread across the seven
+ * Default scan prompt set from the Brand Context, spread across the seven
  * buyer-intent categories. Users can edit these later.
  */
-export function generateDefaultPrompts(ctx: PromptContext): PromptDraft[] {
-  const ind = industryPhrase(ctx.industry).trim();
-  const loc = ctx.country.trim();
+export function generateDefaultPrompts(ctx: BrandContext): PromptDraft[] {
+  const ind = ctx.industryPhrase;
+  const loc = ctx.market.trim();
   const ref = brandRef(ctx);
+  const id = identity(ctx);
 
   const prompts: PromptDraft[] = [
     // branded — domain-anchored so engines resolve the exact entity
-    { text: `What products and services does ${ctx.domain} provide?`, category: "branded" },
-    { text: `Tell me about the company whose official website is ${ctx.domain}. What is it and who is it for?`, category: "branded" },
+    { text: `What products and services does ${id} provide?`, category: "branded" },
+    { text: ctx.domain
+        ? `Tell me about the company whose official website is ${ctx.domain}. What is it and who is it for?`
+        : `Tell me about ${id}. What is it and who is it for?`,
+      category: "branded" },
     { text: `Is ${ref} a good choice for ${ind}?`, category: "branded" },
 
     // category — "best X" discovery prompts (deliberately brand-free)
@@ -75,17 +64,18 @@ export function generateDefaultPrompts(ctx: PromptContext): PromptDraft[] {
     // problem-solving — pain-first questions
     { text: `My team is struggling with ${ind} — what's the easiest way to solve this?`, category: "problem" },
 
-    // comparison — the tracked domain against its market
-    { text: `How does ${ctx.domain} compare with its competitors in ${ind}?`, category: "comparison" },
+    // comparison — the tracked identity against its market
+    { text: `How does ${id} compare with its competitors in ${ind}?`, category: "comparison" },
   ];
 
-  if (ctx.competitors[0]) {
+  const rival = ctx.competitors[0]?.name;
+  if (rival) {
     prompts.push({
-      text: `${ref} vs ${ctx.competitors[0]} — which ${ind} option is better?`,
+      text: `${ref} vs ${rival} — which ${ind} option is better?`,
       category: "comparison",
     });
     prompts.push({
-      text: `Best alternatives to ${ctx.competitors[0]}`,
+      text: `Best alternatives to ${rival}`,
       category: "comparison",
     });
   }
@@ -98,19 +88,20 @@ export function generateDefaultPrompts(ctx: PromptContext): PromptDraft[] {
  * "AI SEO", …) — the offline/mock fallback for the Prompt Explorer's
  * AI-generated recommendations. Same buyer-intent spread as the default set.
  */
-export function generateTopicPrompts(ctx: PromptContext & { topic: string }): PromptDraft[] {
-  const topic = ctx.topic.trim();
+export function generateTopicPrompts(ctx: BrandContext, topicInput: string): PromptDraft[] {
+  const topic = topicInput.trim();
   const prompts: PromptDraft[] = [
     { text: `What are the best ${topic} solutions right now?`, category: "category" },
     { text: `Which ${topic} tool would you recommend for a small business?`, category: "purchase" },
     { text: `How do I choose a ${topic} provider? What should I look for?`, category: "informational" },
-    { text: `Best ${topic} options in ${ctx.country}`, category: "local" },
+    { text: `Best ${topic} options in ${ctx.market}`, category: "local" },
     { text: `My team is struggling with ${topic} — what's the easiest way to solve this?`, category: "problem" },
     { text: `Is ${brandRef(ctx)} a good choice for ${topic}?`, category: "branded" },
   ];
-  if (ctx.competitors[0]) {
+  const rival = ctx.competitors[0]?.name;
+  if (rival) {
     prompts.push({
-      text: `Best alternatives to ${ctx.competitors[0]} for ${topic}`,
+      text: `Best alternatives to ${rival} for ${topic}`,
       category: "comparison",
     });
   }

@@ -66,10 +66,16 @@ export interface Organization {
   created_at: string;
 }
 
+/** User's answer to the post-scan "are these results relevant?" prompt. */
+export type BrandFeedback = "relevant" | "improved";
+
 /**
  * A Project's canonical identity is its primary domain (`website`) plus the
  * market (country + language); brand name and industry are supporting
  * context. Monitoring anchors on the domain to maximize entity precision.
+ *
+ * The project row *is* the Brand Profile (together with its competitors); the
+ * derived Brand Context lives in `lib/brand` and is what features consume.
  */
 export interface Project {
   id: string;
@@ -87,6 +93,11 @@ export interface Project {
   archived_at: string | null;
   /** Monitoring configuration: include this project in weekly scheduled scans (paid plans). */
   auto_scan_enabled: boolean;
+  /** Google Trends geo override; null follows `country` (the monitoring market). */
+  trends_geo: string | null;
+  /** Relevance feedback given after the first two scans; null = not asked yet. */
+  brand_feedback: BrandFeedback | null;
+  brand_feedback_at: string | null;
   is_demo: boolean;
   created_at: string;
 }

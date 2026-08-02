@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
-import { getTrendsSource } from "@/lib/trends";
+import { getTrendsSource, resolveTrendsGeo } from "@/lib/trends";
 import { planLimits } from "@/lib/plans";
 import { engineInfo, ENGINE_IDS } from "@/lib/ai/engines";
 import { formatDate, timeAgo, cn } from "@/lib/utils";
@@ -55,7 +55,7 @@ export default async function MonitorPage() {
 
   const trends = await getTrendsSource().trendingSearches({
     industry: industryPhrase(project.industry),
-    country: project.country,
+    geo: resolveTrendsGeo(project.trends_geo, project.country),
     language: project.language,
     timeframe: "30d",
   });

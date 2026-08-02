@@ -5,24 +5,24 @@
  * service (no API key) with a letter placeholder as final fallback.
  */
 
+import { canonicalDomain } from "./brand";
+
 export interface ResolvedCompetitor {
   name: string;
   website: string; // normalized https:// origin
   domain: string;
 }
 
-/** Extracts a bare domain from free-form input ("https://x.com/a", "x.com"). */
+/**
+ * Extracts a bare domain from free-form input ("https://x.com/a", "x.com").
+ * Canonicalization is the Brand Context's — this only adds the "must look
+ * like a domain" rule so plain names ("acme") aren't treated as one.
+ */
 export function normalizeDomain(input: string): string | null {
-  const raw = input.trim().toLowerCase();
+  const raw = input.trim();
   if (!raw) return null;
-  try {
-    const url = new URL(/^https?:\/\//.test(raw) ? raw : `https://${raw}`);
-    const host = url.hostname.replace(/^www\./, "");
-    // require a dot so plain names ("acme") aren't treated as domains
-    return host.includes(".") ? host : null;
-  } catch {
-    return null;
-  }
+  const host = canonicalDomain(raw);
+  return host.includes(".") ? host : null;
 }
 
 /** "acme-corp.co.uk" → "Acme Corp" — the offline fallback name. */

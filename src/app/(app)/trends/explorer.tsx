@@ -4,7 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Search, Wand2 } from "lucide-react";
 import { Button, Card, CardHeader, Input, Select } from "@/components/ui";
-import { TIMEFRAMES, type TrendResult, type Timeframe } from "@/lib/trends";
+import {
+  geoLabel,
+  TIMEFRAMES,
+  TRENDS_GEOS,
+  type TrendResult,
+  type Timeframe,
+} from "@/lib/trends";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 
@@ -60,12 +66,19 @@ export function TrendsExplorer({
   projectId,
   initialSearches,
   initialTopics,
+  initialGeo,
+  market,
 }: {
   projectId: string;
   initialSearches: TrendResult[];
   initialTopics: TrendResult[];
+  /** Google Trends geo to open on — the remembered one, else the market. */
+  initialGeo: string;
+  /** The project's monitoring market, shown as the default option. */
+  market: string;
 }) {
   const [timeframe, setTimeframe] = useState<Timeframe>("30d");
+  const [geo, setGeo] = useState(initialGeo);
   const [searches, setSearches] = useState(initialSearches);
   const [topics, setTopics] = useState(initialTopics);
   const [query, setQuery] = useState("");
@@ -74,22 +87,33 @@ export function TrendsExplorer({
   const [busy, setBusy] = useState(false);
   const t = useT();
 
-  async function api(mode: string, q = "", tf = timeframe): Promise<TrendResult[]> {
-    const params = new URLSearchParams({ projectId, mode, q, timeframe: tf });
+  async function api(mode: string, q = "", tf = timeframe, g = geo): Promise<TrendResult[]> {
+    const params = new URLSearchParams({ projectId, mode, q, timeframe: tf, geo: g });
     const res = await fetch(`/api/trends?${params}`);
     if (!res.ok) return [];
     const data = await res.json();
     return data.results ?? [];
   }
 
+  /** Reloads every panel for the current geo + timeframe. */
+  async function reload(tf: Timeframe, g: string) {
+    setBusy(true);
+    const [s, topicRows] = await Promise.all([api("trending", "", tf, g), api("topics", "", tf, g)]);
+    setSearches(s);
+    setTopics(topicRows);
+    if (keywordResults && query) setKeywordResults(await api("search", query, tf, g));
+    setBusy(false);
+  }
+
   async function changeTimeframe(tf: Timeframe) {
     setTimeframe(tf);
-    setBusy(true);
-    const [s, t] = await Promise.all([api("trending", "", tf), api("topics", "", tf)]);
-    setSearches(s);
-    setTopics(t);
-    if (keywordResults && query) setKeywordResults(await api("search", query, tf));
-    setBusy(false);
+    await reload(tf, geo);
+  }
+
+  // the geo is remembered server-side, so the next visit opens here
+  async function changeGeo(g: string) {
+    setGeo(g);
+    await reload(timeframe, g);
   }
 
   async function search() {
@@ -132,6 +156,19 @@ export function TrendsExplorer({
               aria-label={t("common.search")}
             />
           </div>
+          <Select
+            value={geo}
+            onChange={(e) => changeGeo(e.target.value)}
+            className="w-36"
+            aria-label={t("trends.geo")}
+          >
+            {TRENDS_GEOS.map((g) => (
+              <option key={g || "worldwide"} value={g}>
+                {g === "" ? t("trends.worldwide") : geoLabel(g)}
+                {g === market ? ` · ${t("trends.geoMarket")}` : ""}
+              </option>
+            ))}
+          </Select>
           <Select
             value={timeframe}
             onChange={(e) => changeTimeframe(e.target.value as Timeframe)}

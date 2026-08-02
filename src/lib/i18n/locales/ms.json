@@ -25,7 +25,10 @@
     "no": "Tidak",
     "howItWorks": "Cara ia berfungsi",
     "howCalculated": "Bagaimana ini dikira?",
-    "whyCitations": "Mengapa saya melihat petikan ini?"
+    "whyCitations": "Mengapa saya melihat petikan ini?",
+    "close": "Tutup",
+    "cancel": "Batal",
+    "saving": "Menyimpan…"
   },
   "nav": {
     "groupMeasure": "Ukur",
@@ -241,7 +244,10 @@
     "topQueriesHint": "Apa yang paling kerap dicari oleh pasaran anda",
     "risingQueriesTitle": "Pertanyaan yang meningkat",
     "trendingNow": "Sedang sohor kini",
-    "trendingNowHint": "Tema yang lebih luas yang semakin mendapat perhatian dalam pasaran anda"
+    "trendingNowHint": "Tema yang lebih luas yang semakin mendapat perhatian dalam pasaran anda",
+    "geo": "Wilayah Google Trends",
+    "worldwide": "Seluruh dunia",
+    "geoMarket": "pasaran"
   },
   "optimize": {
     "title": "Optimum",
@@ -385,7 +391,9 @@
     "companyName": "Nama syarikat",
     "companyWebsite": "Laman web syarikat",
     "companyLogo": "URL logo syarikat",
-    "viewerOnlyNote": "Pada pelan anda, rakan sepasukan yang dijemput menyertai sebagai penonton (laporan sahaja). Naik taraf ke Pro untuk menambah ahli yang boleh menyunting."
+    "viewerOnlyNote": "Pada pelan anda, rakan sepasukan yang dijemput menyertai sebagai penonton (laporan sahaja). Naik taraf ke Pro untuk menambah ahli yang boleh menyunting.",
+    "businessDescription": "Penerangan perniagaan",
+    "businessDescriptionHint": "Digunakan untuk membezakan jenama anda daripada syarikat bernama serupa dalam jawapan AI."
   },
   "summary": {
     "title": "Ringkasan imbasan terakhir",
@@ -573,5 +581,14 @@
     "successPrompts": "{count} prompt dijejaki",
     "successScans": "{count} imbasan sebulan",
     "goToDashboard": "Ke papan pemuka"
+  },
+  "relevance": {
+    "question": "Adakah keputusan ini relevan dengan jenama anda?",
+    "yes": "Ya",
+    "improve": "Tingkatkan keputusan",
+    "improveTitle": "Perhalusi profil jenama",
+    "improveHint": "Hanya medan yang mempengaruhi padanan jenama — selebihnya kekal sama.",
+    "descriptionHint": "Satu ayat tentang perniagaan anda membantu menyingkirkan syarikat bernama serupa.",
+    "save": "Simpan dan guna"
   }
 }

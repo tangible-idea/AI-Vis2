@@ -25,7 +25,10 @@
     "no": "아니요",
     "howItWorks": "작동 방식",
     "howCalculated": "어떻게 계산되나요?",
-    "whyCitations": "이 인용은 왜 보이나요?"
+    "whyCitations": "이 인용은 왜 보이나요?",
+    "close": "닫기",
+    "cancel": "취소",
+    "saving": "저장 중…"
   },
   "nav": {
     "groupMeasure": "측정",
@@ -241,7 +244,10 @@
     "topQueriesHint": "시장에서 가장 많이 검색되는 질문",
     "risingQueriesTitle": "급상승 검색어",
     "trendingNow": "지금 뜨는 주제",
-    "trendingNowHint": "지금 시장에서 주목받는 폭넓은 테마"
+    "trendingNowHint": "지금 시장에서 주목받는 폭넓은 테마",
+    "geo": "Google 트렌드 지역",
+    "worldwide": "전 세계",
+    "geoMarket": "모니터링 시장"
   },
   "optimize": {
     "title": "최적화",
@@ -385,7 +391,9 @@
     "companyName": "회사명",
     "companyWebsite": "회사 웹사이트",
     "companyLogo": "회사 로고 URL",
-    "viewerOnlyNote": "현재 플랜에서는 초대한 팀원이 뷰어(리포트 보기 전용)로 참여합니다. 편집 멤버를 추가하려면 Pro로 업그레이드하세요."
+    "viewerOnlyNote": "현재 플랜에서는 초대한 팀원이 뷰어(리포트 보기 전용)로 참여합니다. 편집 멤버를 추가하려면 Pro로 업그레이드하세요.",
+    "businessDescription": "비즈니스 설명",
+    "businessDescriptionHint": "AI 답변에서 이름이 비슷한 회사와 브랜드를 구분하는 데 사용됩니다."
   },
   "summary": {
     "title": "마지막 스캔 요약",
@@ -573,5 +581,14 @@
     "successPrompts": "추적 프롬프트 {count}개",
     "successScans": "월 스캔 {count}회",
     "goToDashboard": "대시보드로 이동"
+  },
+  "relevance": {
+    "question": "이 결과가 브랜드와 관련이 있나요?",
+    "yes": "네",
+    "improve": "결과 개선하기",
+    "improveTitle": "브랜드 프로필 다듬기",
+    "improveHint": "브랜드 매칭에 영향을 주는 항목만 표시됩니다. 나머지는 그대로 유지됩니다.",
+    "descriptionHint": "무엇을 하는지 한 문장이면 이름이 비슷한 회사를 걸러내는 데 도움이 됩니다.",
+    "save": "저장하고 적용"
   }
 }

@@ -8,6 +8,7 @@ import { timeAgo } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader, Badge } from "@/components/ui";
 import { ScanButton } from "@/components/scan-button";
 import { getT } from "@/lib/i18n/server";
+import { brandContextFor, brandSegments, classifySource, type BrandContext } from "@/lib/brand";
 import type { CitationSource, Engine, ScanResult, SourceType } from "@/lib/types";
 
 export const metadata = { title: "Sources" };
@@ -57,18 +58,7 @@ function citationExcerpt(text: string, domain: string): { before: string; match:
   };
 }
 
-/** Splits text on brand occurrences so the brand can render bold + highlighted. */
-function brandSegments(text: string, brand: string): { text: string; isBrand: boolean }[] {
-  const b = brand.trim();
-  if (!b) return [{ text, isBrand: false }];
-  const re = new RegExp(`(${b.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
-  return text
-    .split(re)
-    .filter((s) => s !== "")
-    .map((s) => ({ text: s, isBrand: s.toLowerCase() === b.toLowerCase() }));
-}
-
-function BrandText({ text, brand }: { text: string; brand: string }) {
+function BrandText({ text, brand }: { text: string; brand: BrandContext }) {
   return (
     <>
       {brandSegments(text, brand).map((seg, i) =>
@@ -88,6 +78,14 @@ export default async function SourcesPage() {
   const { project } = await requireProject();
   const supabase = await createClient();
   const t = await getT();
+  // Sources inherit the shared Brand Context — ownership of a cited domain and
+  // brand highlighting both come from it, never from a local name comparison.
+  const { data: competitorRows } = await supabase
+    .from("competitors")
+    .select("name, website")
+    .eq("project_id", project.id)
+    .order("position");
+  const brand = brandContextFor(project, competitorRows ?? []);
 
   const { data: doneScans } = await supabase
     .from("scans")
@@ -117,16 +115,28 @@ export default async function SourcesPage() {
   >[];
   const promptText = new Map((promptRows ?? []).map((p) => [p.id, p.text]));
 
+  // classification is re-derived from the *current* Brand Context rather than
+  // trusting what was stored at scan time, so refining the Brand Profile
+  // immediately corrects mislabelled ownership on existing citations too
+  const typeOf = (s: CitationSource): SourceType => {
+    try {
+      return classifySource(s.domain, new URL(s.url).pathname, brand);
+    } catch {
+      return s.type;
+    }
+  };
+
   // aggregate by domain: which platforms cite it, how often, what kind —
   // and keep every citing answer so users can see the full context in-app
   const byDomain = new Map<string, SourceRow>();
   for (const r of results) {
     for (const s of r.sources ?? []) {
+      const type = typeOf(s);
       const row = byDomain.get(s.domain) ?? {
         domain: s.domain,
         url: s.url,
         title: null,
-        type: s.type,
+        type,
         engines: new Set<Engine>(),
         count: 0,
         brandMentioned: false,
@@ -147,7 +157,7 @@ export default async function SourcesPage() {
         competitors: r.competitors_mentioned ?? [],
       });
       // prefer the most specific classification for the domain
-      if (row.type === "third_party" && s.type !== "third_party") row.type = s.type;
+      if (row.type === "third_party" && type !== "third_party") row.type = type;
       byDomain.set(s.domain, row);
     }
   }
@@ -173,7 +183,8 @@ export default async function SourcesPage() {
     let total = 0;
     for (const r of list) {
       for (const s of r.sources ?? []) {
-        counts.set(s.type, (counts.get(s.type) ?? 0) + 1);
+        const type = typeOf(s);
+        counts.set(type, (counts.get(type) ?? 0) + 1);
         total++;
       }
     }
@@ -368,11 +379,11 @@ export default async function SourcesPage() {
                                   {t("sources.citedText")}
                                 </p>
                                 <p className="text-xs leading-relaxed text-ink-soft">
-                                  <BrandText text={excerpt.before} brand={project.name} />
+                                  <BrandText text={excerpt.before} brand={brand} />
                                   <mark className="rounded bg-accent-soft px-0.5 font-medium text-accent-strong">
                                     {excerpt.match}
                                   </mark>
-                                  <BrandText text={excerpt.after} brand={project.name} />
+                                  <BrandText text={excerpt.after} brand={brand} />
                                 </p>
                               </>
                             ) : (
@@ -383,7 +394,7 @@ export default async function SourcesPage() {
                                 <p className="max-h-32 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-ink-soft">
                                   <BrandText
                                     text={c.responseText.slice(0, 500) + (c.responseText.length > 500 ? "…" : "")}
-                                    brand={project.name}
+                                    brand={brand}
                                   />
                                 </p>
                               </>

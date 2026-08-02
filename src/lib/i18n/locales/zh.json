@@ -25,7 +25,10 @@
     "no": "否",
     "howItWorks": "工作原理",
     "howCalculated": "这是如何计算的？",
-    "whyCitations": "为什么会看到这些引用？"
+    "whyCitations": "为什么会看到这些引用？",
+    "close": "关闭",
+    "cancel": "取消",
+    "saving": "保存中…"
   },
   "nav": {
     "groupMeasure": "衡量",
@@ -241,7 +244,10 @@
     "topQueriesHint": "您所在市场搜索最多的问题",
     "risingQueriesTitle": "上升查询",
     "trendingNow": "当前热点",
-    "trendingNowHint": "当前市场正在获得关注的更广泛主题"
+    "trendingNowHint": "当前市场正在获得关注的更广泛主题",
+    "geo": "Google 趋势地区",
+    "worldwide": "全球",
+    "geoMarket": "市场"
   },
   "optimize": {
     "title": "优化",
@@ -385,7 +391,9 @@
     "companyName": "公司名称",
     "companyWebsite": "公司网站",
     "companyLogo": "公司 Logo URL",
-    "viewerOnlyNote": "在您当前的套餐中，受邀成员以查看者身份加入（仅查看报告）。升级到 Pro 可添加可编辑成员。"
+    "viewerOnlyNote": "在您当前的套餐中，受邀成员以查看者身份加入（仅查看报告）。升级到 Pro 可添加可编辑成员。",
+    "businessDescription": "业务描述",
+    "businessDescriptionHint": "用于在 AI 回答中将您的品牌与同名公司区分开。"
   },
   "summary": {
     "title": "上次扫描摘要",
@@ -573,5 +581,14 @@
     "successPrompts": "{count} 条追踪提示词",
     "successScans": "每月 {count} 次扫描",
     "goToDashboard": "前往仪表盘"
+  },
+  "relevance": {
+    "question": "这些结果与您的品牌相关吗？",
+    "yes": "是",
+    "improve": "改进结果",
+    "improveTitle": "优化品牌资料",
+    "improveHint": "仅显示影响品牌匹配的字段，其余保持不变。",
+    "descriptionHint": "一句业务说明有助于排除名称相似的公司。",
+    "save": "保存并应用"
   }
 }

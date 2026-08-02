@@ -1,7 +1,8 @@
 import { engineInfo } from "../ai/engines";
+import { brandIdentityLabel, type BrandContext } from "../brand";
 import { industryLabel } from "../types";
 import { formatDate } from "../utils";
-import type { Project, Snapshot, Recommendation } from "../types";
+import type { Snapshot, Recommendation } from "../types";
 
 /** White-label identity (Pro) stamped on exported reports. */
 export interface ReportBranding {
@@ -11,20 +12,20 @@ export interface ReportBranding {
 }
 
 export interface ReportData {
-  project: Project;
+  /** The reported-on brand, from the shared Brand Context. */
+  brand: BrandContext;
   snapshot: Snapshot | null;
   previous: Snapshot | null;
   recommendations: Recommendation[];
-  competitors: string[];
   branding?: ReportBranding | null;
 }
 
 export function buildMarkdownReport(d: ReportData): string {
-  const { project, snapshot, previous, recommendations, branding } = d;
+  const { brand: subject, snapshot, previous, recommendations, branding } = d;
   const lines: string[] = [
-    `# AI Visibility Report — ${project.name}`,
+    `# AI Visibility Report — ${subject.brand}`,
     ``,
-    `Generated ${formatDate(new Date().toISOString())} · ${project.website} · ${industryLabel(project.industry)}`,
+    `Generated ${formatDate(new Date().toISOString())} · ${brandIdentityLabel(subject)} · ${industryLabel(subject.industry)} · ${subject.market}`,
     ``,
   ];
   // white-label identity (Pro); everyone else gets the default Sightline label
@@ -68,7 +69,7 @@ export function buildMarkdownReport(d: ReportData): string {
       ``,
       `| Brand | Mentions | Share |`,
       `| --- | --- | --- |`,
-      ...sov.map(([name, n]) => `| ${name}${name === project.name ? " (you)" : ""} | ${n} | ${Math.round((n / total) * 100)}% |`),
+      ...sov.map(([name, n]) => `| ${name}${name === subject.brand ? " (you)" : ""} | ${n} | ${Math.round((n / total) * 100)}% |`),
       ``
     );
   }
@@ -84,9 +85,9 @@ export function buildMarkdownReport(d: ReportData): string {
 }
 
 export function buildCsvReport(d: ReportData): string {
-  const { snapshot, project } = d;
+  const { snapshot, brand: subject } = d;
   const rows: string[][] = [["metric", "value"]];
-  rows.push(["project", project.name]);
+  rows.push(["project", subject.brand], ["identity", brandIdentityLabel(subject)], ["market", subject.market]);
   if (snapshot) {
     rows.push(
       ["overall_score", String(snapshot.overall_score)],

@@ -6,6 +6,8 @@
  * content type so it plugs straight into the AI Content Generator.
  */
 
+import { COUNTRIES } from "../types";
+
 export type Timeframe = "7d" | "30d" | "90d" | "12m";
 export type TrendDirection = "rising" | "steady" | "declining";
 
@@ -15,6 +17,25 @@ export const TIMEFRAMES: { id: Timeframe; label: string }[] = [
   { id: "90d", label: "Past 90 days" },
   { id: "12m", label: "Past 12 months" },
 ];
+
+/**
+ * Google Trends geo codes. Deliberately independent of the monitoring market:
+ * a brand monitored in KR may still want to read demand worldwide or in the US.
+ * "" is Google Trends' own code for Worldwide.
+ */
+export const WORLDWIDE_GEO = "";
+
+export const TRENDS_GEOS: string[] = [WORLDWIDE_GEO, ...COUNTRIES];
+
+/** Falls back to the monitoring market when no geo has been chosen. */
+export function resolveTrendsGeo(stored: string | null | undefined, market: string): string {
+  return stored === null || stored === undefined ? market : stored;
+}
+
+/** True for values this app will accept as a Google Trends geo. */
+export function isValidTrendsGeo(value: string): boolean {
+  return TRENDS_GEOS.includes(value);
+}
 
 /** Content the generator can produce from a trend, in one click. */
 export interface ContentSuggestion {
@@ -34,9 +55,15 @@ export interface TrendResult {
 
 export interface TrendsQuery {
   industry: string;
-  country: string;
+  /** Google Trends geo — never the monitoring market unless they happen to match. */
+  geo: string;
   language: string;
   timeframe: Timeframe;
+}
+
+/** Human label for a geo code ("" → Worldwide). */
+export function geoLabel(geo: string): string {
+  return geo === WORLDWIDE_GEO ? "Worldwide" : geo;
 }
 
 export interface TrendsSource {
@@ -80,12 +107,16 @@ class MockTrendsSource implements TrendsSource {
     return [
       `AI in ${ind}`,
       `${ind} automation`,
-      `${ind} regulations ${q.country}`,
+      `${ind} regulations ${geoLabel(q.geo)}`,
       `${ind} cost trends`,
       `switching ${ind} providers`,
     ].map((k) => this.result(k, q));
   }
 
+  /**
+   * Each keyword is measured independently and returned as its own series —
+   * the same thing Google Trends Explore does with comma-separated terms.
+   */
   async keywordInterest(keywords: string[], q: TrendsQuery): Promise<TrendResult[]> {
     return keywords.filter(Boolean).map((k) => this.result(k.trim(), q));
   }
@@ -98,13 +129,13 @@ class MockTrendsSource implements TrendsSource {
       `${k} vs alternatives`,
       `best ${k}`,
       `${k} for beginners`,
-      `${k} ${q.country.toLowerCase()}`,
+      `${k} ${geoLabel(q.geo).toLowerCase()}`,
     ].map((r) => this.result(r, q));
   }
 
-  /** Deterministic per keyword+timeframe+country, so the UI feels stable. */
+  /** Deterministic per keyword+timeframe+geo, so the UI feels stable. */
   private result(keyword: string, q: TrendsQuery): TrendResult {
-    const rand = rng(hash(`${keyword}|${q.timeframe}|${q.country}`));
+    const rand = rng(hash(`${keyword}|${q.timeframe}|${q.geo}`));
     const growth = Math.round(rand() * 260 - 40); // -40% … +220%
     const direction: TrendDirection = growth > 15 ? "rising" : growth < -10 ? "declining" : "steady";
     const volume = `${(0.8 + rand() * 14).toFixed(1)}K/mo`;

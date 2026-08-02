@@ -1,5 +1,6 @@
 import type { Engine, RecommendationType } from "../types";
 import { engineInfo } from "../ai/engines";
+import type { BrandContext } from "../brand";
 import type { ScoreBreakdown } from "../scan/scoring";
 import type { ResultRow } from "../scan/scoring";
 
@@ -12,28 +13,25 @@ export interface RecommendationDraft {
   effort: string;
 }
 
-interface Ctx {
-  brand: string;
-  industry: string;
-  competitors: string[];
-  engines: Engine[];
-}
-
 /**
  * Gap-based recommendation engine: turns a scan's score breakdown into
  * concrete, prioritized actions. Pure function — reused by the scan
- * pipeline and the demo seeder.
+ * pipeline and the demo seeder. Brand wording comes from the shared Brand
+ * Context, so recommendations name the brand exactly as monitoring does.
  */
 export function deriveRecommendations(
   scores: ScoreBreakdown,
   results: ResultRow[],
-  ctx: Ctx
+  ctx: BrandContext,
+  engines: Engine[]
 ): RecommendationDraft[] {
   const recs: RecommendationDraft[] = [];
-  const { brand, industry, competitors } = ctx;
+  const brand = ctx.brand;
+  const industry = ctx.industryPhrase;
+  const competitors = ctx.competitors.map((c) => c.name);
 
   // engines where the brand is invisible
-  const darkEngines = ctx.engines.filter(
+  const darkEngines = engines.filter(
     (e) => !results.some((r) => r.engine === e && r.brand_mentioned)
   );
   if (darkEngines.length) {

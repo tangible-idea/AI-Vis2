@@ -78,6 +78,21 @@ export default async function SettingsPage() {
               <IndustrySelect id="s-industry" name="industry" defaultValue={project.industry} required />
             </div>
             <div>
+              <Label htmlFor="s-description">
+                {t("settings.businessDescription")}{" "}
+                <span className="font-normal text-ink-faint">{t("onboarding.optional")}</span>
+              </Label>
+              <textarea
+                id="s-description"
+                name="description"
+                rows={3}
+                maxLength={500}
+                defaultValue={project.description ?? ""}
+                className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
+              />
+              <p className="mt-1 text-[11px] text-ink-faint">{t("settings.businessDescriptionHint")}</p>
+            </div>
+            <div>
               <Label htmlFor="s-logo">{t("settings.brandLogo")}</Label>
               <Input
                 id="s-logo"

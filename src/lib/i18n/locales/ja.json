@@ -25,7 +25,10 @@
     "no": "いいえ",
     "howItWorks": "仕組み",
     "howCalculated": "どのように算出されますか？",
-    "whyCitations": "この引用が表示される理由は？"
+    "whyCitations": "この引用が表示される理由は？",
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "saving": "保存中…"
   },
   "nav": {
     "groupMeasure": "計測",
@@ -241,7 +244,10 @@
     "topQueriesHint": "市場で最も検索されている質問",
     "risingQueriesTitle": "急上昇クエリ",
     "trendingNow": "今話題のトピック",
-    "trendingNowHint": "いま市場で注目を集めている幅広いテーマ"
+    "trendingNowHint": "いま市場で注目を集めている幅広いテーマ",
+    "geo": "Google トレンドの地域",
+    "worldwide": "全世界",
+    "geoMarket": "市場"
   },
   "optimize": {
     "title": "最適化",
@@ -385,7 +391,9 @@
     "companyName": "会社名",
     "companyWebsite": "会社ウェブサイト",
     "companyLogo": "会社ロゴURL",
-    "viewerOnlyNote": "現在のプランでは、招待したメンバーはビューア（レポート閲覧のみ）として参加します。編集メンバーを追加するにはProにアップグレードしてください。"
+    "viewerOnlyNote": "現在のプランでは、招待したメンバーはビューア（レポート閲覧のみ）として参加します。編集メンバーを追加するにはProにアップグレードしてください。",
+    "businessDescription": "事業内容",
+    "businessDescriptionHint": "AI の回答で、似た名前の企業とブランドを区別するために使われます。"
   },
   "summary": {
     "title": "最終スキャン概要",
@@ -573,5 +581,14 @@
     "successPrompts": "追跡プロンプト{count}件",
     "successScans": "月{count}回のスキャン",
     "goToDashboard": "ダッシュボードへ"
+  },
+  "relevance": {
+    "question": "これらの結果はあなたのブランドに関連していますか？",
+    "yes": "はい",
+    "improve": "結果を改善",
+    "improveTitle": "ブランドプロフィールを調整",
+    "improveHint": "ブランド判定に影響する項目のみです。それ以外はそのまま維持されます。",
+    "descriptionHint": "事業内容の一文が、似た名前の企業を除外する助けになります。",
+    "save": "保存して適用"
   }
 }

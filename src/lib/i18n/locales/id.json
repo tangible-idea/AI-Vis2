@@ -25,7 +25,10 @@
     "no": "Tidak",
     "howItWorks": "Cara kerjanya",
     "howCalculated": "Bagaimana ini dihitung?",
-    "whyCitations": "Mengapa saya melihat kutipan ini?"
+    "whyCitations": "Mengapa saya melihat kutipan ini?",
+    "close": "Tutup",
+    "cancel": "Batal",
+    "saving": "Menyimpan…"
   },
   "nav": {
     "groupMeasure": "Ukur",
@@ -241,7 +244,10 @@
     "topQueriesHint": "Apa yang paling sering dicari pasar Anda",
     "risingQueriesTitle": "Kueri yang naik",
     "trendingNow": "Sedang tren",
-    "trendingNowHint": "Tema yang lebih luas yang sedang menarik perhatian di pasar Anda"
+    "trendingNowHint": "Tema yang lebih luas yang sedang menarik perhatian di pasar Anda",
+    "geo": "Wilayah Google Trends",
+    "worldwide": "Seluruh dunia",
+    "geoMarket": "pasar"
   },
   "optimize": {
     "title": "Optimalkan",
@@ -385,7 +391,9 @@
     "companyName": "Nama perusahaan",
     "companyWebsite": "Situs web perusahaan",
     "companyLogo": "URL logo perusahaan",
-    "viewerOnlyNote": "Pada paket Anda, rekan tim yang diundang bergabung sebagai penonton (hanya laporan). Tingkatkan ke Pro untuk menambah anggota yang dapat mengedit."
+    "viewerOnlyNote": "Pada paket Anda, rekan tim yang diundang bergabung sebagai penonton (hanya laporan). Tingkatkan ke Pro untuk menambah anggota yang dapat mengedit.",
+    "businessDescription": "Deskripsi bisnis",
+    "businessDescriptionHint": "Digunakan untuk membedakan merek Anda dari perusahaan bernama serupa dalam jawaban AI."
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",
@@ -573,5 +581,14 @@
     "successPrompts": "{count} prompt terlacak",
     "successScans": "{count} pemindaian per bulan",
     "goToDashboard": "Ke dasbor"
+  },
+  "relevance": {
+    "question": "Apakah hasil ini relevan dengan merek Anda?",
+    "yes": "Ya",
+    "improve": "Tingkatkan hasil",
+    "improveTitle": "Sempurnakan profil merek",
+    "improveHint": "Hanya kolom yang memengaruhi pencocokan merek — sisanya tetap sama.",
+    "descriptionHint": "Satu kalimat tentang bisnis Anda membantu menyingkirkan perusahaan bernama serupa.",
+    "save": "Simpan dan terapkan"
   }
 }

@@ -1,6 +1,6 @@
 import { requireProject } from "@/lib/project";
 import { planLimits } from "@/lib/plans";
-import { getTrendsSource } from "@/lib/trends";
+import { getTrendsSource, resolveTrendsGeo } from "@/lib/trends";
 import { CONTENT_LANGUAGES , industryPhrase} from "@/lib/types";
 import { PageHeader, Card, CardHeader, LockedOverlay } from "@/components/ui";
 import { getT } from "@/lib/i18n/server";
@@ -15,10 +15,14 @@ export default async function TrendsPage() {
   const langLabel =
     CONTENT_LANGUAGES.find((l) => l.code === project.language)?.label ?? project.language;
 
+  // the Google Trends geo is remembered per project and defaults to the
+  // monitoring market — the two stay independent from here on
+  const geo = resolveTrendsGeo(project.trends_geo, project.country);
+
   const source = getTrendsSource();
   const query = {
     industry: industryPhrase(project.industry),
-    country: project.country,
+    geo,
     language: project.language,
     timeframe: "30d" as const,
   };
@@ -59,6 +63,8 @@ export default async function TrendsPage() {
         projectId={project.id}
         initialSearches={searches}
         initialTopics={topics}
+        initialGeo={geo}
+        market={project.country}
       />
     </>
   );

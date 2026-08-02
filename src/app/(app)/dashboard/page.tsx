@@ -3,12 +3,14 @@ import { ArrowRight, Download, TrendingUp } from "lucide-react";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { ENGINES } from "@/lib/ai/engines";
-import { getTrendsSource } from "@/lib/trends";
+import { getTrendsSource, resolveTrendsGeo } from "@/lib/trends";
 import { historyCutoffIso, planLimits } from "@/lib/plans";
 import { pct, timeAgo, formatDate, cn } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader, Badge, ButtonLink } from "@/components/ui";
 import { ScoreHero, WeeklyScoreTrend, SovBars, StatTile } from "@/components/charts";
 import { ScanButton } from "@/components/scan-button";
+import { BrandRelevance } from "@/components/brand-relevance";
+import { BRAND_PROFILE_COMPETITOR_SLOTS } from "@/lib/brand";
 import { LastScanSummary, type ActivityItem } from "./last-scan-summary";
 import { PlatformCards, type PlatformCardData } from "./platform-cards";
 import { RecentConversations, type ConversationItem } from "./recent-conversations";
@@ -102,6 +104,25 @@ export default async function DashboardPage() {
     : { data: [] as ScanResult[] };
   const results = (resultRows ?? []) as ScanResult[];
   const promptList = (prompts ?? []) as Pick<Prompt, "id" | "text">[];
+
+  // relevance check: asked once, after the first two scans have completed
+  const askRelevance = project.brand_feedback == null;
+  const [{ count: doneScanCount }, { data: relevanceCompetitors }] = askRelevance
+    ? await Promise.all([
+        supabase
+          .from("scans")
+          .select("id", { count: "exact", head: true })
+          .eq("project_id", project.id)
+          .eq("status", "done"),
+        supabase
+          .from("competitors")
+          .select("name, website")
+          .eq("project_id", project.id)
+          .order("position")
+          .limit(Math.min(BRAND_PROFILE_COMPETITOR_SLOTS, limits.maxCompetitors)),
+      ])
+    : [{ count: 0 }, { data: [] }];
+  const showRelevance = askRelevance && (doneScanCount ?? 0) >= 2;
   const promptText = new Map(promptList.map((p) => [p.id, p.text]));
 
   const delta = previous ? latest.overall_score - previous.overall_score : null;
@@ -193,7 +214,8 @@ export default async function DashboardPage() {
   const trends = limits.trends
     ? await getTrendsSource().trendingSearches({
         industry: industryPhrase(project.industry),
-        country: project.country,
+        // the project's Google Trends geo, which may differ from its market
+        geo: resolveTrendsGeo(project.trends_geo, project.country),
         language: project.language,
         timeframe: "30d",
       })
@@ -212,6 +234,25 @@ export default async function DashboardPage() {
       />
 
       <div className="stagger space-y-4">
+        {showRelevance && (
+          <BrandRelevance
+            fields={{
+              projectId: project.id,
+              company: project.name,
+              website: project.website,
+              industry: project.industry,
+              description: project.description ?? "",
+              competitors: Array.from(
+                { length: Math.min(BRAND_PROFILE_COMPETITOR_SLOTS, limits.maxCompetitors) },
+                (_, i) => {
+                  const c = (relevanceCompetitors ?? [])[i];
+                  return c?.website ?? c?.name ?? "";
+                }
+              ),
+            }}
+          />
+        )}
+
         {/* 1 — AI Visibility Score hero */}
         <Card className="p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">

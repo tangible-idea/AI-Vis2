@@ -25,7 +25,10 @@
     "no": "No",
     "howItWorks": "How it works",
     "howCalculated": "How is this calculated?",
-    "whyCitations": "Why am I seeing these citations?"
+    "whyCitations": "Why am I seeing these citations?",
+    "close": "Close",
+    "cancel": "Cancel",
+    "saving": "Saving…"
   },
   "nav": {
     "groupMeasure": "Measure",
@@ -241,7 +244,10 @@
     "topQueriesHint": "What your market searches for the most",
     "risingQueriesTitle": "Rising queries",
     "trendingNow": "Trending now",
-    "trendingNowHint": "Broader themes gaining attention in your market right now"
+    "trendingNowHint": "Broader themes gaining attention in your market right now",
+    "geo": "Google Trends geo",
+    "worldwide": "Worldwide",
+    "geoMarket": "market"
   },
   "optimize": {
     "title": "Optimize",
@@ -385,7 +391,9 @@
     "companyName": "Company name",
     "companyWebsite": "Company website",
     "companyLogo": "Company logo URL",
-    "viewerOnlyNote": "On your plan, invited teammates join as viewers (reports only). Upgrade to Pro to add editing members."
+    "viewerOnlyNote": "On your plan, invited teammates join as viewers (reports only). Upgrade to Pro to add editing members.",
+    "businessDescription": "Business description",
+    "businessDescriptionHint": "Used to tell your brand apart from similarly named companies in AI answers."
   },
   "summary": {
     "title": "Last scan summary",
@@ -573,5 +581,14 @@
     "successPrompts": "{count} tracked prompts",
     "successScans": "{count} scans per month",
     "goToDashboard": "Go to dashboard"
+  },
+  "relevance": {
+    "question": "Are these results relevant to your brand?",
+    "yes": "Yes",
+    "improve": "Improve results",
+    "improveTitle": "Refine your brand profile",
+    "improveHint": "Only the fields that affect brand matching — everything else stays as it is.",
+    "descriptionHint": "A sentence about what you do helps rule out companies with similar names.",
+    "save": "Save and apply"
   }
 }

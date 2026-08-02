@@ -6,7 +6,8 @@ import { mockContextMessage } from "../ai/mock";
 import { analyzeResponse } from "./analyzer";
 import { computeScores, type ResultRow } from "./scoring";
 import { deriveRecommendations } from "../recommendations";
-import type { Engine, Prompt } from "../types";
+import { brandContextFor } from "../brand";
+import type { Engine, Project, Prompt } from "../types";
 
 const SCAN_SYSTEM_PROMPT =
   "You are a helpful assistant. Answer the user's question the way you normally would, naming specific products, companies or services where relevant.";
@@ -66,8 +67,10 @@ export async function runScan(scanId: string): Promise<void> {
     if (project.archived_at) throw new Error("Project is archived — restore it to run scans");
     if (!prompts?.length) throw new Error("No active prompts to scan");
 
-    const competitorNames = (competitors ?? []).map((c) => c.name);
-    const competitorWebsites = (competitors ?? []).map((c) => c.website);
+    // one Brand Context for the whole scan — the same object every other
+    // feature builds, so matching here matches everywhere else
+    const brand = brandContextFor(project as Project, competitors ?? []);
+    const competitorNames = brand.competitors.map((c) => c.name);
     const provider = getProvider();
 
     const jobs: { engine: Engine; model: string; prompt: Prompt }[] = [];
@@ -142,10 +145,7 @@ export async function runScan(scanId: string): Promise<void> {
         }
       }
 
-      const analyzed = analyzeResponse(text, project.name, competitorNames, {
-        brandWebsite: project.website,
-        competitorWebsites,
-      });
+      const analyzed = analyzeResponse(text, brand);
       rows.push({
         engine: job.engine,
         prompt_id: job.prompt.id,
@@ -212,7 +212,7 @@ export async function runScan(scanId: string): Promise<void> {
     }
 
     const engineIds = ENGINES.map((e) => e.id);
-    const scores = computeScores(rows, project.name, competitorNames, engineIds);
+    const scores = computeScores(rows, brand.brand, competitorNames, engineIds);
 
     await db.from("snapshots").insert({
       user_id: scan.user_id,
@@ -228,12 +228,7 @@ export async function runScan(scanId: string): Promise<void> {
     });
 
     // refresh open scan-derived recommendations with the latest picture
-    const drafts = deriveRecommendations(scores, rows, {
-      brand: project.name,
-      industry: project.industry,
-      competitors: competitorNames,
-      engines: engineIds,
-    });
+    const drafts = deriveRecommendations(scores, rows, brand, engineIds);
     await db
       .from("recommendations")
       .delete()
