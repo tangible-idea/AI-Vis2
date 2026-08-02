@@ -209,10 +209,12 @@ export default async function MonitorPage() {
                     <p className="truncate text-sm text-ink">{t.keyword}</p>
                     <p className="truncate text-[11px] text-ink-faint">{t.contentAngle}</p>
                   </div>
-                  <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
-                    {t.growth >= 0 ? "+" : ""}
-                    {t.growth}%
-                  </span>
+                  {t.growth !== null && (
+                    <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
+                      {t.growth >= 0 ? "+" : ""}
+                      {t.growth}%
+                    </span>
+                  )}
                   <span className="tabular hidden text-xs text-ink-faint sm:block">{t.volume}</span>
                 </div>
               ))}

@@ -249,7 +249,8 @@
     "worldwide": "全球",
     "geoMarket": "市场",
     "geoScope": "Google 趋势地区：{geo}",
-    "geoMarketNote": "监测市场：{market}"
+    "geoMarketNote": "监测市场：{market}",
+    "sampleNotice": "无法连接 Google 趋势 — 正在显示示例数据"
   },
   "optimize": {
     "title": "优化",

@@ -387,10 +387,12 @@ export default async function DashboardPage() {
                     )}
                   />
                   <span className="min-w-0 flex-1 truncate text-sm text-ink">{t.keyword}</span>
-                  <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
-                    {t.growth >= 0 ? "+" : ""}
-                    {t.growth}%
-                  </span>
+                  {t.growth !== null && (
+                    <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
+                      {t.growth >= 0 ? "+" : ""}
+                      {t.growth}%
+                    </span>
+                  )}
                   <Link
                     href={`/optimize?type=${t.suggestion.type}&topic=${encodeURIComponent(t.keyword)}`}
                     className="shrink-0 rounded-lg border border-line-strong px-2.5 py-1 text-xs font-medium text-ink hover:bg-hover"

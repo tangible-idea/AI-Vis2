@@ -249,7 +249,8 @@
     "worldwide": "Worldwide",
     "geoMarket": "market",
     "geoScope": "Showing Google Trends for {geo}",
-    "geoMarketNote": "monitoring market: {market}"
+    "geoMarketNote": "monitoring market: {market}",
+    "sampleNotice": "Google Trends unavailable — showing sample data"
   },
   "optimize": {
     "title": "Optimize",

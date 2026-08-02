@@ -249,7 +249,8 @@
     "worldwide": "Seluruh dunia",
     "geoMarket": "pasar",
     "geoScope": "Menampilkan Google Trends untuk {geo}",
-    "geoMarketNote": "pasar pemantauan: {market}"
+    "geoMarketNote": "pasar pemantauan: {market}",
+    "sampleNotice": "Google Trends tidak tersedia — menampilkan data contoh"
   },
   "optimize": {
     "title": "Optimalkan",

@@ -249,7 +249,8 @@
     "worldwide": "Toàn cầu",
     "geoMarket": "thị trường",
     "geoScope": "Đang hiển thị Google Trends cho {geo}",
-    "geoMarketNote": "thị trường giám sát: {market}"
+    "geoMarketNote": "thị trường giám sát: {market}",
+    "sampleNotice": "Không kết nối được Google Trends — đang hiển thị dữ liệu mẫu"
   },
   "optimize": {
     "title": "Tối ưu",

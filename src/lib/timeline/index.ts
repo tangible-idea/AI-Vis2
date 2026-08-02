@@ -301,8 +301,10 @@ export async function buildTimeline(
       language: project.language,
       timeframe: "30d",
     });
-    const top = trends.filter((t) => t.direction === "rising").sort((a, b) => b.growth - a.growth)[0];
-    if (top && top.growth >= 80) {
+    const top = trends
+      .filter((t) => t.direction === "rising" && t.growth !== null)
+      .sort((a, b) => (b.growth ?? 0) - (a.growth ?? 0))[0];
+    if (top && (top.growth ?? 0) >= 80) {
       events.push({
         id: `trend-${top.keyword}`,
         category: "trends",

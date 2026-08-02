@@ -249,7 +249,8 @@
     "worldwide": "全世界",
     "geoMarket": "市場",
     "geoScope": "Google トレンドの地域: {geo}",
-    "geoMarketNote": "モニタリング市場: {market}"
+    "geoMarketNote": "モニタリング市場: {market}",
+    "sampleNotice": "Google トレンドに接続できません — サンプルデータを表示中"
   },
   "optimize": {
     "title": "最適化",

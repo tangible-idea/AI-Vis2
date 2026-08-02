@@ -249,7 +249,8 @@
     "worldwide": "ทั่วโลก",
     "geoMarket": "ตลาด",
     "geoScope": "แสดง Google Trends สำหรับ {geo}",
-    "geoMarketNote": "ตลาดที่ติดตาม: {market}"
+    "geoMarketNote": "ตลาดที่ติดตาม: {market}",
+    "sampleNotice": "เชื่อมต่อ Google Trends ไม่ได้ — กำลังแสดงข้อมูลตัวอย่าง"
   },
   "optimize": {
     "title": "ปรับแต่ง",

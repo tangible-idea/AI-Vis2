@@ -35,10 +35,12 @@ export function TrendRows({ results, related }: { results: TrendResult[]; relate
             <p className="truncate text-sm text-ink">{row.keyword}</p>
             <p className="truncate text-[11px] text-ink-faint">{row.contentAngle}</p>
           </div>
-          <span className={cn("tabular text-xs", row.growth >= 0 ? "text-good" : "text-poor")}>
-            {row.growth >= 0 ? "+" : ""}
-            {row.growth}%
-          </span>
+          {row.growth !== null && (
+            <span className={cn("tabular text-xs", row.growth >= 0 ? "text-good" : "text-poor")}>
+              {row.growth >= 0 ? "+" : ""}
+              {row.growth}%
+            </span>
+          )}
           <span className="tabular hidden w-16 text-right text-xs text-ink-faint sm:block">{row.volume}</span>
           {related && (
             <button
@@ -89,6 +91,10 @@ export function TrendsExplorer({
 
   /** Worldwide needs the translated label; country codes show as-is. */
   const label = (g: string) => (g === "" ? t("trends.worldwide") : geoLabel(g));
+
+  // every panel served from the fallback → Google Trends is unavailable
+  const isSample = [...searches, ...topics].length > 0 &&
+    [...searches, ...topics].every((r) => r.sample);
 
   /**
    * `persist` is set only when the user actively picked a geo. Without it a
@@ -208,6 +214,9 @@ export function TrendsExplorer({
         <p className="mt-2 text-[11px] text-ink-faint">
           {t("trends.geoScope", { geo: label(geo) })}
           {geo !== market && ` · ${t("trends.geoMarketNote", { market })}`}
+          {/* be explicit when Google was unreachable — otherwise identical
+              placeholder rows across geos read as "the geo isn't working" */}
+          {isSample && ` · ${t("trends.sampleNotice")}`}
         </p>
       </Card>
 
@@ -264,13 +273,13 @@ export function TrendsExplorer({
 
 /** Highest search volume first — "what does this market ask the most?" */
 function topQueries(results: TrendResult[]): TrendResult[] {
-  return [...results].sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume)).slice(0, 5);
+  return [...results].sort((a, b) => b.score - a.score).slice(0, 5);
 }
 
 /** Fastest-growing demand first — "what should I cover before rivals do?" */
 function risingQueries(results: TrendResult[]): TrendResult[] {
   return [...results]
     .filter((r) => r.direction !== "declining")
-    .sort((a, b) => b.growth - a.growth)
+    .sort((a, b) => (b.growth ?? 0) - (a.growth ?? 0))
     .slice(0, 5);
 }
