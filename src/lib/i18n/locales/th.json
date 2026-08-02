@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "เทรนด์",
-    "subtitle": "ควรเขียนอะไรดี? ความต้องการค้นหาใน {country} · {language} แปลงเป็นคอนเทนต์ได้ในคลิกเดียว",
+    "subtitle": "ควรเขียนเรื่องอะไร? เปลี่ยนความต้องการค้นหาเป็นคอนเทนต์ในคลิกเดียว",
     "subtitleLocked": "ความต้องการค้นหาใน {country} · {language}",
     "locked": "ข้อมูลเชิงลึก Google Trends มีในแพ็กเกจ Starter และ Pro",
     "trendingSearches": "การค้นหายอดนิยม",
@@ -234,20 +234,22 @@
     "interestIn": "ความสนใจใน “{kw}”",
     "relatedTo": "เกี่ยวข้องกับ “{kw}”",
     "interestHint": "การเปลี่ยนแปลงความสนใจในช่วงเวลาที่เลือก",
-    "risingQueries": "คำค้นที่กำลังเพิ่มขึ้นในหมวดหมู่และตลาดของคุณ",
+    "risingQueries": "คำค้นที่กำลังมาแรงในหมวดของคุณ · {geo}",
     "trendingTopics": "หัวข้อมาแรง",
     "topicsHint": "ธีมกว้างๆ ที่กำลังได้รับความสนใจ",
     "noResults": "ไม่มีผลลัพธ์ — ลองคีย์เวิร์ดอื่น",
     "related": "เกี่ยวข้อง",
     "explore": "สำรวจ",
     "topQueries": "คำค้นยอดนิยม",
-    "topQueriesHint": "สิ่งที่ตลาดของคุณค้นหามากที่สุด",
+    "topQueriesHint": "สิ่งที่ {geo} ค้นหามากที่สุด",
     "risingQueriesTitle": "คำค้นที่กำลังมาแรง",
     "trendingNow": "กำลังเป็นกระแส",
-    "trendingNowHint": "ธีมกว้าง ๆ ที่กำลังได้รับความสนใจในตลาดของคุณตอนนี้",
+    "trendingNowHint": "ธีมกว้าง ๆ ที่กำลังได้รับความสนใจใน {geo} ตอนนี้",
     "geo": "ภูมิภาค Google Trends",
     "worldwide": "ทั่วโลก",
-    "geoMarket": "ตลาด"
+    "geoMarket": "ตลาด",
+    "geoScope": "แสดง Google Trends สำหรับ {geo}",
+    "geoMarketNote": "ตลาดที่ติดตาม: {market}"
   },
   "optimize": {
     "title": "ปรับแต่ง",
@@ -342,7 +344,7 @@
     "subtitle": "โปรเจกต์ พรอมป์ต และคู่แข่ง",
     "project": "โปรเจกต์",
     "companyBrand": "บริษัท / แบรนด์",
-    "website": "เว็บไซต์",
+    "website": "เว็บไซต์ / URL แอป",
     "industry": "อุตสาหกรรม",
     "competitors": "คู่แข่ง",
     "competitorsHint": "{count} จาก {max} ในแพ็กเกจ {plan} — กรอกโดเมนแล้วเราจะดึงชื่อและโลโก้ให้ ลากเพื่อจัดลำดับ",
@@ -393,7 +395,8 @@
     "companyLogo": "URL โลโก้บริษัท",
     "viewerOnlyNote": "ในแพ็กเกจของคุณ เพื่อนร่วมทีมที่เชิญจะเข้าร่วมในฐานะผู้ชม (ดูรายงานเท่านั้น) อัปเกรดเป็น Pro เพื่อเพิ่มสมาชิกที่แก้ไขได้",
     "businessDescription": "คำอธิบายธุรกิจ",
-    "businessDescriptionHint": "ใช้เพื่อแยกแบรนด์ของคุณออกจากบริษัทที่ชื่อคล้ายกันในคำตอบของ AI"
+    "businessDescriptionHint": "ใช้เพื่อแยกแบรนด์ของคุณออกจากบริษัทที่ชื่อคล้ายกันในคำตอบของ AI",
+    "websiteHint": "ใส่โดเมน (acme.com) หรือลิงก์ App Store / Google Play แอป iOS และ Android จะถูกติดตามเป็นคนละโปรเจกต์"
   },
   "summary": {
     "title": "สรุปการสแกนล่าสุด",
@@ -552,7 +555,13 @@
     "paused": "หยุดชั่วคราว",
     "pause": "หยุดพรอมป์ตชั่วคราว",
     "resume": "ใช้งานพรอมป์ตต่อ",
-    "delete": "ลบพรอมป์ต"
+    "delete": "ลบพรอมป์ต",
+    "bulkSelected": "เลือกแล้ว {count} รายการ",
+    "bulkSelectAll": "เลือกทั้งหมด",
+    "bulkSelectOne": "เลือกพรอมต์",
+    "bulkConfirmDelete": "ยืนยันการลบ",
+    "bulkClear": "ล้างการเลือก",
+    "bulkDone": "อัปเดตพรอมต์แล้ว {count} รายการ"
   },
   "conversations": {
     "title": "บทสนทนา AI ล่าสุด",

@@ -33,6 +33,8 @@ export async function GET(request: Request) {
   const tf = url.searchParams.get("timeframe") ?? "30d";
   const timeframe: Timeframe = TIMEFRAMES.some((t) => t.id === tf) ? (tf as Timeframe) : "30d";
   const requestedGeo = url.searchParams.get("geo");
+  // only an explicit pick in the geo selector updates the remembered value
+  const persistGeo = url.searchParams.get("persistGeo") === "1";
 
   const [{ data: project }, { data: profile }, { data: competitors }] = await Promise.all([
     supabase.from("projects").select("*").eq("id", projectId).single(),
@@ -47,10 +49,18 @@ export async function GET(request: Request) {
   // Trends reads its industry/language from the shared Brand Context; only the
   // geo is its own dimension.
   const brand = brandContextFor(project as Project, competitors ?? []);
+  // an invalid or absent geo falls back to the remembered one, else the market
   let geo = resolveTrendsGeo(project.trends_geo, brand.market);
-  if (requestedGeo !== null && isValidTrendsGeo(requestedGeo) && requestedGeo !== project.trends_geo) {
+  if (requestedGeo !== null && isValidTrendsGeo(requestedGeo)) {
     geo = requestedGeo;
-    await supabase.from("projects").update({ trends_geo: geo }).eq("id", projectId);
+    if (persistGeo && requestedGeo !== project.trends_geo) {
+      const { error } = await supabase
+        .from("projects")
+        .update({ trends_geo: geo })
+        .eq("id", projectId);
+      // migration 0011 not applied yet: the geo still works, it just isn't remembered
+      if (error) console.warn("[trends] could not remember geo:", error.message);
+    }
   }
 
   const source = getTrendsSource();

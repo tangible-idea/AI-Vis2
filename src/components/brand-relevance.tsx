@@ -93,7 +93,14 @@ export function BrandRelevance({ fields }: { fields: BrandRelevanceFields }) {
           </div>
           <div>
             <Label htmlFor="r-website">{t("settings.website")}</Label>
-            <Input id="r-website" name="website" defaultValue={fields.website} required />
+            <Input
+              id="r-website"
+              name="website"
+              placeholder="acme.com"
+              defaultValue={fields.website}
+              required
+            />
+            <p className="mt-1 text-[11px] text-ink-faint">{t("settings.websiteHint")}</p>
           </div>
         </div>
         <div>

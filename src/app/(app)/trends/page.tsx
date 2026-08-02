@@ -36,7 +36,7 @@ export default async function TrendsPage() {
       <>
         <PageHeader
           title={t("trends.title")}
-          subtitle={t("trends.subtitleLocked", { country: project.country, language: langLabel })}
+          subtitle={t("trends.subtitleLocked", { country: geo || "Worldwide", language: langLabel })}
         />
         <LockedOverlay message={t("trends.locked")} cta={t("common.upgrade")}>
           <Card>
@@ -55,10 +55,9 @@ export default async function TrendsPage() {
 
   return (
     <>
-      <PageHeader
-        title={t("trends.title")}
-        subtitle={t("trends.subtitle", { country: project.country, language: langLabel })}
-      />
+      {/* the header stays location-free — the geo selector in the explorer is
+          the single place the active Google Trends region is stated */}
+      <PageHeader title={t("trends.title")} subtitle={t("trends.subtitle")} />
       <TrendsExplorer
         projectId={project.id}
         initialSearches={searches}

@@ -6,10 +6,11 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { PROJECT_COOKIE } from "@/lib/project";
 import { generateDefaultPrompts } from "@/lib/scan/prompts";
-import { brandContextFor, BRAND_PROFILE_COMPETITOR_SLOTS } from "@/lib/brand";
+import { brandContextFor, normalizeWebsiteInput, BRAND_PROFILE_COMPETITOR_SLOTS } from "@/lib/brand";
 import { planLimits } from "@/lib/plans";
 import { resolveCompetitorInput } from "@/lib/competitors";
-import { normalizeIndustry } from "@/lib/types";
+import { normalizeIndustry, type BrandFeedback } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export async function switchProject(projectId: string) {
   const cookieStore = await cookies();
@@ -36,8 +37,7 @@ export async function createProject(
   if (!user) redirect("/login");
 
   const name = String(formData.get("name") ?? "").trim();
-  const rawWebsite = String(formData.get("website") ?? "").trim();
-  const website = rawWebsite && !/^https?:\/\//i.test(rawWebsite) ? `https://${rawWebsite}` : rawWebsite;
+  const website = normalizeWebsiteInput(String(formData.get("website") ?? ""));
   const industry = normalizeIndustry(String(formData.get("industry") ?? "").trim());
   const country = String(formData.get("country") ?? "US");
   const language = String(formData.get("language") ?? "en");
@@ -212,11 +212,40 @@ export async function confirmBrandRelevance(projectId: string) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  await supabase
-    .from("projects")
-    .update({ brand_feedback: "relevant", brand_feedback_at: new Date().toISOString() })
-    .eq("id", projectId);
+  await recordBrandFeedback(supabase, projectId, "relevant");
   revalidatePath("/dashboard");
+}
+
+/**
+ * PostgREST reports an unknown column as PGRST204 ("Could not find the 'x'
+ * column of 'y' in the schema cache") — i.e. the migration adding it hasn't
+ * been applied to this database yet.
+ */
+function isMissingColumn(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  return error.code === "PGRST204" || /schema cache|does not exist/i.test(error.message ?? "");
+}
+
+/**
+ * Stamps the relevance answer. Deliberately a separate write from the Brand
+ * Profile update: the feedback columns are pure bookkeeping, so a database
+ * that hasn't had migration 0011 applied must never cost the user their
+ * profile edits.
+ */
+async function recordBrandFeedback(
+  supabase: SupabaseClient,
+  projectId: string,
+  feedback: BrandFeedback
+) {
+  const { error } = await supabase
+    .from("projects")
+    .update({ brand_feedback: feedback, brand_feedback_at: new Date().toISOString() })
+    .eq("id", projectId);
+  if (error && !isMissingColumn(error)) {
+    console.error("[brand] feedback write failed:", error.message);
+  } else if (error) {
+    console.warn("[brand] brand_feedback column missing — apply migration 0011");
+  }
 }
 
 export interface ImproveBrandState {
@@ -243,24 +272,17 @@ export async function improveBrandProfile(
 
   const projectId = String(formData.get("projectId") ?? "");
   const name = String(formData.get("name") ?? "").trim();
-  const rawWebsite = String(formData.get("website") ?? "").trim();
-  const website = rawWebsite && !/^https?:\/\//i.test(rawWebsite) ? `https://${rawWebsite}` : rawWebsite;
+  const website = normalizeWebsiteInput(String(formData.get("website") ?? ""));
   const industry = normalizeIndustry(String(formData.get("industry") ?? "").trim());
   const description = String(formData.get("description") ?? "").trim().slice(0, 500) || null;
   if (!projectId || !name || !website || !industry) {
     return { error: "Please fill in the required fields." };
   }
 
+  // the profile write stands alone — see recordBrandFeedback below
   const { error } = await supabase
     .from("projects")
-    .update({
-      name,
-      website,
-      industry,
-      description,
-      brand_feedback: "improved",
-      brand_feedback_at: new Date().toISOString(),
-    })
+    .update({ name, website, industry, description })
     .eq("id", projectId);
   if (error?.code === "23505") {
     return { error: "You're already monitoring that domain in this market." };
@@ -302,6 +324,7 @@ export async function improveBrandProfile(
     }
   }
 
+  await recordBrandFeedback(supabase, projectId, "improved");
   revalidatePath("/", "layout");
   return { saved: true };
 }

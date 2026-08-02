@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "トレンド",
-    "subtitle": "何を書くべき？{country} · {language} の検索需要をワンクリックでコンテンツに",
+    "subtitle": "何を書くべき？ 検索需要をワンクリックでコンテンツに",
     "subtitleLocked": "{country} · {language} の検索需要",
     "locked": "Google トレンドのインサイトは Starter と Pro でご利用いただけます",
     "trendingSearches": "急上昇検索",
@@ -234,20 +234,22 @@
     "interestIn": "「{kw}」への関心",
     "relatedTo": "「{kw}」の関連検索",
     "interestHint": "選択期間における関心の変化",
-    "risingQueries": "業種・市場で上昇中のクエリ",
+    "risingQueries": "カテゴリ内で伸びている検索 · {geo}",
     "trendingTopics": "急上昇トピック",
     "topicsHint": "注目を集める幅広いテーマ",
     "noResults": "結果なし — 別のキーワードをお試しください。",
     "related": "関連",
     "explore": "探索",
     "topQueries": "人気クエリ",
-    "topQueriesHint": "市場で最も検索されている質問",
+    "topQueriesHint": "{geo} で最も検索されている内容",
     "risingQueriesTitle": "急上昇クエリ",
     "trendingNow": "今話題のトピック",
-    "trendingNowHint": "いま市場で注目を集めている幅広いテーマ",
+    "trendingNowHint": "いま {geo} で注目を集めている大きなテーマ",
     "geo": "Google トレンドの地域",
     "worldwide": "全世界",
-    "geoMarket": "市場"
+    "geoMarket": "市場",
+    "geoScope": "Google トレンドの地域: {geo}",
+    "geoMarketNote": "モニタリング市場: {market}"
   },
   "optimize": {
     "title": "最適化",
@@ -342,7 +344,7 @@
     "subtitle": "プロジェクト、プロンプト、競合",
     "project": "プロジェクト",
     "companyBrand": "会社 / ブランド",
-    "website": "ウェブサイト",
+    "website": "ウェブサイト / アプリ URL",
     "industry": "業種",
     "competitors": "競合",
     "competitorsHint": "{plan} プランで {max} 中 {count} — ドメインを入力すると名前とロゴを取得します。ドラッグで並べ替え。",
@@ -393,7 +395,8 @@
     "companyLogo": "会社ロゴURL",
     "viewerOnlyNote": "現在のプランでは、招待したメンバーはビューア（レポート閲覧のみ）として参加します。編集メンバーを追加するにはProにアップグレードしてください。",
     "businessDescription": "事業内容",
-    "businessDescriptionHint": "AI の回答で、似た名前の企業とブランドを区別するために使われます。"
+    "businessDescriptionHint": "AI の回答で、似た名前の企業とブランドを区別するために使われます。",
+    "websiteHint": "ドメイン（acme.com）または App Store・Google Play のリンクを入力してください。iOS と Android のアプリは別プロジェクトとして計測されます。"
   },
   "summary": {
     "title": "最終スキャン概要",
@@ -552,7 +555,13 @@
     "paused": "一時停止",
     "pause": "プロンプトを一時停止",
     "resume": "プロンプトを再開",
-    "delete": "プロンプトを削除"
+    "delete": "プロンプトを削除",
+    "bulkSelected": "{count} 件選択中",
+    "bulkSelectAll": "すべて選択",
+    "bulkSelectOne": "プロンプトを選択",
+    "bulkConfirmDelete": "削除を確認",
+    "bulkClear": "選択解除",
+    "bulkDone": "{count} 件のプロンプトを更新しました"
   },
   "conversations": {
     "title": "最近のAI会話",

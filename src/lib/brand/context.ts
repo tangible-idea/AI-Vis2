@@ -102,6 +102,18 @@ export function canonicalDomain(website: string): string {
   }
 }
 
+/**
+ * Normalizes the Website / App URL field as typed by the user. Accepts a bare
+ * domain ("acme.com"), a full URL, or a store listing — every entry point
+ * (onboarding, Settings, the Improve-results dialog) runs this so the stored
+ * value is always consistent.
+ */
+export function normalizeWebsiteInput(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 const APP_STORE_HOSTS = ["apps.apple.com", "itunes.apple.com"];
 const PLAY_STORE_HOST = "play.google.com";
 

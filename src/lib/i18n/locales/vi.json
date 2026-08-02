@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "Xu hướng",
-    "subtitle": "Nên viết gì? Nhu cầu tìm kiếm tại {country} · {language}, biến thành nội dung chỉ với một cú nhấp",
+    "subtitle": "Nên viết về điều gì? Biến nhu cầu tìm kiếm thành nội dung chỉ với một cú nhấp",
     "subtitleLocked": "Nhu cầu tìm kiếm tại {country} · {language}",
     "locked": "Thông tin Google Trends có ở gói Starter và Pro",
     "trendingSearches": "Tìm kiếm thịnh hành",
@@ -234,20 +234,22 @@
     "interestIn": "Mức quan tâm đến “{kw}”",
     "relatedTo": "Liên quan đến “{kw}”",
     "interestHint": "Thay đổi mức quan tâm trong khoảng thời gian đã chọn",
-    "risingQueries": "Truy vấn đang tăng trong ngành và thị trường của bạn",
+    "risingQueries": "Truy vấn đang tăng trong danh mục của bạn · {geo}",
     "trendingTopics": "Chủ đề thịnh hành",
     "topicsHint": "Các chủ đề rộng hơn đang được chú ý",
     "noResults": "Không có kết quả — thử từ khóa khác.",
     "related": "Liên quan",
     "explore": "Khám phá",
     "topQueries": "Truy vấn hàng đầu",
-    "topQueriesHint": "Những gì thị trường của bạn tìm kiếm nhiều nhất",
+    "topQueriesHint": "Nội dung {geo} tìm kiếm nhiều nhất",
     "risingQueriesTitle": "Truy vấn đang tăng",
     "trendingNow": "Đang thịnh hành",
-    "trendingNowHint": "Các chủ đề rộng hơn đang thu hút sự chú ý trong thị trường của bạn",
+    "trendingNowHint": "Các chủ đề rộng đang được chú ý tại {geo}",
     "geo": "Khu vực Google Trends",
     "worldwide": "Toàn cầu",
-    "geoMarket": "thị trường"
+    "geoMarket": "thị trường",
+    "geoScope": "Đang hiển thị Google Trends cho {geo}",
+    "geoMarketNote": "thị trường giám sát: {market}"
   },
   "optimize": {
     "title": "Tối ưu",
@@ -342,7 +344,7 @@
     "subtitle": "Dự án, prompt và đối thủ",
     "project": "Dự án",
     "companyBrand": "Công ty / thương hiệu",
-    "website": "Website",
+    "website": "Website / URL ứng dụng",
     "industry": "Ngành",
     "competitors": "Đối thủ",
     "competitorsHint": "{count} / {max} theo gói {plan} — nhập tên miền, chúng tôi sẽ lấy tên và logo. Kéo để sắp xếp.",
@@ -393,7 +395,8 @@
     "companyLogo": "URL logo công ty",
     "viewerOnlyNote": "Ở gói của bạn, đồng đội được mời tham gia với vai trò người xem (chỉ xem báo cáo). Nâng cấp lên Pro để thêm thành viên có quyền chỉnh sửa.",
     "businessDescription": "Mô tả doanh nghiệp",
-    "businessDescriptionHint": "Dùng để phân biệt thương hiệu của bạn với các công ty trùng tên trong câu trả lời của AI."
+    "businessDescriptionHint": "Dùng để phân biệt thương hiệu của bạn với các công ty trùng tên trong câu trả lời của AI.",
+    "websiteHint": "Nhập tên miền (acme.com) hoặc liên kết App Store / Google Play. Ứng dụng iOS và Android được theo dõi như hai dự án riêng."
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",
@@ -552,7 +555,13 @@
     "paused": "tạm dừng",
     "pause": "Tạm dừng prompt",
     "resume": "Tiếp tục prompt",
-    "delete": "Xóa prompt"
+    "delete": "Xóa prompt",
+    "bulkSelected": "Đã chọn {count}",
+    "bulkSelectAll": "Chọn tất cả",
+    "bulkSelectOne": "Chọn prompt",
+    "bulkConfirmDelete": "Xác nhận xóa",
+    "bulkClear": "Bỏ chọn",
+    "bulkDone": "Đã cập nhật {count} prompt"
   },
   "conversations": {
     "title": "Hội thoại AI gần đây",

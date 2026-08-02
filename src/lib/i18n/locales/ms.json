@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "Trend",
-    "subtitle": "Apa yang patut saya tulis? Permintaan carian di {country} · {language}, ditukar menjadi kandungan dengan satu klik",
+    "subtitle": "Apa patut ditulis? Tukar permintaan carian kepada kandungan dengan satu klik",
     "subtitleLocked": "Permintaan carian di {country} · {language}",
     "locked": "Cerapan Google Trends tersedia pada Starter dan Pro",
     "trendingSearches": "Carian sohor kini",
@@ -234,20 +234,22 @@
     "interestIn": "Minat terhadap “{kw}”",
     "relatedTo": "Berkaitan “{kw}”",
     "interestHint": "Perubahan minat dalam tempoh yang dipilih",
-    "risingQueries": "Pertanyaan yang meningkat dalam kategori dan pasaran anda",
+    "risingQueries": "Carian yang meningkat dalam kategori anda · {geo}",
     "trendingTopics": "Topik sohor kini",
     "topicsHint": "Tema lebih luas yang mendapat perhatian",
     "noResults": "Tiada hasil — cuba kata kunci lain.",
     "related": "Berkaitan",
     "explore": "Teroka",
     "topQueries": "Pertanyaan teratas",
-    "topQueriesHint": "Apa yang paling kerap dicari oleh pasaran anda",
+    "topQueriesHint": "Yang paling banyak dicari di {geo}",
     "risingQueriesTitle": "Pertanyaan yang meningkat",
     "trendingNow": "Sedang sohor kini",
-    "trendingNowHint": "Tema yang lebih luas yang semakin mendapat perhatian dalam pasaran anda",
+    "trendingNowHint": "Tema lebih luas yang mendapat perhatian di {geo} sekarang",
     "geo": "Wilayah Google Trends",
     "worldwide": "Seluruh dunia",
-    "geoMarket": "pasaran"
+    "geoMarket": "pasaran",
+    "geoScope": "Memaparkan Google Trends untuk {geo}",
+    "geoMarketNote": "pasaran pemantauan: {market}"
   },
   "optimize": {
     "title": "Optimum",
@@ -342,7 +344,7 @@
     "subtitle": "Projek, prompt dan pesaing",
     "project": "Projek",
     "companyBrand": "Syarikat / jenama",
-    "website": "Laman web",
+    "website": "Laman web / URL apl",
     "industry": "Industri",
     "competitors": "Pesaing",
     "competitorsHint": "{count} daripada {max} pada pelan {plan} — masukkan domain, kami dapatkan nama dan logo. Seret untuk menyusun.",
@@ -393,7 +395,8 @@
     "companyLogo": "URL logo syarikat",
     "viewerOnlyNote": "Pada pelan anda, rakan sepasukan yang dijemput menyertai sebagai penonton (laporan sahaja). Naik taraf ke Pro untuk menambah ahli yang boleh menyunting.",
     "businessDescription": "Penerangan perniagaan",
-    "businessDescriptionHint": "Digunakan untuk membezakan jenama anda daripada syarikat bernama serupa dalam jawapan AI."
+    "businessDescriptionHint": "Digunakan untuk membezakan jenama anda daripada syarikat bernama serupa dalam jawapan AI.",
+    "websiteHint": "Masukkan domain (acme.com) atau pautan App Store / Google Play. Apl iOS dan Android dijejaki sebagai projek berasingan."
   },
   "summary": {
     "title": "Ringkasan imbasan terakhir",
@@ -552,7 +555,13 @@
     "paused": "dijeda",
     "pause": "Jeda prompt",
     "resume": "Sambung prompt",
-    "delete": "Padam prompt"
+    "delete": "Padam prompt",
+    "bulkSelected": "{count} dipilih",
+    "bulkSelectAll": "Pilih semua",
+    "bulkSelectOne": "Pilih prompt",
+    "bulkConfirmDelete": "Sahkan padam",
+    "bulkClear": "Kosongkan",
+    "bulkDone": "{count} prompt dikemas kini"
   },
   "conversations": {
     "title": "Perbualan AI terkini",

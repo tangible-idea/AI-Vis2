@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "趋势",
-    "subtitle": "该写什么？{country} · {language} 的搜索需求，一键转化为内容",
+    "subtitle": "该写什么？一键把搜索需求变成内容",
     "subtitleLocked": "{country} · {language} 的搜索需求",
     "locked": "Google 趋势洞察适用于 Starter 和 Pro",
     "trendingSearches": "热门搜索",
@@ -234,20 +234,22 @@
     "interestIn": "“{kw}” 的关注度",
     "relatedTo": "与 “{kw}” 相关",
     "interestHint": "所选时间范围内的关注度变化",
-    "risingQueries": "你的品类和市场中上升的查询",
+    "risingQueries": "所属类目中上升的搜索 · {geo}",
     "trendingTopics": "热门话题",
     "topicsHint": "受关注的更广泛主题",
     "noResults": "无结果 — 试试其他关键词。",
     "related": "相关",
     "explore": "探索",
     "topQueries": "热门查询",
-    "topQueriesHint": "您所在市场搜索最多的问题",
+    "topQueriesHint": "{geo} 搜索最多的内容",
     "risingQueriesTitle": "上升查询",
     "trendingNow": "当前热点",
-    "trendingNowHint": "当前市场正在获得关注的更广泛主题",
+    "trendingNowHint": "当前在 {geo} 受到关注的更广泛主题",
     "geo": "Google 趋势地区",
     "worldwide": "全球",
-    "geoMarket": "市场"
+    "geoMarket": "市场",
+    "geoScope": "Google 趋势地区：{geo}",
+    "geoMarketNote": "监测市场：{market}"
   },
   "optimize": {
     "title": "优化",
@@ -342,7 +344,7 @@
     "subtitle": "项目、提示词与竞品",
     "project": "项目",
     "companyBrand": "公司 / 品牌",
-    "website": "网站",
+    "website": "网站 / 应用 URL",
     "industry": "行业",
     "competitors": "竞品",
     "competitorsHint": "{plan} 方案 {max} 个中已用 {count} 个 — 输入域名，我们会获取名称和 Logo。拖动可排序。",
@@ -393,7 +395,8 @@
     "companyLogo": "公司 Logo URL",
     "viewerOnlyNote": "在您当前的套餐中，受邀成员以查看者身份加入（仅查看报告）。升级到 Pro 可添加可编辑成员。",
     "businessDescription": "业务描述",
-    "businessDescriptionHint": "用于在 AI 回答中将您的品牌与同名公司区分开。"
+    "businessDescriptionHint": "用于在 AI 回答中将您的品牌与同名公司区分开。",
+    "websiteHint": "填写域名（acme.com）或 App Store / Google Play 链接。iOS 与 Android 应用作为独立项目追踪。"
   },
   "summary": {
     "title": "上次扫描摘要",
@@ -552,7 +555,13 @@
     "paused": "已暂停",
     "pause": "暂停提示词",
     "resume": "恢复提示词",
-    "delete": "删除提示词"
+    "delete": "删除提示词",
+    "bulkSelected": "已选择 {count} 条",
+    "bulkSelectAll": "全选",
+    "bulkSelectOne": "选择提示词",
+    "bulkConfirmDelete": "确认删除",
+    "bulkClear": "取消选择",
+    "bulkDone": "已更新 {count} 条提示词"
   },
   "conversations": {
     "title": "最近的 AI 对话",

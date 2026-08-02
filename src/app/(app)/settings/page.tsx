@@ -70,7 +70,17 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <Label htmlFor="s-website">{t("settings.website")}</Label>
-                <Input id="s-website" name="website" type="url" defaultValue={project.website} required />
+                {/* not type="url": a bare domain is valid input and is
+                    normalized server-side, same as the onboarding and
+                    Improve-results forms */}
+                <Input
+                  id="s-website"
+                  name="website"
+                  placeholder="acme.com"
+                  defaultValue={project.website}
+                  required
+                />
+                <p className="mt-1 text-[11px] text-ink-faint">{t("settings.websiteHint")}</p>
               </div>
             </div>
             <div>

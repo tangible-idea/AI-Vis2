@@ -6,7 +6,12 @@ import { Check, Pause, Play, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { Badge, Button, Card, CardHeader, Input } from "@/components/ui";
 import { PROMPT_CATEGORIES, type Prompt, type PromptCategory } from "@/lib/types";
 import { togglePrompt, removePrompt } from "../settings/actions";
-import { addPrompts, type PromptDraft } from "./actions";
+import {
+  addPrompts,
+  bulkRemovePrompts,
+  bulkSetPromptsActive,
+  type PromptDraft,
+} from "./actions";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 
@@ -39,11 +44,53 @@ export function PromptExplorer({
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<{ tone: "good" | "poor"; text: string } | null>(null);
   const [manualText, setManualText] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [, startRow] = useTransition();
   const [saving, startSave] = useTransition();
+  const [bulkBusy, startBulk] = useTransition();
 
   const activeCount = prompts.filter((p) => p.is_active).length;
   const atLimit = activeCount >= maxPrompts;
+
+  // ── multi-select ───────────────────────────────────────────
+  const toggleOne = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleMany = (ids: string[], select: boolean) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) {
+        if (select) next.add(id);
+        else next.delete(id);
+      }
+      return next;
+    });
+
+  const clearSelection = () => {
+    setSelected(new Set());
+    setConfirmDelete(false);
+  };
+
+  /** Runs a bulk action over the current selection, then clears it. */
+  const runBulk = (fn: (ids: string[]) => Promise<{ changed: number; error?: string }>) => {
+    const ids = [...selected];
+    if (!ids.length) return;
+    startBulk(async () => {
+      const res = await fn(ids);
+      setNotice(
+        res.error
+          ? { tone: "poor", text: res.error }
+          : { tone: "good", text: t("promptExplorer.bulkDone", { count: res.changed }) }
+      );
+      clearSelection();
+    });
+  };
 
   // library grouped by topic; untopiced prompts fall into one general group
   const groups = new Map<string, Prompt[]>();
@@ -247,7 +294,10 @@ export function PromptExplorer({
       </Card>
 
       {/* library grouped by topic */}
-      {[...groups.entries()].map(([groupName, rows]) => (
+      {[...groups.entries()].map(([groupName, rows]) => {
+        const ids = rows.map((p) => p.id);
+        const allSelected = ids.every((id) => selected.has(id));
+        return (
         <Card key={groupName}>
           <CardHeader
             title={groupName}
@@ -255,10 +305,28 @@ export function PromptExplorer({
               active: rows.filter((p) => p.is_active).length,
               total: rows.length,
             })}
+            action={
+              <label className="flex cursor-pointer items-center gap-1.5 text-xs text-ink-faint hover:text-ink">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={(e) => toggleMany(ids, e.target.checked)}
+                  className="h-3.5 w-3.5 cursor-pointer accent-[var(--color-accent-strong,currentColor)]"
+                />
+                {t("promptExplorer.bulkSelectAll")}
+              </label>
+            }
           />
           <div className="divide-y divide-line px-5 pb-4">
             {rows.map((p) => (
               <div key={p.id} className="flex items-center gap-3 py-2.5">
+                <input
+                  type="checkbox"
+                  checked={selected.has(p.id)}
+                  onChange={() => toggleOne(p.id)}
+                  aria-label={t("promptExplorer.bulkSelectOne")}
+                  className="h-3.5 w-3.5 shrink-0 cursor-pointer accent-[var(--color-accent-strong,currentColor)]"
+                />
                 <span
                   className={cn(
                     "flex-1 text-sm",
@@ -290,7 +358,56 @@ export function PromptExplorer({
             ))}
           </div>
         </Card>
-      ))}
+        );
+      })}
+
+      {/* bulk action bar — sticky so it stays reachable on mobile while
+          scrolling a long prompt library */}
+      {selected.size > 0 && (
+        <div className="sticky bottom-3 z-10 flex flex-wrap items-center gap-2 rounded-xl border border-line-strong bg-surface p-3 shadow-card">
+          <span className="text-sm font-medium text-ink">
+            {t("promptExplorer.bulkSelected", { count: selected.size })}
+          </span>
+          <div className="flex flex-1 flex-wrap justify-end gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={bulkBusy}
+              onClick={() => runBulk((ids) => bulkSetPromptsActive(projectId, ids, false))}
+            >
+              <Pause className="h-3.5 w-3.5" />
+              {t("promptExplorer.pause")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={bulkBusy}
+              onClick={() => runBulk((ids) => bulkSetPromptsActive(projectId, ids, true))}
+            >
+              <Play className="h-3.5 w-3.5" />
+              {t("promptExplorer.resume")}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={bulkBusy}
+              onClick={() => {
+                if (!confirmDelete) {
+                  setConfirmDelete(true);
+                  return;
+                }
+                runBulk((ids) => bulkRemovePrompts(projectId, ids));
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {confirmDelete ? t("promptExplorer.bulkConfirmDelete") : t("promptExplorer.delete")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={clearSelection} disabled={bulkBusy}>
+              {t("promptExplorer.bulkClear")}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

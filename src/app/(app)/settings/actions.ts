@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { resolveCompetitorInput } from "@/lib/competitors";
+import { normalizeWebsiteInput } from "@/lib/brand";
 import { normalizeIndustry } from "@/lib/types";
 
 async function requireUser() {
@@ -28,7 +29,7 @@ export async function updateProject(formData: FormData) {
     .from("projects")
     .update({
       name: String(formData.get("name") ?? "").trim(),
-      website: String(formData.get("website") ?? "").trim(),
+      website: normalizeWebsiteInput(String(formData.get("website") ?? "")),
       industry: normalizeIndustry(String(formData.get("industry") ?? "").trim()),
       country: String(formData.get("country") ?? "US"),
       language: String(formData.get("language") ?? "en"),

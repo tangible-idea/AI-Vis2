@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "Tren",
-    "subtitle": "Harus menulis apa? Permintaan pencarian di {country} · {language}, diubah menjadi konten sekali klik",
+    "subtitle": "Harus menulis tentang apa? Ubah permintaan pencarian jadi konten dalam satu klik",
     "subtitleLocked": "Permintaan pencarian di {country} · {language}",
     "locked": "Wawasan Google Trends tersedia di Starter dan Pro",
     "trendingSearches": "Pencarian tren",
@@ -234,20 +234,22 @@
     "interestIn": "Minat pada “{kw}”",
     "relatedTo": "Terkait “{kw}”",
     "interestHint": "Perubahan minat dalam rentang waktu terpilih",
-    "risingQueries": "Kueri yang naik di kategori dan pasar Anda",
+    "risingQueries": "Kueri yang naik di kategori Anda · {geo}",
     "trendingTopics": "Topik tren",
     "topicsHint": "Tema lebih luas yang menarik perhatian",
     "noResults": "Tidak ada hasil — coba kata kunci lain.",
     "related": "Terkait",
     "explore": "Jelajahi",
     "topQueries": "Kueri teratas",
-    "topQueriesHint": "Apa yang paling sering dicari pasar Anda",
+    "topQueriesHint": "Yang paling banyak dicari di {geo}",
     "risingQueriesTitle": "Kueri yang naik",
     "trendingNow": "Sedang tren",
-    "trendingNowHint": "Tema yang lebih luas yang sedang menarik perhatian di pasar Anda",
+    "trendingNowHint": "Tema yang lebih luas yang sedang menarik perhatian di {geo}",
     "geo": "Wilayah Google Trends",
     "worldwide": "Seluruh dunia",
-    "geoMarket": "pasar"
+    "geoMarket": "pasar",
+    "geoScope": "Menampilkan Google Trends untuk {geo}",
+    "geoMarketNote": "pasar pemantauan: {market}"
   },
   "optimize": {
     "title": "Optimalkan",
@@ -342,7 +344,7 @@
     "subtitle": "Proyek, prompt, dan kompetitor",
     "project": "Proyek",
     "companyBrand": "Perusahaan / merek",
-    "website": "Situs web",
+    "website": "Situs web / URL aplikasi",
     "industry": "Industri",
     "competitors": "Kompetitor",
     "competitorsHint": "{count} dari {max} pada paket {plan} — masukkan domain, kami ambil nama dan logonya. Seret untuk mengurutkan.",
@@ -393,7 +395,8 @@
     "companyLogo": "URL logo perusahaan",
     "viewerOnlyNote": "Pada paket Anda, rekan tim yang diundang bergabung sebagai penonton (hanya laporan). Tingkatkan ke Pro untuk menambah anggota yang dapat mengedit.",
     "businessDescription": "Deskripsi bisnis",
-    "businessDescriptionHint": "Digunakan untuk membedakan merek Anda dari perusahaan bernama serupa dalam jawaban AI."
+    "businessDescriptionHint": "Digunakan untuk membedakan merek Anda dari perusahaan bernama serupa dalam jawaban AI.",
+    "websiteHint": "Masukkan domain (acme.com) atau tautan App Store / Google Play. Aplikasi iOS dan Android dilacak sebagai proyek terpisah."
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",
@@ -552,7 +555,13 @@
     "paused": "dijeda",
     "pause": "Jeda prompt",
     "resume": "Lanjutkan prompt",
-    "delete": "Hapus prompt"
+    "delete": "Hapus prompt",
+    "bulkSelected": "{count} dipilih",
+    "bulkSelectAll": "Pilih semua",
+    "bulkSelectOne": "Pilih prompt",
+    "bulkConfirmDelete": "Konfirmasi hapus",
+    "bulkClear": "Bersihkan",
+    "bulkDone": "{count} prompt diperbarui"
   },
   "conversations": {
     "title": "Percakapan AI terbaru",

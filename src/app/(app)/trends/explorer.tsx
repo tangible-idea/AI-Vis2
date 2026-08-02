@@ -87,18 +87,36 @@ export function TrendsExplorer({
   const [busy, setBusy] = useState(false);
   const t = useT();
 
-  async function api(mode: string, q = "", tf = timeframe, g = geo): Promise<TrendResult[]> {
+  /** Worldwide needs the translated label; country codes show as-is. */
+  const label = (g: string) => (g === "" ? t("trends.worldwide") : geoLabel(g));
+
+  /**
+   * `persist` is set only when the user actively picked a geo. Without it a
+   * project whose geo still follows its monitoring market would get pinned to
+   * that market by the first unrelated request (a timeframe change, a search).
+   */
+  async function api(
+    mode: string,
+    q = "",
+    tf = timeframe,
+    g = geo,
+    persist = false
+  ): Promise<TrendResult[]> {
     const params = new URLSearchParams({ projectId, mode, q, timeframe: tf, geo: g });
+    if (persist) params.set("persistGeo", "1");
     const res = await fetch(`/api/trends?${params}`);
     if (!res.ok) return [];
     const data = await res.json();
     return data.results ?? [];
   }
 
-  /** Reloads every panel for the current geo + timeframe. */
-  async function reload(tf: Timeframe, g: string) {
+  /** Reloads every panel for the given geo + timeframe. */
+  async function reload(tf: Timeframe, g: string, persist = false) {
     setBusy(true);
-    const [s, topicRows] = await Promise.all([api("trending", "", tf, g), api("topics", "", tf, g)]);
+    const [s, topicRows] = await Promise.all([
+      api("trending", "", tf, g, persist),
+      api("topics", "", tf, g),
+    ]);
     setSearches(s);
     setTopics(topicRows);
     if (keywordResults && query) setKeywordResults(await api("search", query, tf, g));
@@ -110,10 +128,10 @@ export function TrendsExplorer({
     await reload(tf, geo);
   }
 
-  // the geo is remembered server-side, so the next visit opens here
+  // an explicit pick — remembered server-side, so the next visit opens here
   async function changeGeo(g: string) {
     setGeo(g);
-    await reload(timeframe, g);
+    await reload(timeframe, g, true);
   }
 
   async function search() {
@@ -164,7 +182,7 @@ export function TrendsExplorer({
           >
             {TRENDS_GEOS.map((g) => (
               <option key={g || "worldwide"} value={g}>
-                {g === "" ? t("trends.worldwide") : geoLabel(g)}
+                {label(g)}
                 {g === market ? ` · ${t("trends.geoMarket")}` : ""}
               </option>
             ))}
@@ -185,6 +203,12 @@ export function TrendsExplorer({
             {busy ? t("common.loading") : t("common.search")}
           </Button>
         </form>
+        {/* makes the two dimensions visibly independent: every result below is
+            for the selected geo, whatever the project's monitoring market is */}
+        <p className="mt-2 text-[11px] text-ink-faint">
+          {t("trends.geoScope", { geo: label(geo) })}
+          {geo !== market && ` · ${t("trends.geoMarketNote", { market })}`}
+        </p>
       </Card>
 
       {keywordResults && (
@@ -205,13 +229,19 @@ export function TrendsExplorer({
         <h2 className="mb-2 px-1 text-sm font-semibold">{t("trends.explore")}</h2>
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
-            <CardHeader title={t("trends.topQueries")} hint={t("trends.topQueriesHint")} />
+            <CardHeader
+              title={t("trends.topQueries")}
+              hint={t("trends.topQueriesHint", { geo: label(geo) })}
+            />
             <div className="px-5 pb-4">
               <TrendRows results={topQueries(searches)} related={related} />
             </div>
           </Card>
           <Card>
-            <CardHeader title={t("trends.risingQueriesTitle")} hint={t("trends.risingQueries")} />
+            <CardHeader
+              title={t("trends.risingQueriesTitle")}
+              hint={t("trends.risingQueries", { geo: label(geo) })}
+            />
             <div className="px-5 pb-4">
               <TrendRows results={risingQueries(searches)} related={related} />
             </div>
@@ -220,7 +250,10 @@ export function TrendsExplorer({
       </section>
 
       <Card>
-        <CardHeader title={t("trends.trendingNow")} hint={t("trends.trendingNowHint")} />
+        <CardHeader
+          title={t("trends.trendingNow")}
+          hint={t("trends.trendingNowHint", { geo: label(geo) })}
+        />
         <div className="px-5 pb-4">
           <TrendRows results={topics} related={related} />
         </div>

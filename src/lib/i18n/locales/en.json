@@ -223,7 +223,7 @@
   },
   "trends": {
     "title": "Trends",
-    "subtitle": "What should I write about? Search demand in {country} · {language}, turned into content in one click",
+    "subtitle": "What should I write about? Turn search demand into content in one click",
     "subtitleLocked": "Search demand in {country} · {language}",
     "locked": "Google Trends insights are available on Starter and Pro",
     "trendingSearches": "Trending searches",
@@ -234,20 +234,22 @@
     "interestIn": "Interest in “{kw}”",
     "relatedTo": "Related to “{kw}”",
     "interestHint": "Interest change over the selected timeframe",
-    "risingQueries": "Rising queries in your category and market",
+    "risingQueries": "Rising queries in your category · {geo}",
     "trendingTopics": "Trending topics",
     "topicsHint": "Broader themes gaining attention",
     "noResults": "No results — try different keywords.",
     "related": "Related",
     "explore": "Explore",
     "topQueries": "Top queries",
-    "topQueriesHint": "What your market searches for the most",
+    "topQueriesHint": "What {geo} searches for the most",
     "risingQueriesTitle": "Rising queries",
     "trendingNow": "Trending now",
-    "trendingNowHint": "Broader themes gaining attention in your market right now",
+    "trendingNowHint": "Broader themes gaining attention in {geo} right now",
     "geo": "Google Trends geo",
     "worldwide": "Worldwide",
-    "geoMarket": "market"
+    "geoMarket": "market",
+    "geoScope": "Showing Google Trends for {geo}",
+    "geoMarketNote": "monitoring market: {market}"
   },
   "optimize": {
     "title": "Optimize",
@@ -342,7 +344,7 @@
     "subtitle": "Project, prompts and competitors",
     "project": "Project",
     "companyBrand": "Company / brand",
-    "website": "Website",
+    "website": "Website / App URL",
     "industry": "Industry",
     "competitors": "Competitors",
     "competitorsHint": "{count} of {max} on your {plan} plan — enter a domain, we fetch the name and logo. Drag to reorder.",
@@ -393,7 +395,8 @@
     "companyLogo": "Company logo URL",
     "viewerOnlyNote": "On your plan, invited teammates join as viewers (reports only). Upgrade to Pro to add editing members.",
     "businessDescription": "Business description",
-    "businessDescriptionHint": "Used to tell your brand apart from similarly named companies in AI answers."
+    "businessDescriptionHint": "Used to tell your brand apart from similarly named companies in AI answers.",
+    "websiteHint": "Your domain (acme.com) or an App Store / Google Play listing. iOS and Android apps are tracked as separate projects."
   },
   "summary": {
     "title": "Last scan summary",
@@ -552,7 +555,13 @@
     "paused": "paused",
     "pause": "Pause prompt",
     "resume": "Resume prompt",
-    "delete": "Delete prompt"
+    "delete": "Delete prompt",
+    "bulkSelected": "{count} selected",
+    "bulkSelectAll": "Select all",
+    "bulkSelectOne": "Select prompt",
+    "bulkConfirmDelete": "Confirm delete",
+    "bulkClear": "Clear",
+    "bulkDone": "{count} prompts updated"
   },
   "conversations": {
     "title": "Recent AI conversations",
