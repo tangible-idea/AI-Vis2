@@ -1,98 +1,74 @@
-import { GoogleTrendsSource } from "./google";
-import {
-  hash,
-  rng,
-  suggestionFor,
-  type TrendResult,
-  type TrendsQuery,
-  type TrendsSource,
-} from "./types";
-
 /**
- * Trends entry point. Live data comes from Google Trends (see ./google);
- * SampleTrendsSource below is the deterministic fallback used when Google is
- * unreachable or rate-limiting, and when GOOGLE_TRENDS_DISABLED is set.
- * It is clearly-labelled sample data, never presented as real demand.
+ * Trends service. Two operations, both backed by real Google Trends data:
+ *
+ *   exploreTrends()  — keyword-driven: average interest, top and rising queries
+ *   trendingNow()    — geo-driven only: what's spiking right now
+ *
+ * When Google is unavailable the caller gets an empty result rather than an
+ * estimate; the UI says so. Nothing here invents numbers.
  */
+
+import { fetchExplore, fetchTrendingNow, TrendsUnavailableError } from "./google";
+import { googleExploreUrl, googleTrendingUrl, type ExploreParams, type TrendingParams } from "./urls";
+import type { ExploreResult, TrendingNowResult } from "./types";
 
 export * from "./types";
-export { GoogleTrendsSource } from "./google";
+export * from "./urls";
+export { TrendsUnavailableError, CACHE_TTL } from "./google";
 
-/**
- * Deterministic stand-in. Seeded per keyword+geo+timeframe so the UI stays
- * stable across renders instead of flickering new numbers on every load.
- */
-export class SampleTrendsSource implements TrendsSource {
-  name = "sample";
-
-  async trendingSearches(q: TrendsQuery): Promise<TrendResult[]> {
-    const ind = q.industry.trim();
-    return [
-      `best ${ind} for small business`,
-      `${ind} pricing comparison`,
-      `ai ${ind} tools`,
-      `${ind} alternatives`,
-      `is ${ind} worth it`,
-      `${ind} for startups`,
-      `free ${ind} options`,
-    ].map((k) => this.result(k, q));
-  }
-
-  async trendingTopics(q: TrendsQuery): Promise<TrendResult[]> {
-    const ind = q.industry.trim();
-    return [
-      `AI in ${ind}`,
-      `${ind} automation`,
-      `${ind} cost trends`,
-      `switching ${ind} providers`,
-      `${ind} regulations`,
-    ].map((k) => this.result(k, q));
-  }
-
-  /**
-   * Each keyword is measured independently and returned as its own series —
-   * the same thing Google Trends Explore does with comma-separated terms.
-   */
-  async keywordInterest(keywords: string[], q: TrendsQuery): Promise<TrendResult[]> {
-    return keywords.filter(Boolean).map((k) => this.result(k.trim(), q));
-  }
-
-  async relatedQueries(keyword: string, q: TrendsQuery): Promise<TrendResult[]> {
-    const k = keyword.trim();
-    return [
-      `${k} reviews`,
-      `${k} pricing`,
-      `${k} vs alternatives`,
-      `best ${k}`,
-      `${k} for beginners`,
-    ].map((r) => this.result(r, q));
-  }
-
-  private result(keyword: string, q: TrendsQuery): TrendResult {
-    const rand = rng(hash(`${keyword}|${q.timeframe}|${q.geo}`));
-    const growth = Math.round(rand() * 260 - 40); // -40% … +220%
-    const direction = growth > 15 ? "rising" : growth < -10 ? "declining" : "steady";
-    const score = Math.round(5 + rand() * 95);
-    const { suggestion, contentAngle } = suggestionFor(keyword, q, direction);
-    return {
-      keyword,
-      growth,
-      direction,
-      score,
-      volume: `${score}/100`,
-      suggestion,
-      contentAngle,
-      sample: true,
-    };
-  }
+/** Result plus whether Google actually answered — drives the UI's empty state. */
+export interface TrendsOutcome<T> {
+  data: T;
+  available: boolean;
 }
 
 /**
- * Google Trends, with the sample source behind it. Set GOOGLE_TRENDS_DISABLED
- * to skip the upstream calls entirely (useful offline and in tests).
+ * Circuit breaker for the Explore endpoints. They rate-limit hard, and a
+ * blocked request costs two backoff sleeps before it gives up — which the
+ * Dashboard, Monitor and Timeline would each pay on every render. After a
+ * failure the whole family is skipped for a few minutes and callers get the
+ * empty result immediately. Per-instance and in-memory: nothing to operate.
  */
-export function getTrendsSource(): TrendsSource {
-  const sample = new SampleTrendsSource();
-  if (process.env.GOOGLE_TRENDS_DISABLED) return sample;
-  return new GoogleTrendsSource(sample);
+const BREAKER_MS = 5 * 60_000;
+let exploreBlockedUntil = 0;
+
+export async function exploreTrends(
+  params: ExploreParams
+): Promise<TrendsOutcome<ExploreResult>> {
+  const empty: ExploreResult = {
+    keywords: [],
+    top: [],
+    rising: [],
+    sourceUrl: googleExploreUrl(params),
+  };
+  if (process.env.GOOGLE_TRENDS_DISABLED) return { data: empty, available: false };
+  if (Date.now() < exploreBlockedUntil) return { data: empty, available: false };
+  try {
+    const data = await fetchExplore(params);
+    exploreBlockedUntil = 0;
+    return { data, available: true };
+  } catch (err) {
+    exploreBlockedUntil = Date.now() + BREAKER_MS;
+    warn("explore", err);
+    return { data: empty, available: false };
+  }
+}
+
+export async function trendingNow(
+  params: TrendingParams
+): Promise<TrendsOutcome<TrendingNowResult>> {
+  const empty: TrendingNowResult = { items: [], sourceUrl: googleTrendingUrl(params) };
+  if (process.env.GOOGLE_TRENDS_DISABLED) return { data: empty, available: false };
+  try {
+    return { data: await fetchTrendingNow(params), available: true };
+  } catch (err) {
+    warn("trendingNow", err);
+    return { data: empty, available: false };
+  }
+}
+
+function warn(what: string, err: unknown) {
+  const message = err instanceof Error ? err.message : String(err);
+  console.warn(`[trends] ${what} unavailable:`, message);
+  if (!(err instanceof TrendsUnavailableError)) console.warn(err);
 }

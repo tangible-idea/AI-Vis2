@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { industryPhrase } from "../types";
 import { ENGINES, engineInfo } from "../ai/engines";
-import { getTrendsSource, resolveTrendsGeo } from "../trends";
+import { exploreTrends, resolveTrendsGeo } from "../trends";
 import type { Engine, Project, ScanResult, Snapshot } from "../types";
 
 /**
@@ -295,27 +295,26 @@ export async function buildTimeline(
 
   // ── rising trend nudge (today) ───────────────────────────────
   try {
-    const trends = await getTrendsSource().trendingSearches({
-      industry: industryPhrase(project.industry),
+    // same cached Explore response the Trends and Dashboard pages use
+    const { data } = await exploreTrends({
+      keywords: [industryPhrase(project.industry)],
       geo: resolveTrendsGeo(project.trends_geo, project.country),
+      timeframe: "week",
       language: project.language,
-      timeframe: "30d",
     });
-    const top = trends
-      .filter((t) => t.direction === "rising" && t.growth !== null)
-      .sort((a, b) => (b.growth ?? 0) - (a.growth ?? 0))[0];
-    if (top && (top.growth ?? 0) >= 80) {
+    const top = data.rising[0];
+    if (top && (top.breakout || (top.change ?? 0) >= 80)) {
       events.push({
-        id: `trend-${top.keyword}`,
+        id: `trend-${top.query}`,
         category: "trends",
-        title: `Google Trends: "${top.keyword}" is rising fast`,
-        summary: `+${top.growth}% interest — ${top.contentAngle}`,
+        title: `Google Trends: "${top.query}" is rising fast`,
+        summary: `${top.breakout ? "Breakout" : `+${top.change}%`} interest — ${top.contentAngle}`,
         at: new Date().toISOString(),
         tone: "good",
         highlight: true,
         action: {
           label: top.suggestion.label,
-          href: `/optimize?type=${top.suggestion.type}&topic=${encodeURIComponent(top.keyword)}`,
+          href: `/optimize?type=${top.suggestion.type}&topic=${encodeURIComponent(top.query)}`,
         },
       });
     }

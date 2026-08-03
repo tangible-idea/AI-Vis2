@@ -1,63 +1,94 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDownRight, ArrowRight, ArrowUpRight, Search, Wand2 } from "lucide-react";
-import { Button, Card, CardHeader, Input, Select } from "@/components/ui";
+import { ArrowUpRight, ExternalLink, Search, Wand2 } from "lucide-react";
+import { Badge, Button, Card, CardHeader, Input, Label, Select } from "@/components/ui";
 import {
-  geoLabel,
-  TIMEFRAMES,
+  EXPLORE_TIMEFRAMES,
+  TRENDING_TIMEFRAMES,
   TRENDS_GEOS,
-  type TrendResult,
-  type Timeframe,
+  geoLabel,
+  type ExploreResult,
+  type ExploreTimeframe,
+  type QueryResult,
+  type TrendingNowResult,
+  type TrendingTimeframe,
 } from "@/lib/trends";
-import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 
-function DirectionIcon({ direction }: { direction: TrendResult["direction"] }) {
-  if (direction === "rising") return <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-good" />;
-  if (direction === "declining") return <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-poor" />;
-  return <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-faint" />;
+/** One-click content generation for a term — the existing generator route. */
+function GenerateLink({ type, topic, label }: { type: string; topic: string; label: string }) {
+  return (
+    <Link
+      href={`/optimize?type=${type}&topic=${encodeURIComponent(topic)}`}
+      className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-line-strong px-2.5 py-1 text-xs font-medium text-ink hover:bg-hover"
+    >
+      <Wand2 className="h-3 w-3" />
+      {label}
+    </Link>
+  );
 }
 
-/** One trend per row: keyword, growth, direction, one-click generate. */
-export function TrendRows({ results, related }: { results: TrendResult[]; related?: (kw: string) => void }) {
-  const t = useT();
-  if (!results.length) {
-    return <p className="py-4 text-sm text-ink-faint">{t("trends.noResults")}</p>;
-  }
+function SourceLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-[11px] text-ink-faint hover:text-accent-strong"
+    >
+      {label}
+      <ExternalLink className="h-3 w-3" />
+    </a>
+  );
+}
+
+/**
+ * A Top or Rising query row. Each list shows the metric Google actually
+ * reports for it — relative popularity for Top, change for Rising — so the
+ * numbers can be checked against the matching Google Trends panel.
+ */
+function QueryRows({
+  rows,
+  emptyLabel,
+  onDrillDown,
+  relatedLabel,
+}: {
+  rows: QueryResult[];
+  emptyLabel: string;
+  onDrillDown: (query: string) => void;
+  relatedLabel: string;
+}) {
+  if (!rows.length) return <p className="py-4 text-sm text-ink-faint">{emptyLabel}</p>;
   return (
     <div className="divide-y divide-line">
-      {results.map((row) => (
-        <div key={row.keyword} className="flex items-center gap-3 py-2.5">
-          <DirectionIcon direction={row.direction} />
+      {rows.map((row) => (
+        <div key={row.query} className="flex items-center gap-3 py-2.5">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-ink">{row.keyword}</p>
+            <p className="truncate text-sm text-ink">{row.query}</p>
             <p className="truncate text-[11px] text-ink-faint">{row.contentAngle}</p>
           </div>
-          {row.growth !== null && (
-            <span className={cn("tabular text-xs", row.growth >= 0 ? "text-good" : "text-poor")}>
-              {row.growth >= 0 ? "+" : ""}
-              {row.growth}%
-            </span>
+
+          {row.popularity !== null && (
+            <span className="tabular w-10 text-right text-xs text-ink-soft">{row.popularity}</span>
           )}
-          <span className="tabular hidden w-16 text-right text-xs text-ink-faint sm:block">{row.volume}</span>
-          {related && (
-            <button
-              onClick={() => related(row.keyword)}
-              className="hidden cursor-pointer text-xs text-ink-faint hover:text-accent-strong sm:block"
-              title={t("trends.related")}
-            >
-              {t("trends.related")}
-            </button>
-          )}
-          <Link
-            href={`/optimize?type=${row.suggestion.type}&topic=${encodeURIComponent(row.keyword)}`}
-            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-line-strong px-2.5 py-1 text-xs font-medium text-ink hover:bg-hover"
+          {row.change !== null &&
+            (row.breakout ? (
+              <Badge tone="good">Breakout</Badge>
+            ) : (
+              <span className="tabular text-xs text-good">
+                +{row.change}%
+              </span>
+            ))}
+
+          <button
+            onClick={() => onDrillDown(row.query)}
+            className="hidden cursor-pointer text-xs text-ink-faint hover:text-accent-strong sm:block"
           >
-            <Wand2 className="h-3 w-3" />
-            {row.suggestion.label}
-          </Link>
+            {relatedLabel}
+          </button>
+          <GenerateLink type={row.suggestion.type} topic={row.query} label={row.suggestion.label} />
         </div>
       ))}
     </div>
@@ -66,111 +97,121 @@ export function TrendRows({ results, related }: { results: TrendResult[]; relate
 
 export function TrendsExplorer({
   projectId,
-  initialSearches,
-  initialTopics,
-  initialGeo,
   market,
+  initialGeo,
+  initialExplore,
+  initialExploreAvailable,
+  initialTrending,
+  initialTrendingAvailable,
 }: {
   projectId: string;
-  initialSearches: TrendResult[];
-  initialTopics: TrendResult[];
-  /** Google Trends geo to open on — the remembered one, else the market. */
-  initialGeo: string;
-  /** The project's monitoring market, shown as the default option. */
+  /** The project's monitoring market — shown so the two are never confused. */
   market: string;
+  initialGeo: string;
+  initialExplore: ExploreResult;
+  initialExploreAvailable: boolean;
+  initialTrending: TrendingNowResult;
+  initialTrendingAvailable: boolean;
 }) {
-  const [timeframe, setTimeframe] = useState<Timeframe>("30d");
-  const [geo, setGeo] = useState(initialGeo);
-  const [searches, setSearches] = useState(initialSearches);
-  const [topics, setTopics] = useState(initialTopics);
-  const [query, setQuery] = useState("");
-  const [keywordResults, setKeywordResults] = useState<TrendResult[] | null>(null);
-  const [keywordHeading, setKeywordHeading] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const t = useT();
+  const [geo, setGeo] = useState(initialGeo);
+  const [query, setQuery] = useState("");
+  const [timeframe, setTimeframe] = useState<ExploreTimeframe>("week");
+  const [trendingTimeframe, setTrendingTimeframe] = useState<TrendingTimeframe>("24h");
 
-  /** Worldwide needs the translated label; country codes show as-is. */
+  const [explore, setExplore] = useState(initialExplore);
+  const [exploreOk, setExploreOk] = useState(initialExploreAvailable);
+  const [trending, setTrending] = useState(initialTrending);
+  const [trendingOk, setTrendingOk] = useState(initialTrendingAvailable);
+  const [exploreBusy, setExploreBusy] = useState(false);
+  const [trendingBusy, setTrendingBusy] = useState(false);
+
+  // last request identity per module — a repeat of the same keywords/geo/
+  // timeframe is skipped entirely rather than re-fetched
+  const lastExplore = useRef<string | null>(null);
+  const lastTrending = useRef<string | null>(null);
+
   const label = (g: string) => (g === "" ? t("trends.worldwide") : geoLabel(g));
 
-  // every panel served from the fallback → Google Trends is unavailable
-  const isSample = [...searches, ...topics].length > 0 &&
-    [...searches, ...topics].every((r) => r.sample);
-
-  /**
-   * `persist` is set only when the user actively picked a geo. Without it a
-   * project whose geo still follows its monitoring market would get pinned to
-   * that market by the first unrelated request (a timeframe change, a search).
-   */
-  async function api(
-    mode: string,
-    q = "",
-    tf = timeframe,
-    g = geo,
-    persist = false
-  ): Promise<TrendResult[]> {
-    const params = new URLSearchParams({ projectId, mode, q, timeframe: tf, geo: g });
-    if (persist) params.set("persistGeo", "1");
-    const res = await fetch(`/api/trends?${params}`);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.results ?? [];
+  async function loadExplore(next: { q?: string; geo?: string; tf?: ExploreTimeframe; persist?: boolean }) {
+    const params = new URLSearchParams({
+      projectId,
+      mode: "explore",
+      q: next.q ?? query,
+      geo: next.geo ?? geo,
+      timeframe: next.tf ?? timeframe,
+    });
+    if (next.persist) params.set("persistGeo", "1");
+    setExploreBusy(true);
+    try {
+      const res = await fetch(`/api/trends?${params}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setExploreOk(false);
+        return;
+      }
+      if (data.key === lastExplore.current) return; // identical result already shown
+      lastExplore.current = data.key;
+      setExplore(data as ExploreResult);
+      setExploreOk(data.available);
+    } catch {
+      setExploreOk(false);
+    } finally {
+      setExploreBusy(false);
+    }
   }
 
-  /** Reloads every panel for the given geo + timeframe. */
-  async function reload(tf: Timeframe, g: string, persist = false) {
-    setBusy(true);
-    const [s, topicRows] = await Promise.all([
-      api("trending", "", tf, g, persist),
-      api("topics", "", tf, g),
-    ]);
-    setSearches(s);
-    setTopics(topicRows);
-    if (keywordResults && query) setKeywordResults(await api("search", query, tf, g));
-    setBusy(false);
+  async function loadTrending(next: { geo?: string; tf?: TrendingTimeframe; persist?: boolean }) {
+    const params = new URLSearchParams({
+      projectId,
+      mode: "trending",
+      geo: next.geo ?? geo,
+      timeframe: next.tf ?? trendingTimeframe,
+    });
+    if (next.persist) params.set("persistGeo", "1");
+    setTrendingBusy(true);
+    try {
+      const res = await fetch(`/api/trends?${params}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setTrendingOk(false);
+        return;
+      }
+      if (data.key === lastTrending.current) return;
+      lastTrending.current = data.key;
+      setTrending(data as TrendingNowResult);
+      setTrendingOk(data.available);
+    } catch {
+      setTrendingOk(false);
+    } finally {
+      setTrendingBusy(false);
+    }
   }
 
-  async function changeTimeframe(tf: Timeframe) {
-    setTimeframe(tf);
-    await reload(tf, geo);
-  }
-
-  // an explicit pick — remembered server-side, so the next visit opens here
-  async function changeGeo(g: string) {
+  /** The geo is shared by both modules and remembered server-side. */
+  function changeGeo(g: string) {
     setGeo(g);
-    await reload(timeframe, g, true);
+    loadExplore({ geo: g, persist: true });
+    loadTrending({ geo: g });
   }
 
-  async function search() {
-    if (!query.trim()) return;
-    setBusy(true);
-    const kws = query.split(",").map((s) => s.trim()).filter(Boolean);
-    setKeywordHeading(
-      kws.length > 1 ? t("trends.comparing", { count: kws.length }) : t("trends.interestIn", { kw: kws[0] })
-    );
-    setKeywordResults(await api("search", query));
-    setBusy(false);
-  }
-
-  async function related(keyword: string) {
-    setBusy(true);
-    setQuery(keyword);
-    setKeywordHeading(t("trends.relatedTo", { kw: keyword }));
-    setKeywordResults(await api("related", keyword));
-    setBusy(false);
+  function drillDown(term: string) {
+    setQuery(term);
+    loadExplore({ q: term });
   }
 
   return (
     <div className="stagger space-y-4">
-      {/* search + compare + timeframe */}
+      {/* ── Explore: keyword + geo + timeline ─────────────────── */}
       <Card className="p-4">
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            search();
+            loadExplore({});
           }}
-          className="flex flex-wrap items-center gap-2"
+          className="space-y-3"
         >
-          <div className="relative min-w-56 flex-1">
+          <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
             <Input
               value={query}
@@ -180,60 +221,83 @@ export function TrendsExplorer({
               aria-label={t("common.search")}
             />
           </div>
-          <Select
-            value={geo}
-            onChange={(e) => changeGeo(e.target.value)}
-            className="w-36"
-            aria-label={t("trends.geo")}
-          >
-            {TRENDS_GEOS.map((g) => (
-              <option key={g || "worldwide"} value={g}>
-                {label(g)}
-                {g === market ? ` · ${t("trends.geoMarket")}` : ""}
-              </option>
-            ))}
-          </Select>
-          <Select
-            value={timeframe}
-            onChange={(e) => changeTimeframe(e.target.value as Timeframe)}
-            className="w-40"
-            aria-label="Timeframe"
-          >
-            {TIMEFRAMES.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.label}
-              </option>
-            ))}
-          </Select>
-          <Button type="submit" size="md" disabled={busy}>
-            {busy ? t("common.loading") : t("common.search")}
-          </Button>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="tr-geo">{t("trends.geoFilterLabel")}</Label>
+              <Select id="tr-geo" value={geo} onChange={(e) => changeGeo(e.target.value)}>
+                {TRENDS_GEOS.map((g) => (
+                  <option key={g || "worldwide"} value={g}>
+                    {label(g)}
+                    {g === market ? ` · ${t("trends.geoMarket")}` : ""}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="tr-time">{t("trends.timelineLabel")}</Label>
+              <Select
+                id="tr-time"
+                value={timeframe}
+                onChange={(e) => {
+                  const tf = e.target.value as ExploreTimeframe;
+                  setTimeframe(tf);
+                  loadExplore({ tf });
+                }}
+              >
+                {EXPLORE_TIMEFRAMES.map((tf) => (
+                  <option key={tf.id} value={tf.id}>
+                    {tf.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Button type="submit" size="md" disabled={exploreBusy}>
+              {exploreBusy ? t("common.loading") : t("common.search")}
+            </Button>
+            <SourceLink href={explore.sourceUrl} label={t("trends.viewOnGoogle")} />
+          </div>
+          <p className="text-[11px] text-ink-faint">
+            {t("trends.geoScope", { geo: label(geo) })}
+            {geo !== market && ` · ${t("trends.geoMarketNote", { market })}`}
+          </p>
         </form>
-        {/* makes the two dimensions visibly independent: every result below is
-            for the selected geo, whatever the project's monitoring market is */}
-        <p className="mt-2 text-[11px] text-ink-faint">
-          {t("trends.geoScope", { geo: label(geo) })}
-          {geo !== market && ` · ${t("trends.geoMarketNote", { market })}`}
-          {/* be explicit when Google was unreachable — otherwise identical
-              placeholder rows across geos read as "the geo isn't working" */}
-          {isSample && ` · ${t("trends.sampleNotice")}`}
-        </p>
       </Card>
 
-      {keywordResults && (
+      {!exploreOk && (
+        <p className="px-1 text-xs text-mid">{t("trends.unavailable")}</p>
+      )}
+
+      {/* ── Comparing keywords: Google's Average interest ─────── */}
+      {explore.keywords.length > 0 && (
         <Card>
           <CardHeader
-            title={keywordHeading ?? t("trends.keywordResults")}
-            hint={t("trends.interestHint")}
+            title={t("trends.comparing", { count: explore.keywords.length })}
+            hint={t("trends.averageInterestHint")}
           />
-          <div className="px-5 pb-4">
-            <TrendRows results={keywordResults} related={related} />
+          <div className="divide-y divide-line px-5 pb-4">
+            {explore.keywords.map((k) => (
+              <div key={k.keyword} className="flex items-center gap-3 py-2.5">
+                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm text-ink">{k.keyword}</p>
+                  <p className="truncate text-[11px] text-ink-faint">{k.contentAngle}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="tabular text-sm font-medium text-ink">{k.averageInterest}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-ink-faint">
+                    {t("trends.averageInterest")}
+                  </p>
+                </div>
+                <GenerateLink type={k.suggestion.type} topic={k.keyword} label={k.suggestion.label} />
+              </div>
+            ))}
           </div>
         </Card>
       )}
 
-      {/* Explore — the market's demand picture: what people search most,
-          and what's gaining fastest. Same cached data, two lenses. */}
+      {/* ── Explore: Top + Rising queries ─────────────────────── */}
       <section>
         <h2 className="mb-2 px-1 text-sm font-semibold">{t("trends.explore")}</h2>
         <div className="grid gap-4 lg:grid-cols-2">
@@ -243,7 +307,12 @@ export function TrendsExplorer({
               hint={t("trends.topQueriesHint", { geo: label(geo) })}
             />
             <div className="px-5 pb-4">
-              <TrendRows results={topQueries(searches)} related={related} />
+              <QueryRows
+                rows={explore.top}
+                emptyLabel={t("trends.noResults")}
+                onDrillDown={drillDown}
+                relatedLabel={t("trends.related")}
+              />
             </div>
           </Card>
           <Card>
@@ -252,34 +321,72 @@ export function TrendsExplorer({
               hint={t("trends.risingQueries", { geo: label(geo) })}
             />
             <div className="px-5 pb-4">
-              <TrendRows results={risingQueries(searches)} related={related} />
+              <QueryRows
+                rows={explore.rising}
+                emptyLabel={t("trends.noResults")}
+                onDrillDown={drillDown}
+                relatedLabel={t("trends.related")}
+              />
             </div>
           </Card>
         </div>
       </section>
 
+      {/* ── Trending now: independent, keyword-free ───────────── */}
       <Card>
         <CardHeader
           title={t("trends.trendingNow")}
           hint={t("trends.trendingNowHint", { geo: label(geo) })}
+          action={
+            <Select
+              value={trendingTimeframe}
+              onChange={(e) => {
+                const tf = e.target.value as TrendingTimeframe;
+                setTrendingTimeframe(tf);
+                loadTrending({ tf });
+              }}
+              className="w-40"
+              aria-label={t("trends.timelineLabel")}
+            >
+              {TRENDING_TIMEFRAMES.map((tf) => (
+                <option key={tf.id} value={tf.id}>
+                  {tf.label}
+                </option>
+              ))}
+            </Select>
+          }
         />
         <div className="px-5 pb-4">
-          <TrendRows results={topics} related={related} />
+          {!trendingOk ? (
+            <p className="py-4 text-sm text-ink-faint">{t("trends.unavailable")}</p>
+          ) : !trending.items.length ? (
+            <p className="py-4 text-sm text-ink-faint">
+              {trendingBusy ? t("common.loading") : t("trends.noResults")}
+            </p>
+          ) : (
+            <div className="divide-y divide-line">
+              {trending.items.map((item) => (
+                <div key={item.title} className="flex items-center gap-3 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-ink">{item.title}</p>
+                  </div>
+                  <span className="tabular shrink-0 text-xs text-ink-soft">
+                    {t("trends.searchVolume", { volume: item.formattedVolume })}
+                  </span>
+                  <GenerateLink
+                    type={item.suggestion.type}
+                    topic={item.title}
+                    label={item.suggestion.label}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="pt-2">
+            <SourceLink href={trending.sourceUrl} label={t("trends.viewOnGoogle")} />
+          </div>
         </div>
       </Card>
     </div>
   );
-}
-
-/** Highest search volume first — "what does this market ask the most?" */
-function topQueries(results: TrendResult[]): TrendResult[] {
-  return [...results].sort((a, b) => b.score - a.score).slice(0, 5);
-}
-
-/** Fastest-growing demand first — "what should I cover before rivals do?" */
-function risingQueries(results: TrendResult[]): TrendResult[] {
-  return [...results]
-    .filter((r) => r.direction !== "declining")
-    .sort((a, b) => (b.growth ?? 0) - (a.growth ?? 0))
-    .slice(0, 5);
 }

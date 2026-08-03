@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
-import { getTrendsSource, resolveTrendsGeo } from "@/lib/trends";
+import { exploreTrends, resolveTrendsGeo } from "@/lib/trends";
 import { planLimits } from "@/lib/plans";
 import { engineInfo, ENGINE_IDS } from "@/lib/ai/engines";
 import { formatDate, timeAgo, cn } from "@/lib/utils";
@@ -53,12 +53,15 @@ export default async function MonitorPage() {
     }),
   }));
 
-  const trends = await getTrendsSource().trendingSearches({
-    industry: industryPhrase(project.industry),
+  // shares the Trends page's cached Explore response — same keywords, geo
+  // and timeframe, so this card costs no extra upstream request
+  const explore = await exploreTrends({
+    keywords: [industryPhrase(project.industry)],
     geo: resolveTrendsGeo(project.trends_geo, project.country),
+    timeframe: "week",
     language: project.language,
-    timeframe: "30d",
   });
+  const trends = [...explore.data.rising, ...explore.data.top].slice(0, 5);
 
   return (
     <>
@@ -197,25 +200,20 @@ export default async function MonitorPage() {
               }
             />
             <div className="divide-y divide-line px-5 pb-3">
-              {trends.slice(0, 5).map((t) => (
-                <div key={t.keyword} className="flex items-center gap-3 py-2.5">
-                  <TrendingUp
-                    className={cn(
-                      "h-3.5 w-3.5 shrink-0",
-                      t.direction === "rising" ? "text-good" : t.direction === "declining" ? "text-poor" : "text-ink-faint"
-                    )}
-                  />
+              {trends.map((row) => (
+                <div key={row.query} className="flex items-center gap-3 py-2.5">
+                  <TrendingUp className="h-3.5 w-3.5 shrink-0 text-good" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-ink">{t.keyword}</p>
-                    <p className="truncate text-[11px] text-ink-faint">{t.contentAngle}</p>
+                    <p className="truncate text-sm text-ink">{row.query}</p>
+                    <p className="truncate text-[11px] text-ink-faint">{row.contentAngle}</p>
                   </div>
-                  {t.growth !== null && (
-                    <span className={cn("tabular text-xs", t.growth >= 0 ? "text-good" : "text-poor")}>
-                      {t.growth >= 0 ? "+" : ""}
-                      {t.growth}%
+                  {row.change !== null ? (
+                    <span className="tabular text-xs text-good">
+                      {row.breakout ? "Breakout" : `+${row.change}%`}
                     </span>
+                  ) : (
+                    <span className="tabular text-xs text-ink-faint">{row.popularity}</span>
                   )}
-                  <span className="tabular hidden text-xs text-ink-faint sm:block">{t.volume}</span>
                 </div>
               ))}
             </div>
@@ -228,8 +226,8 @@ export default async function MonitorPage() {
                 hint={t("monitor.trendingHint", { industry: industryPhrase(project.industry) })}
               />
               <div className="space-y-3 px-5 pb-5">
-                {trends.slice(0, 3).map((t) => (
-                  <div key={t.keyword} className="h-8 rounded bg-hover" />
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-8 rounded bg-hover" />
                 ))}
               </div>
             </Card>
