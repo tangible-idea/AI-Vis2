@@ -7,7 +7,7 @@ import { createProject, type OnboardingState } from "../actions";
 import { useScan } from "@/lib/use-scan";
 import { Button, Card, Input, Label, Select } from "@/components/ui";
 import { IndustrySelect } from "@/components/industry-select";
-import { CONTENT_LANGUAGES, COUNTRIES } from "@/lib/types";
+import { CONTENT_LANGUAGES, COUNTRIES, countryLabel } from "@/lib/types";
 import { PREVIEW_STORAGE_KEY, type PreviewInputs } from "@/lib/preview";
 import { useT } from "@/lib/i18n";
 
@@ -153,7 +153,9 @@ export default function OnboardingPage() {
                   <Label htmlFor="country">{t("common.country")}</Label>
                   <Select id="country" name="country" defaultValue="US">
                     {COUNTRIES.map((c) => (
-                      <option key={c}>{c}</option>
+                      <option key={c} value={c}>
+                        {countryLabel(c)}
+                      </option>
                     ))}
                   </Select>
                 </div>

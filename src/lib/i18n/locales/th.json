@@ -237,7 +237,6 @@
     "trendingNow": "กำลังเป็นกระแส",
     "trendingNowHint": "กำลังพุ่งแรงใน {geo} ตอนนี้ — ไม่ต้องใส่คีย์เวิร์ด",
     "worldwide": "ทั่วโลก",
-    "geoMarket": "ตลาด",
     "geoScope": "แสดง Google Trends สำหรับ {geo}",
     "geoMarketNote": "ตลาดที่ติดตาม: {market}",
     "geoFilterLabel": "ภูมิภาค Google Trends",

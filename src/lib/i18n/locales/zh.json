@@ -237,7 +237,6 @@
     "trendingNow": "当前热点",
     "trendingNowHint": "当前 {geo} 正在飙升 — 无需关键词",
     "worldwide": "全球",
-    "geoMarket": "市场",
     "geoScope": "Google 趋势地区：{geo}",
     "geoMarketNote": "监测市场：{market}",
     "geoFilterLabel": "Google 趋势地区",

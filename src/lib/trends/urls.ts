@@ -1,4 +1,4 @@
-import { COUNTRIES } from "../types";
+import { COUNTRIES, countryLabel } from "../types";
 
 /**
  * Every Google Trends URL the app builds, in one place.
@@ -22,9 +22,9 @@ const API = `${ORIGIN}/trends/api`;
 export const WORLDWIDE_GEO = "";
 
 /**
- * The geos offered for Google Trends. Derived from the single shared country
- * list that also drives "+ Add market", Settings and onboarding — adding a
- * country there adds it here, with no second list to keep in step.
+ * The geos offered for Google Trends: Worldwide plus the shared market list,
+ * in the same order and with the same labels as "+ Add market". Adding a
+ * country to COUNTRIES adds it here, with no second list to keep in step.
  */
 export const TRENDS_GEOS: string[] = [WORLDWIDE_GEO, ...COUNTRIES];
 
@@ -37,9 +37,13 @@ export function resolveTrendsGeo(stored: string | null | undefined, market: stri
   return stored === null || stored === undefined ? market : stored;
 }
 
-/** Human label for a geo code ("" → Worldwide). */
+/**
+ * Human label for a geo code ("" → Worldwide). Country codes go through the
+ * shared market label so the region selector reads exactly like the market
+ * tabs — no extra qualifiers.
+ */
 export function geoLabel(geo: string): string {
-  return geo === WORLDWIDE_GEO ? "Worldwide" : geo;
+  return geo === WORLDWIDE_GEO ? "Worldwide" : countryLabel(geo);
 }
 
 // ── timeframes ───────────────────────────────────────────────

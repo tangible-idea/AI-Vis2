@@ -224,11 +224,11 @@ export function TrendsExplorer({
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label htmlFor="tr-geo">{t("trends.geoFilterLabel")}</Label>
+              {/* same list, same order, same labels as "+ Add market" */}
               <Select id="tr-geo" value={geo} onChange={(e) => changeGeo(e.target.value)}>
                 {TRENDS_GEOS.map((g) => (
                   <option key={g || "worldwide"} value={g}>
                     {label(g)}
-                    {g === market ? ` · ${t("trends.geoMarket")}` : ""}
                   </option>
                 ))}
               </Select>

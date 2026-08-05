@@ -236,8 +236,25 @@ export interface ShareLink {
   created_at: string;
 }
 
-/** Countries offered for market selection — one per AI Visibility scan/market view. */
+/**
+ * Countries offered for market selection — one per AI Visibility scan/market
+ * view. This is the single market list: "+ Add market", Settings, onboarding
+ * and the Google Trends region selector all read it, in this order, so adding
+ * a country here adds it everywhere at once.
+ */
 export const COUNTRIES = ["US", "KR", "JP", "SG", "GB", "DE", "AU", "CA", "TH", "VN", "ID", "MY"] as const;
+
+export type Country = (typeof COUNTRIES)[number];
+
+/**
+ * How a market code is written in the UI. Every selector renders through this
+ * one function, so the same country never reads two different ways ("KR" in
+ * one place, "KR · market" in another). If codes are ever replaced by names,
+ * this is the only place that changes.
+ */
+export function countryLabel(code: string): string {
+  return code;
+}
 
 /**
  * Normalized industry taxonomy — stored as the `id` slug so values stay

@@ -237,7 +237,6 @@
     "trendingNow": "Trending now",
     "trendingNowHint": "What's spiking in {geo} right now — no keyword needed",
     "worldwide": "Worldwide",
-    "geoMarket": "market",
     "geoScope": "Showing Google Trends for {geo}",
     "geoMarketNote": "monitoring market: {market}",
     "geoFilterLabel": "Google Trends region",

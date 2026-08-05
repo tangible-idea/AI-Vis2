@@ -237,7 +237,6 @@
     "trendingNow": "지금 뜨는 주제",
     "trendingNowHint": "지금 {geo}에서 급상승 중 — 키워드 입력 불필요",
     "worldwide": "전 세계",
-    "geoMarket": "모니터링 시장",
     "geoScope": "Google 트렌드 지역: {geo}",
     "geoMarketNote": "모니터링 시장: {market}",
     "geoFilterLabel": "Google 트렌드 지역",

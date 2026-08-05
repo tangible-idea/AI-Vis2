@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Globe2 } from "lucide-react";
 import { switchProject, addMarket } from "@/app/(app)/actions";
-import { COUNTRIES } from "@/lib/types";
+import { COUNTRIES, countryLabel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 
@@ -22,7 +22,7 @@ export function MarketTabs({ markets, activeId }: { markets: MarketTab[]; active
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const used = new Set(markets.map((m) => m.country));
-  const available = COUNTRIES.filter((c) => !used.has(c));
+  const hasAvailable = COUNTRIES.some((c) => !used.has(c));
 
   function onAdd(country: string) {
     if (!country) return;
@@ -51,10 +51,10 @@ export function MarketTabs({ markets, activeId }: { markets: MarketTab[]; active
                 : "border border-line-strong bg-surface text-ink-soft hover:bg-hover hover:text-ink"
             )}
           >
-            {m.country}
+            {countryLabel(m.country)}
           </button>
         ))}
-        {available.length > 0 && (
+        {hasAvailable && (
           <select
             value=""
             onChange={(e) => onAdd(e.target.value)}
@@ -63,9 +63,12 @@ export function MarketTabs({ markets, activeId }: { markets: MarketTab[]; active
             className="cursor-pointer appearance-none rounded-full border border-dashed border-line-strong bg-surface py-1 pl-3 pr-2 text-xs font-medium text-ink-faint hover:bg-hover hover:text-ink focus:outline-none disabled:opacity-60"
           >
             <option value="">{pending ? t("market.adding") : `+ ${t("market.add")}`}</option>
-            {available.map((c) => (
-              <option key={c} value={c}>
-                {c}
+            {/* the full shared list, in the same order and with the same
+                labels as the Google Trends region selector; markets already
+                tracked stay visible but can't be added twice */}
+            {COUNTRIES.map((c) => (
+              <option key={c} value={c} disabled={used.has(c)}>
+                {countryLabel(c)}
               </option>
             ))}
           </select>

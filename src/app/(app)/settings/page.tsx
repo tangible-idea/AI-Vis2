@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
 import { IndustrySelect } from "@/components/industry-select";
-import { CONTENT_LANGUAGES, COUNTRIES, type Competitor, type Prompt } from "@/lib/types";
+import { CONTENT_LANGUAGES, COUNTRIES, countryLabel, type Competitor, type Prompt } from "@/lib/types";
 import { updateProject, addCompetitor, addPrompt, inviteMember, updateBranding } from "./actions";
 import { PromptRows } from "./prompt-list";
 import { CompetitorList } from "./competitor-list";
@@ -118,7 +118,9 @@ export default async function SettingsPage() {
                 <Label htmlFor="s-country">{t("common.country")}</Label>
                 <Select id="s-country" name="country" defaultValue={project.country}>
                   {COUNTRIES.map((c) => (
-                    <option key={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {countryLabel(c)}
+                    </option>
                   ))}
                 </Select>
               </div>

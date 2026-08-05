@@ -237,7 +237,6 @@
     "trendingNow": "今話題のトピック",
     "trendingNowHint": "いま {geo} で急上昇中 — キーワード不要",
     "worldwide": "全世界",
-    "geoMarket": "市場",
     "geoScope": "Google トレンドの地域: {geo}",
     "geoMarketNote": "モニタリング市場: {market}",
     "geoFilterLabel": "Google トレンドの地域",
