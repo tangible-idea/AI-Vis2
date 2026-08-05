@@ -247,7 +247,8 @@
     "viewOnGoogle": "Lihat di Google Trends",
     "unavailable": "Google Trends tidak memberi respons — cuba lagi sebentar.",
     "searchVolume": "{volume} carian",
-    "lockedHint": "Carian teratas dan meningkat dari Google Trends"
+    "lockedHint": "Carian teratas dan meningkat dari Google Trends",
+    "dailyFeedNote": "Suapan harian Google — merangkumi sehari lepas bagi wilayah ini."
   },
   "optimize": {
     "title": "Optimum",

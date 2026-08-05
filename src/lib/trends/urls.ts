@@ -7,9 +7,10 @@ import { COUNTRIES } from "../types";
  * Google changes a parameter name, an endpoint path or a date token, this
  * file is the only thing that has to change.
  *
- * Two request families are covered:
- *   • Explore     — keyword-driven: interest over time + top/rising queries
- *   • Trending now — geo-driven only, no keywords
+ * Three request families are covered:
+ *   • Explore      — keyword-driven: interest over time + top/rising queries
+ *   • Trending now — geo-driven only, no keywords (batched RPC)
+ *   • Daily RSS    — the same trending feed as a plain per-geo RSS document
  */
 
 const ORIGIN = "https://trends.google.com";
@@ -156,8 +157,37 @@ export function widgetDataUrl(
   })}`;
 }
 
+/**
+ * Any Trends page will do to obtain the `NID` cookie the Explore endpoints
+ * want; this one is served (and sets the cookie) even while rate-limited, so
+ * it doubles as the recovery path out of a 429.
+ */
+export const TRENDS_COOKIE_URL = `${ORIGIN}/trends/explore`;
+
 /** Trending now is a batched RPC rather than a REST endpoint. */
 export const TRENDING_RPC_URL = `${ORIGIN}/_/TrendsUi/data/batchexecute`;
+
+/**
+ * Google's Daily Search Trends feed for one country — the same trending
+ * terms as the RPC, published as ordinary RSS with the top news story
+ * attached to each. It is unauthenticated and not rate-limited, which makes
+ * it the fallback when the RPC is blocked.
+ *
+ * e.g. https://trends.google.com/trending/rss?geo=KR
+ */
+export function trendingRssUrl(geo: string): string {
+  return `${ORIGIN}/trending/rss?geo=${encodeURIComponent(geo)}`;
+}
+
+/**
+ * Whether a geo has a usable RSS feed. Requesting the feed without a geo
+ * does not mean "worldwide" — Google geolocates the caller's IP and answers
+ * for whatever country the server happens to sit in, which would label one
+ * country's trends as another's. Worldwide therefore has no RSS fallback.
+ */
+export function supportsTrendingRss(geo: string): boolean {
+  return geo !== WORLDWIDE_GEO;
+}
 
 /**
  * Form body for the trending-now RPC. The inner payload is a JSON string

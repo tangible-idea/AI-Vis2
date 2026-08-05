@@ -8,8 +8,14 @@
  * estimate; the UI says so. Nothing here invents numbers.
  */
 
-import { fetchExplore, fetchTrendingNow, TrendsUnavailableError } from "./google";
-import { googleExploreUrl, googleTrendingUrl, type ExploreParams, type TrendingParams } from "./urls";
+import { fetchExplore, fetchTrendingNow, fetchTrendingRss, TrendsUnavailableError } from "./google";
+import {
+  googleExploreUrl,
+  googleTrendingUrl,
+  supportsTrendingRss,
+  type ExploreParams,
+  type TrendingParams,
+} from "./urls";
 import type { ExploreResult, TrendingNowResult } from "./types";
 
 export * from "./types";
@@ -54,15 +60,39 @@ export async function exploreTrends(
   }
 }
 
+/**
+ * What's trending in one geo right now.
+ *
+ * The RPC leads because it honours the selected timeframe, covers worldwide
+ * and reports numeric volumes. When it fails — it is the endpoint most likely
+ * to be blocked from a datacentre IP — the per-geo RSS feed answers instead,
+ * with the same terms plus the news stories behind them. Only worldwide has
+ * no fallback, since the feed is published per country.
+ *
+ * The result records which one answered so the UI can be honest about the
+ * window it actually covers.
+ */
 export async function trendingNow(
   params: TrendingParams
 ): Promise<TrendsOutcome<TrendingNowResult>> {
-  const empty: TrendingNowResult = { items: [], sourceUrl: googleTrendingUrl(params) };
+  const empty: TrendingNowResult = {
+    items: [],
+    sourceUrl: googleTrendingUrl(params),
+    source: "live",
+  };
   if (process.env.GOOGLE_TRENDS_DISABLED) return { data: empty, available: false };
+
   try {
     return { data: await fetchTrendingNow(params), available: true };
   } catch (err) {
     warn("trendingNow", err);
+  }
+
+  if (!supportsTrendingRss(params.geo)) return { data: empty, available: false };
+  try {
+    return { data: await fetchTrendingRss(params), available: true };
+  } catch (err) {
+    warn("trendingNow (rss)", err);
     return { data: empty, available: false };
   }
 }

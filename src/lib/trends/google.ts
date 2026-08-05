@@ -3,8 +3,10 @@ import {
   googleExploreUrl,
   googleTrendingUrl,
   trendingRpcBody,
+  trendingRssUrl,
   widgetDataUrl,
   TRENDING_RPC_URL,
+  TRENDS_COOKIE_URL,
   type ExploreParams,
   type TrendingParams,
 } from "./urls";
@@ -13,6 +15,7 @@ import {
   type ExploreResult,
   type KeywordInterest,
   type QueryResult,
+  type TrendingNews,
   type TrendingNowResult,
   type TrendingResult,
 } from "./types";
@@ -22,13 +25,17 @@ import {
  * calls — no API key, no vendor, no recurring cost. Every URL comes from
  * ./urls; nothing is assembled here.
  *
- * Two upstream families with very different reliability:
- *   • Explore (`/trends/api/*`) rate-limits hard — 429s appear after a
- *     handful of calls from one IP.
- *   • Trending now (the `batchexecute` RPC) is far more tolerant and keeps
- *     answering while Explore is throttled.
+ * Three upstreams with very different reliability:
+ *   • Explore (`/trends/api/*`) refuses cookie-less callers outright — every
+ *     request 429s until the client carries an `NID` cookie, which is why
+ *     this module keeps one (see `cookieHeader`).
+ *   • Trending now (the `batchexecute` RPC) is far more tolerant, honours the
+ *     selected timeframe, and covers worldwide.
+ *   • The daily RSS feed is plain, unauthenticated XML per country. It only
+ *     covers the past day, but it answers when the RPC does not — so it backs
+ *     trending up rather than leading it.
  *
- * Both are cached for an hour keyed by URL, so a given geo/keyword/timeframe
+ * All are cached for an hour keyed by URL, so a given geo/keyword/timeframe
  * combination costs one upstream call per hour no matter how many people view
  * it. On failure the caller gets an empty result and the UI says Google is
  * unavailable — nothing is estimated or synthesised.
@@ -190,11 +197,101 @@ export async function fetchTrendingNow(params: TrendingParams): Promise<Trending
       const title = String(row[TREND_TITLE] ?? "").trim();
       const searchVolume = Number(row[TREND_VOLUME] ?? 0);
       const { suggestion, contentAngle } = suggestionFor(title, params.geo);
-      return { title, searchVolume, formattedVolume: formatVolume(searchVolume), suggestion, contentAngle };
+      return {
+        title,
+        searchVolume,
+        formattedVolume: formatVolume(searchVolume),
+        // the RPC returns article ids, not headlines — only RSS carries those
+        news: [],
+        suggestion,
+        contentAngle,
+      };
     })
     .filter((i) => i.title);
 
-  return { items, sourceUrl };
+  return { items, sourceUrl, source: "live" };
+}
+
+// ── daily RSS ────────────────────────────────────────────────
+
+/**
+ * Trending now for one geo, read from Google's Daily Search Trends RSS feed.
+ *
+ * Same terms as the RPC, in Google's own order, plus the news stories that
+ * explain each one. The feed is always the past day, so the caller must not
+ * present it as answering a longer window. Traffic arrives pre-formatted
+ * ("2000+"); that string is Google's own label and is shown verbatim.
+ */
+export async function fetchTrendingRss(params: TrendingParams): Promise<TrendingNowResult> {
+  // the feed is read, but "view the source" must land on the readable page
+  const sourceUrl = googleTrendingUrl(params);
+  const res = await request(trendingRssUrl(params.geo), { headers: { "User-Agent": UA } });
+  const xml = await res.text();
+
+  const items = tags(xml, "item").map((item) => {
+    const title = xmlText(item, "title");
+    const formattedVolume = xmlText(item, "ht:approx_traffic");
+    const { suggestion, contentAngle } = suggestionFor(title, params.geo);
+    return {
+      title,
+      searchVolume: parseApproxTraffic(formattedVolume),
+      formattedVolume,
+      news: newsItems(item),
+      suggestion,
+      contentAngle,
+    };
+  });
+
+  return { items: items.filter((i) => i.title), sourceUrl, source: "daily" };
+}
+
+function newsItems(item: string): TrendingNews[] {
+  return tags(item, "ht:news_item")
+    .map((n) => ({
+      title: xmlText(n, "ht:news_item_title"),
+      url: xmlText(n, "ht:news_item_url"),
+      source: xmlText(n, "ht:news_item_source"),
+    }))
+    .filter((n) => n.title && n.url);
+}
+
+/** "2000+" → 2000. Google's own approximation; the "+" carries no value. */
+function parseApproxTraffic(formatted: string): number {
+  const digits = formatted.replace(/[^\d]/g, "");
+  return digits ? Number(digits) : 0;
+}
+
+// ── minimal XML reading ──────────────────────────────────────
+//
+// The feed is a small, fixed-shape document from one publisher, so matching
+// its elements directly is enough — and avoids a dependency for one endpoint.
+
+/** The inner text of every `<name>…</name>` element in `xml`. */
+function tags(xml: string, name: string): string[] {
+  const pattern = new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)</${name}>`, "g");
+  return [...xml.matchAll(pattern)].map((m) => m[1]);
+}
+
+/** First `<name>` child as decoded text ("" when absent or self-closing). */
+function xmlText(xml: string, name: string): string {
+  return decodeXml(tags(xml, name)[0] ?? "").trim();
+}
+
+const ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+};
+
+function decodeXml(s: string): string {
+  return s
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#[xX]([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    // named entities last: an escaped "&amp;lt;" must not become "<"
+    .replace(/&(amp|lt|gt|quot|apos);/g, (_, name) => ENTITIES[name]);
 }
 
 /** 20000 → "20K+", matching how Google labels these estimates. */
@@ -215,29 +312,103 @@ function trimZero(n: number): string {
  * JSON hijacking, so the payload starts at the first brace.
  */
 async function getJson(url: string): Promise<ExplorePayload> {
-  const res = await request(url, { headers: browserHeaders() });
+  // headers are built per attempt so a retry after 429 carries a fresh cookie
+  const res = await request(url, async () => ({ headers: await browserHeaders() }));
   const text = await res.text();
   const start = text.indexOf("{");
   if (start < 0) throw new TrendsUnavailableError("unexpected Google Trends payload");
   return JSON.parse(text.slice(start));
 }
 
-function browserHeaders(): Record<string, string> {
+async function browserHeaders(): Promise<Record<string, string>> {
+  const cookie = await cookieHeader();
   return {
     "User-Agent": UA,
     "Accept-Language": "en-US,en;q=0.9",
-    Referer: "https://trends.google.com/trends/explore",
+    Referer: TRENDS_COOKIE_URL,
+    ...(cookie ? { Cookie: cookie } : {}),
   };
+}
+
+// ── cookie ───────────────────────────────────────────────────
+
+/**
+ * Google issues NID with a months-long expiry, so it is renewed rarely; a 429
+ * invalidates it early. Holding it steady also keeps the fetch cache key
+ * steady, so rotating the cookie doesn't quietly discard the hourly cache.
+ */
+const COOKIE_TTL_MS = 6 * 60 * 60_000;
+let cookie: { value: string; expiresAt: number } | null = null;
+/** Concurrent callers on a cold cache share one bootstrap, not one each. */
+let cookieInFlight: Promise<string | null> | null = null;
+
+/**
+ * The Explore endpoints reject cookie-less callers with 429 — not because of
+ * request volume, but because a real browser always arrives holding an `NID`
+ * cookie from trends.google.com. Fetching any Trends page yields one, and
+ * with it attached the same requests that returned 429 return 200.
+ *
+ * The cookie is kept in module memory and reused. It is not per-user and
+ * carries no identity of ours — it is the anonymous cookie Google hands to
+ * any first-time visitor.
+ */
+async function cookieHeader(): Promise<string | null> {
+  if (cookie && Date.now() < cookie.expiresAt) return cookie.value;
+  cookieInFlight ??= fetchCookie().finally(() => {
+    cookieInFlight = null;
+  });
+  return cookieInFlight;
+}
+
+async function fetchCookie(): Promise<string | null> {
+  try {
+    // Google serves this page (and sets the cookie) even while rate-limiting,
+    // so a 429 here is still a success — only the cookie is read, not the body.
+    const res = await fetch(TRENDS_COOKIE_URL, {
+      headers: { "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9" },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      // must reach Google to receive a Set-Cookie; a cached response has none
+      cache: "no-store",
+    });
+    const value = readNid(res);
+    cookie = value ? { value, expiresAt: Date.now() + COOKIE_TTL_MS } : null;
+    return value;
+  } catch {
+    return null;
+  }
+}
+
+/** The `NID=…` pair out of the response's Set-Cookie headers. */
+function readNid(res: Response): string | null {
+  const headers = res.headers as Headers & { getSetCookie?: () => string[] };
+  const all = headers.getSetCookie?.() ?? [res.headers.get("set-cookie") ?? ""];
+  for (const header of all) {
+    const match = /(^|[;,]\s*)(NID=[^;]+)/.exec(header);
+    if (match) return match[2];
+  }
+  return null;
+}
+
+/** Drops the cached cookie so the next Explore request bootstraps a fresh one. */
+function invalidateCookie() {
+  cookie = null;
 }
 
 /**
  * Shared transport. Identical URLs are deduplicated and cached for an hour by
  * the Next fetch cache, so repeat views and concurrent viewers of the same
  * geo/keyword/timeframe never hit Google twice.
+ *
+ * `init` may be a factory, in which case it is re-evaluated for each attempt —
+ * that is how a retry picks up a renewed cookie rather than replaying the
+ * headers that were just rejected.
  */
-async function request(url: string, init: RequestInit, attempt = 0): Promise<Response> {
+type RequestInitFactory = RequestInit | (() => RequestInit | Promise<RequestInit>);
+
+async function request(url: string, init: RequestInitFactory, attempt = 0): Promise<Response> {
+  const resolved = typeof init === "function" ? await init() : init;
   const res = await fetch(url, {
-    ...init,
+    ...resolved,
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     next: { revalidate: CACHE_TTL },
   });
@@ -247,6 +418,10 @@ async function request(url: string, init: RequestInit, attempt = 0): Promise<Res
   // most ~4s on a cold cache; beyond that it's a sustained block and waiting
   // only delays telling the user.
   if (attempt < RETRY_DELAYS_MS.length && (res.status === 429 || res.status >= 500)) {
+    // a 429 here usually means the cookie is stale or was never obtained,
+    // not that we are genuinely over a quota — drop it and let the retry
+    // bootstrap a new one
+    if (res.status === 429) invalidateCookie();
     await sleep(RETRY_DELAYS_MS[attempt]);
     return request(url, init, attempt + 1);
   }

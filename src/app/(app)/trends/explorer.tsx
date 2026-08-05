@@ -369,6 +369,17 @@ export function TrendsExplorer({
                 <div key={item.title} className="flex items-center gap-3 py-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm text-ink">{item.title}</p>
+                    {/* why it's trending — Google supplies this on the daily feed */}
+                    {item.news[0] && (
+                      <a
+                        href={item.news[0].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block truncate text-[11px] text-ink-faint hover:text-accent-strong"
+                      >
+                        {item.news[0].title} · {item.news[0].source}
+                      </a>
+                    )}
                   </div>
                   <span className="tabular shrink-0 text-xs text-ink-soft">
                     {t("trends.searchVolume", { volume: item.formattedVolume })}
@@ -381,6 +392,10 @@ export function TrendsExplorer({
                 </div>
               ))}
             </div>
+          )}
+          {/* the daily feed always covers the past day, whatever is selected */}
+          {trendingOk && trending.source === "daily" && (
+            <p className="pt-2 text-[11px] text-ink-faint">{t("trends.dailyFeedNote")}</p>
           )}
           <div className="pt-2">
             <SourceLink href={trending.sourceUrl} label={t("trends.viewOnGoogle")} />

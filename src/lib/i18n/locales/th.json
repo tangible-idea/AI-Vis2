@@ -247,7 +247,8 @@
     "viewOnGoogle": "ดูใน Google Trends",
     "unavailable": "Google Trends ไม่ตอบสนอง — โปรดลองอีกครั้งในอีกสักครู่",
     "searchVolume": "ค้นหา {volume} ครั้ง",
-    "lockedHint": "คำค้นยอดนิยมและมาแรงจาก Google Trends"
+    "lockedHint": "คำค้นยอดนิยมและมาแรงจาก Google Trends",
+    "dailyFeedNote": "ฟีดรายวันของ Google — ครอบคลุมข้อมูลวันที่ผ่านมาของภูมิภาคนี้"
   },
   "optimize": {
     "title": "ปรับแต่ง",

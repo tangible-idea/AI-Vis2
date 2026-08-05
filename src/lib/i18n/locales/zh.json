@@ -247,7 +247,8 @@
     "viewOnGoogle": "在 Google 趋势中查看",
     "unavailable": "Google 趋势未响应 — 请稍后重试。",
     "searchVolume": "{volume} 次搜索",
-    "lockedHint": "来自 Google 趋势的热门与上升查询"
+    "lockedHint": "来自 Google 趋势的热门与上升查询",
+    "dailyFeedNote": "Google 每日趋势 — 涵盖该地区过去一天的数据。"
   },
   "optimize": {
     "title": "优化",

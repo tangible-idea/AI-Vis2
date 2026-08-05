@@ -247,7 +247,8 @@
     "viewOnGoogle": "View on Google Trends",
     "unavailable": "Google Trends didn't respond — try again in a moment.",
     "searchVolume": "{volume} searches",
-    "lockedHint": "Top and rising queries from Google Trends"
+    "lockedHint": "Top and rising queries from Google Trends",
+    "dailyFeedNote": "Google's daily feed — covers the past day for this region."
   },
   "optimize": {
     "title": "Optimize",

@@ -35,6 +35,14 @@ export interface QueryResult {
   contentAngle: string;
 }
 
+/** A news story Google attached to a trending term. RSS only. */
+export interface TrendingNews {
+  title: string;
+  url: string;
+  /** Publication name, e.g. "MBC 뉴스". */
+  source: string;
+}
+
 /** One row of Google's Trending now feed. */
 export interface TrendingResult {
   title: string;
@@ -42,6 +50,11 @@ export interface TrendingResult {
   searchVolume: number;
   /** Display form of `searchVolume`, e.g. "20K+". */
   formattedVolume: string;
+  /**
+   * Why the term is trending, when Google says so. The RPC returns article
+   * ids without titles, so this is populated from the RSS feed only.
+   */
+  news: TrendingNews[];
   suggestion: ContentSuggestion;
   contentAngle: string;
 }
@@ -55,9 +68,17 @@ export interface ExploreResult {
   sourceUrl: string;
 }
 
+/**
+ * Which upstream answered. "live" honours the selected timeframe; "daily" is
+ * the RSS feed, which Google publishes for the past day only — the UI says so
+ * rather than presenting day-old data as a 7-day window.
+ */
+export type TrendingSource = "live" | "daily";
+
 export interface TrendingNowResult {
   items: TrendingResult[];
   sourceUrl: string;
+  source: TrendingSource;
 }
 
 const SUGGESTIONS: ContentSuggestion[] = [
