@@ -9,6 +9,7 @@ import {
   TRENDING_TIMEFRAMES,
   TRENDS_GEOS,
   geoLabel,
+  supportsTrendingNow,
   type ExploreResult,
   type ExploreTimeframe,
   type QueryResult,
@@ -132,6 +133,11 @@ export function TrendsExplorer({
   const lastTrending = useRef<string | null>(null);
 
   const label = (g: string) => (g === "" ? t("trends.worldwide") : geoLabel(g));
+
+  // Trending now is a per-country feed at Google. Derived from the selected
+  // geo rather than the last response, so switching to Worldwide explains
+  // itself immediately instead of after a round trip that cannot succeed.
+  const trendingUnsupported = !supportsTrendingNow(geo);
 
   async function loadExplore(next: { q?: string; geo?: string; tf?: ExploreTimeframe; persist?: boolean }) {
     const params = new URLSearchParams({
@@ -357,7 +363,11 @@ export function TrendsExplorer({
           }
         />
         <div className="px-5 pb-4">
-          {!trendingOk ? (
+          {/* Google publishes this per country only — say so rather than
+              blaming an outage the user could wait out */}
+          {trendingUnsupported ? (
+            <p className="py-4 text-sm text-ink-faint">{t("trends.trendingNeedsRegion")}</p>
+          ) : !trendingOk ? (
             <p className="py-4 text-sm text-ink-faint">{t("trends.unavailable")}</p>
           ) : !trending.items.length ? (
             <p className="py-4 text-sm text-ink-faint">
@@ -393,8 +403,9 @@ export function TrendsExplorer({
               ))}
             </div>
           )}
-          {/* the daily feed always covers the past day, whatever is selected */}
-          {trendingOk && trending.source === "daily" && (
+          {/* the daily feed covers one day; say so only when that falls short
+              of the window the user asked for */}
+          {trendingOk && trending.source === "daily" && trendingTimeframe !== "24h" && (
             <p className="pt-2 text-[11px] text-ink-faint">{t("trends.dailyFeedNote")}</p>
           )}
           <div className="pt-2">

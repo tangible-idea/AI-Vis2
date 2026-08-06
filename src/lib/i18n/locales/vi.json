@@ -247,7 +247,8 @@
     "unavailable": "Google Trends không phản hồi — vui lòng thử lại sau giây lát.",
     "searchVolume": "{volume} lượt tìm",
     "lockedHint": "Truy vấn hàng đầu và đang tăng từ Google Trends",
-    "dailyFeedNote": "Nguồn cấp hằng ngày của Google — bao gồm một ngày qua ở khu vực này."
+    "dailyFeedNote": "Nguồn cấp hằng ngày của Google — bao gồm một ngày qua ở khu vực này.",
+    "trendingNeedsRegion": "Google chỉ công bố Xu hướng hiện tại theo từng quốc gia — hãy chọn một khu vực ở trên."
   },
   "optimize": {
     "title": "Tối ưu",

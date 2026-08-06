@@ -247,7 +247,8 @@
     "unavailable": "Google 트렌드가 응답하지 않았습니다 — 잠시 후 다시 시도해 주세요.",
     "searchVolume": "검색 {volume}",
     "lockedHint": "Google 트렌드의 인기·급상승 검색어",
-    "dailyFeedNote": "구글 일간 피드 — 이 지역의 지난 24시간 기준입니다."
+    "dailyFeedNote": "구글 일간 피드 — 이 지역의 지난 24시간 기준입니다.",
+    "trendingNeedsRegion": "구글은 실시간 인기 급상승을 국가별로만 제공합니다 — 위에서 지역을 선택하세요."
   },
   "optimize": {
     "title": "최적화",

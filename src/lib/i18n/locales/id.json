@@ -247,7 +247,8 @@
     "unavailable": "Google Trends tidak merespons — coba lagi sebentar.",
     "searchVolume": "{volume} pencarian",
     "lockedHint": "Kueri teratas dan naik dari Google Trends",
-    "dailyFeedNote": "Umpan harian Google — mencakup satu hari terakhir untuk wilayah ini."
+    "dailyFeedNote": "Umpan harian Google — mencakup satu hari terakhir untuk wilayah ini.",
+    "trendingNeedsRegion": "Google hanya menerbitkan Tren saat ini per negara — pilih wilayah di atas."
   },
   "optimize": {
     "title": "Optimalkan",

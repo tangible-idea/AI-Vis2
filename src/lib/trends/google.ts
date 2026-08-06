@@ -191,7 +191,11 @@ export async function fetchTrendingNow(params: TrendingParams): Promise<Trending
   const envelope = rows.find((r) => r[0] === "wrb.fr" && r[1] === "i0OFE");
   if (!envelope) throw new TrendsUnavailableError("unexpected trending payload");
 
-  const payload = JSON.parse(envelope[2]) as [unknown, unknown[][]];
+  // Google answers "no data" by returning a null slot rather than an error —
+  // it does this for any geo it doesn't publish a trending feed for.
+  const payload = (envelope[2] ? JSON.parse(envelope[2]) : null) as [unknown, unknown[][]] | null;
+  if (!payload) throw new TrendsUnavailableError(`no trending feed for geo "${params.geo}"`);
+
   const items: TrendingResult[] = (payload[1] ?? [])
     .map((row) => {
       const title = String(row[TREND_TITLE] ?? "").trim();
@@ -353,6 +357,13 @@ let cookieInFlight: Promise<string | null> | null = null;
  * any first-time visitor.
  */
 async function cookieHeader(): Promise<string | null> {
+  // Escape hatch for hosts Google throttles on sight (datacentre IPs are the
+  // usual case): once an IP is throttled it will still hand out an NID, but
+  // one the API refuses, so a blocked host can never bootstrap its way out.
+  // Pasting a working `NID=…` from a browser restores Explore there.
+  const pinned = process.env.GOOGLE_TRENDS_COOKIE?.trim();
+  if (pinned) return pinned.startsWith("NID=") ? pinned : `NID=${pinned}`;
+
   if (cookie && Date.now() < cookie.expiresAt) return cookie.value;
   cookieInFlight ??= fetchCookie().finally(() => {
     cookieInFlight = null;
@@ -361,9 +372,8 @@ async function cookieHeader(): Promise<string | null> {
 }
 
 async function fetchCookie(): Promise<string | null> {
+  const current = cookie?.value ?? null;
   try {
-    // Google serves this page (and sets the cookie) even while rate-limiting,
-    // so a 429 here is still a success — only the cookie is read, not the body.
     const res = await fetch(TRENDS_COOKIE_URL, {
       headers: { "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9" },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -371,10 +381,18 @@ async function fetchCookie(): Promise<string | null> {
       cache: "no-store",
     });
     const value = readNid(res);
-    cookie = value ? { value, expiresAt: Date.now() + COOKIE_TTL_MS } : null;
+    if (!value) return current;
+
+    // A throttled bootstrap still hands out an NID, but one the API then
+    // refuses. Taking it would trade a working cookie for a poisoned one and
+    // keep us throttled long after Google let up, so a cookie minted under
+    // 429 is only accepted when we have nothing better.
+    if (!res.ok && current) return current;
+
+    cookie = { value, expiresAt: Date.now() + COOKIE_TTL_MS };
     return value;
   } catch {
-    return null;
+    return current;
   }
 }
 
@@ -389,9 +407,13 @@ function readNid(res: Response): string | null {
   return null;
 }
 
-/** Drops the cached cookie so the next Explore request bootstraps a fresh one. */
+/**
+ * Marks the cookie for renewal on the next Explore request. It is expired
+ * rather than dropped: if the renewal comes back throttled, the old cookie is
+ * still the best one we have and `fetchCookie` falls back to it.
+ */
 function invalidateCookie() {
-  cookie = null;
+  if (cookie) cookie = { ...cookie, expiresAt: 0 };
 }
 
 /**

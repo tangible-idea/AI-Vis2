@@ -57,7 +57,7 @@ export async function GET(request: Request) {
     const tf = url.searchParams.get("timeframe") ?? "24h";
     const timeframe: TrendingTimeframe = isTrendingTimeframe(tf) ? tf : "24h";
     const params = { geo, timeframe, language: brand.language };
-    const { data, available } = await trendingNow(params);
+    const { data, available, unsupported } = await trendingNow(params);
     return NextResponse.json({
       ...data,
       // only the top 5 are shown — this section is deliberately lightweight
@@ -65,6 +65,8 @@ export async function GET(request: Request) {
       geo,
       timeframe,
       available,
+      /** Google has no trending feed for this geo — not an outage. */
+      unsupported: unsupported ?? false,
       key: requestKey("trending", params),
     });
   }

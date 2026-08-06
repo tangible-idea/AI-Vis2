@@ -247,7 +247,8 @@
     "unavailable": "Google Trends didn't respond — try again in a moment.",
     "searchVolume": "{volume} searches",
     "lockedHint": "Top and rising queries from Google Trends",
-    "dailyFeedNote": "Google's daily feed — covers the past day for this region."
+    "dailyFeedNote": "Google's daily feed — covers the past day for this region.",
+    "trendingNeedsRegion": "Google publishes Trending now per country — pick a region above to see it."
   },
   "optimize": {
     "title": "Optimize",

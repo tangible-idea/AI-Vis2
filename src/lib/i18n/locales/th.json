@@ -247,7 +247,8 @@
     "unavailable": "Google Trends ไม่ตอบสนอง — โปรดลองอีกครั้งในอีกสักครู่",
     "searchVolume": "ค้นหา {volume} ครั้ง",
     "lockedHint": "คำค้นยอดนิยมและมาแรงจาก Google Trends",
-    "dailyFeedNote": "ฟีดรายวันของ Google — ครอบคลุมข้อมูลวันที่ผ่านมาของภูมิภาคนี้"
+    "dailyFeedNote": "ฟีดรายวันของ Google — ครอบคลุมข้อมูลวันที่ผ่านมาของภูมิภาคนี้",
+    "trendingNeedsRegion": "Google เผยแพร่เทรนด์ล่าสุดแยกตามประเทศเท่านั้น — โปรดเลือกภูมิภาคด้านบน"
   },
   "optimize": {
     "title": "ปรับแต่ง",

@@ -247,7 +247,8 @@
     "unavailable": "Google Trends tidak memberi respons — cuba lagi sebentar.",
     "searchVolume": "{volume} carian",
     "lockedHint": "Carian teratas dan meningkat dari Google Trends",
-    "dailyFeedNote": "Suapan harian Google — merangkumi sehari lepas bagi wilayah ini."
+    "dailyFeedNote": "Suapan harian Google — merangkumi sehari lepas bagi wilayah ini.",
+    "trendingNeedsRegion": "Google hanya menerbitkan Sohor kini mengikut negara — pilih wilayah di atas."
   },
   "optimize": {
     "title": "Optimum",

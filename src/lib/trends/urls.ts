@@ -184,12 +184,18 @@ export function trendingRssUrl(geo: string): string {
 }
 
 /**
- * Whether a geo has a usable RSS feed. Requesting the feed without a geo
- * does not mean "worldwide" — Google geolocates the caller's IP and answers
- * for whatever country the server happens to sit in, which would label one
- * country's trends as another's. Worldwide therefore has no RSS fallback.
+ * Whether Google publishes a Trending now feed for this geo. It is a
+ * per-country product: neither upstream covers Worldwide.
+ *
+ *   • The RPC answers a worldwide request with an empty payload, not an error.
+ *   • The RSS feed has no worldwide edition — omitting `geo` makes Google
+ *     geolocate the caller's IP, so a server in one country would return that
+ *     country's trends labelled as everyone's.
+ *
+ * Explore is unaffected and does cover Worldwide, so the geo stays selectable;
+ * only this one panel has to say it needs a country.
  */
-export function supportsTrendingRss(geo: string): boolean {
+export function supportsTrendingNow(geo: string): boolean {
   return geo !== WORLDWIDE_GEO;
 }
 

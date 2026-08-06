@@ -12,7 +12,7 @@ import { fetchExplore, fetchTrendingNow, fetchTrendingRss, TrendsUnavailableErro
 import {
   googleExploreUrl,
   googleTrendingUrl,
-  supportsTrendingRss,
+  supportsTrendingNow,
   type ExploreParams,
   type TrendingParams,
 } from "./urls";
@@ -26,6 +26,11 @@ export { TrendsUnavailableError, CACHE_TTL } from "./google";
 export interface TrendsOutcome<T> {
   data: T;
   available: boolean;
+  /**
+   * Google publishes nothing for this geo, so there is no outage to report and
+   * retrying cannot help. Distinguishes "pick a country" from "try again".
+   */
+  unsupported?: boolean;
 }
 
 /**
@@ -61,16 +66,24 @@ export async function exploreTrends(
 }
 
 /**
- * What's trending in one geo right now.
+ * What's trending in one geo right now, from whichever of Google's two
+ * trending feeds suits the requested window.
  *
- * The RPC leads because it honours the selected timeframe, covers worldwide
- * and reports numeric volumes. When it fails — it is the endpoint most likely
- * to be blocked from a datacentre IP — the per-geo RSS feed answers instead,
- * with the same terms plus the news stories behind them. Only worldwide has
- * no fallback, since the feed is published per country.
+ * The RSS feed is a daily digest: ten ranked terms for one country, each with
+ * the news stories that explain why it is trending. That makes it the better
+ * answer for the 24-hour view — the news is context the RPC simply doesn't
+ * carry — but it cannot answer anything longer.
  *
- * The result records which one answered so the UI can be honest about the
- * window it actually covers.
+ * The RPC covers any window and returns hundreds of terms with numeric
+ * volumes, so it leads for 7 days. It is also the endpoint most likely to be
+ * blocked from a datacentre IP.
+ *
+ * Whichever leads, the other backs it up, so trending survives either one
+ * being unavailable.
+ *
+ * Worldwide is not a gap in this code: Google publishes no worldwide trending
+ * feed at all, so the caller is told the geo is unsupported rather than both
+ * upstreams being tried and failing.
  */
 export async function trendingNow(
   params: TrendingParams
@@ -81,20 +94,23 @@ export async function trendingNow(
     source: "live",
   };
   if (process.env.GOOGLE_TRENDS_DISABLED) return { data: empty, available: false };
+  if (!supportsTrendingNow(params.geo)) return { data: empty, available: false, unsupported: true };
 
-  try {
-    return { data: await fetchTrendingNow(params), available: true };
-  } catch (err) {
-    warn("trendingNow", err);
-  }
+  const daily = { name: "rss", fetch: fetchTrendingRss };
+  const live = { name: "rpc", fetch: fetchTrendingNow };
+  const sources = params.timeframe === "24h" ? [daily, live] : [live, daily];
 
-  if (!supportsTrendingRss(params.geo)) return { data: empty, available: false };
-  try {
-    return { data: await fetchTrendingRss(params), available: true };
-  } catch (err) {
-    warn("trendingNow (rss)", err);
-    return { data: empty, available: false };
+  for (const source of sources) {
+    try {
+      const data = await source.fetch(params);
+      // an empty feed is not an answer — let the other source try
+      if (data.items.length) return { data, available: true };
+      warn(`trendingNow (${source.name})`, new TrendsUnavailableError("empty feed"));
+    } catch (err) {
+      warn(`trendingNow (${source.name})`, err);
+    }
   }
+  return { data: empty, available: false };
 }
 
 function warn(what: string, err: unknown) {

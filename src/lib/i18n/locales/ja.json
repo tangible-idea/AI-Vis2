@@ -247,7 +247,8 @@
     "unavailable": "Google トレンドから応答がありませんでした — 少し待って再試行してください。",
     "searchVolume": "{volume} 検索",
     "lockedHint": "Google トレンドの人気・急上昇クエリ",
-    "dailyFeedNote": "Google のデイリーフィード — この地域の過去1日間が対象です。"
+    "dailyFeedNote": "Google のデイリーフィード — この地域の過去1日間が対象です。",
+    "trendingNeedsRegion": "Google の急上昇ワードは国別のみの提供です — 上でリージョンを選択してください。"
   },
   "optimize": {
     "title": "最適化",

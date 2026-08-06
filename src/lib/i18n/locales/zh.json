@@ -247,7 +247,8 @@
     "unavailable": "Google 趋势未响应 — 请稍后重试。",
     "searchVolume": "{volume} 次搜索",
     "lockedHint": "来自 Google 趋势的热门与上升查询",
-    "dailyFeedNote": "Google 每日趋势 — 涵盖该地区过去一天的数据。"
+    "dailyFeedNote": "Google 每日趋势 — 涵盖该地区过去一天的数据。",
+    "trendingNeedsRegion": "Google 的实时热搜仅按国家/地区提供 — 请在上方选择一个区域。"
   },
   "optimize": {
     "title": "优化",
