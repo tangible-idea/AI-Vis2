@@ -8,7 +8,13 @@
  * estimate; the UI says so. Nothing here invents numbers.
  */
 
-import { fetchExplore, fetchTrendingNow, fetchTrendingRss, TrendsUnavailableError } from "./google";
+import {
+  fetchExplore,
+  fetchTrendingNow,
+  fetchTrendingRss,
+  isRateLimited,
+  TrendsUnavailableError,
+} from "./google";
 import {
   googleExploreUrl,
   googleTrendingUrl,
@@ -31,6 +37,12 @@ export interface TrendsOutcome<T> {
    * retrying cannot help. Distinguishes "pick a country" from "try again".
    */
   unsupported?: boolean;
+  /**
+   * Google throttled us. Routine, self-clearing, and unrelated to what the
+   * user asked for — so this is reported as "no data right now", not as a
+   * failure the user should act on.
+   */
+  rateLimited?: boolean;
 }
 
 /**
@@ -42,6 +54,8 @@ export interface TrendsOutcome<T> {
  */
 const BREAKER_MS = 5 * 60_000;
 let exploreBlockedUntil = 0;
+/** Why the breaker tripped, so every skipped call reports what the first one did. */
+let exploreBlockedByRateLimit = false;
 
 export async function exploreTrends(
   params: ExploreParams
@@ -53,15 +67,18 @@ export async function exploreTrends(
     sourceUrl: googleExploreUrl(params),
   };
   if (process.env.GOOGLE_TRENDS_DISABLED) return { data: empty, available: false };
-  if (Date.now() < exploreBlockedUntil) return { data: empty, available: false };
+  if (Date.now() < exploreBlockedUntil) {
+    return { data: empty, available: false, rateLimited: exploreBlockedByRateLimit };
+  }
   try {
     const data = await fetchExplore(params);
     exploreBlockedUntil = 0;
     return { data, available: true };
   } catch (err) {
     exploreBlockedUntil = Date.now() + BREAKER_MS;
+    exploreBlockedByRateLimit = isRateLimited(err);
     warn("explore", err);
-    return { data: empty, available: false };
+    return { data: empty, available: false, rateLimited: exploreBlockedByRateLimit };
   }
 }
 

@@ -40,17 +40,17 @@ export default async function TrendsPage() {
     );
   }
 
-  // first paint carries real data: the category's Explore view plus what's
-  // trending in the geo right now. Both are cached upstream for an hour.
-  const [explore, trending] = await Promise.all([
-    exploreTrends({
-      keywords: [brand.industryPhrase],
-      geo,
-      timeframe: "week",
-      language: brand.language,
-    }),
-    trendingNow({ geo, timeframe: "24h", language: brand.language }),
-  ]);
+  // Started here but deliberately not awaited. Awaiting both held the whole
+  // page on the slower one — Explore, which backs off and retries for several
+  // seconds when Google throttles it. Handing the promises to the client lets
+  // the shell paint at once and each section stream in on its own.
+  const explorePromise = exploreTrends({
+    keywords: [brand.industryPhrase],
+    geo,
+    timeframe: "week",
+    language: brand.language,
+  });
+  const trendingPromise = trendingNow({ geo, timeframe: "24h", language: brand.language });
 
   return (
     <>
@@ -61,10 +61,8 @@ export default async function TrendsPage() {
         projectId={project.id}
         market={brand.market}
         initialGeo={geo}
-        initialExplore={explore.data}
-        initialExploreAvailable={explore.available}
-        initialTrending={{ ...trending.data, items: trending.data.items.slice(0, 5) }}
-        initialTrendingAvailable={trending.available}
+        explorePromise={explorePromise}
+        trendingPromise={trendingPromise}
       />
     </>
   );

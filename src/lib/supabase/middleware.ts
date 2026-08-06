@@ -4,7 +4,13 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_PATHS = ["/", "/login", "/signup", "/pricing", "/preview", "/redeem", "/how-it-works"];
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  // Plain `next()` on purpose. `NextResponse.next({ request })` makes Next
+  // buffer the whole response, which silently disables streaming for every
+  // page in the app — Suspense fallbacks stop flushing early and a page is
+  // held back by its slowest section. Nothing has been changed on the request
+  // at this point, so forwarding it here buys nothing; the one place it is
+  // genuinely needed (refreshed auth cookies) still uses it, in setAll below.
+  let supabaseResponse = NextResponse.next();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,6 +24,9 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
+          // only here does the request actually differ — server components in
+          // this same request must read the refreshed tokens, not the expired
+          // ones. Costs streaming on token-refresh requests alone.
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)

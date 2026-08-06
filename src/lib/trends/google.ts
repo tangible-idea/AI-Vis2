@@ -52,7 +52,24 @@ const RETRY_DELAYS_MS = [1000, 3000];
 /** Google shows "Breakout" instead of a percentage above roughly this. */
 const BREAKOUT = 5000;
 
-export class TrendsUnavailableError extends Error {}
+export class TrendsUnavailableError extends Error {
+  /** HTTP status, when the failure came from a response rather than parsing. */
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+/**
+ * Whether a failure is Google throttling us rather than being down. Throttling
+ * is routine, self-clearing and says nothing about the query the user typed,
+ * so the UI stays quiet about it instead of reporting an outage.
+ */
+export function isRateLimited(err: unknown): boolean {
+  return err instanceof TrendsUnavailableError && err.status === 429;
+}
 
 interface Widget {
   id: string;
@@ -447,7 +464,7 @@ async function request(url: string, init: RequestInitFactory, attempt = 0): Prom
     await sleep(RETRY_DELAYS_MS[attempt]);
     return request(url, init, attempt + 1);
   }
-  throw new TrendsUnavailableError(`Google Trends responded ${res.status}`);
+  throw new TrendsUnavailableError(`Google Trends responded ${res.status}`, res.status);
 }
 
 function sleep(ms: number) {

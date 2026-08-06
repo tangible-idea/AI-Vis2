@@ -81,12 +81,14 @@ export async function GET(request: Request) {
     timeframe,
     language: brand.language,
   };
-  const { data, available } = await exploreTrends(params);
+  const { data, available, rateLimited } = await exploreTrends(params);
   return NextResponse.json({
     ...data,
     geo,
     timeframe,
     available,
+    /** Google is throttling us — transient, and not worth alarming the user. */
+    rateLimited: rateLimited ?? false,
     /** True when the results describe the brand's category, not a typed query. */
     implicit: keywords.length === 0,
     key: requestKey("explore", params),
