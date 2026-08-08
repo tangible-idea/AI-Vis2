@@ -1,14 +1,17 @@
 "use client";
 
-import { Suspense, use, useRef, useState } from "react";
+import { Suspense, use, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight, ExternalLink, Search, Wand2 } from "lucide-react";
 import { Badge, Button, Card, CardHeader, Input, Label, Select } from "@/components/ui";
 import {
+  EXPLORE_ROWS,
   EXPLORE_TIMEFRAMES,
+  MAX_EXPLORE_KEYWORDS,
   TRENDING_TIMEFRAMES,
   TRENDS_GEOS,
   geoLabel,
+  parseKeywords,
   supportsTrendingNow,
   type ExploreResult,
   type ExploreTimeframe,
@@ -18,6 +21,7 @@ import {
   type TrendsOutcome,
 } from "@/lib/trends";
 import { useT } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 /**
  * A section's data plus how it arrived. The server streams the first one in as
@@ -219,29 +223,98 @@ function ExploreSummary({
   );
 }
 
-/** One of Google's two ranked lists. The card and its heading render without it. */
-function QueryPanel({
-  kind,
+/**
+ * The Top and Rising cards side by side. Headings and hints live here so they
+ * paint with the page and stay put while the rows themselves stream in.
+ */
+function QueryCards({ geo, top, rising }: { geo: string; top: ReactNode; rising: ReactNode }) {
+  const t = useT();
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <Card>
+        <CardHeader title={t("trends.topQueries")} hint={t("trends.topQueriesHint", { geo })} />
+        <div className="px-5 pb-4">{top}</div>
+      </Card>
+      <Card>
+        <CardHeader
+          title={t("trends.risingQueriesTitle")}
+          hint={t("trends.risingQueries", { geo })}
+        />
+        <div className="px-5 pb-4">{rising}</div>
+      </Card>
+    </div>
+  );
+}
+
+/**
+ * Explore results, one keyword at a time.
+ *
+ * Google ranks related queries per comparison item, and Sightline keeps them
+ * that way: comparing two keywords gives each its own tab, and the two panels
+ * only ever show the selected keyword's queries — the same way Google's own
+ * Explore separates them. A single keyword needs no tabs.
+ */
+function ExploreQueries({
   promise,
   override,
   failed,
+  geo,
   onDrillDown,
 }: {
-  kind: "top" | "rising";
   promise: Promise<ExploreState>;
   override: ExploreState | null;
   failed: boolean;
+  geo: string;
   onDrillDown: (query: string) => void;
 }) {
   const t = useT();
   const { data, rateLimited } = useSection(promise, override, failed);
-  return (
+  const groups = data.byKeyword;
+
+  // the selection belongs to a keyword set: a new search starts at its first
+  // keyword rather than keeping an index that now means something else
+  const identity = groups.map((g) => g.keyword).join("|");
+  const [selected, setSelected] = useState({ identity, index: 0 });
+  const index =
+    selected.identity === identity ? Math.min(selected.index, Math.max(groups.length - 1, 0)) : 0;
+  const active = groups[index];
+
+  // Google throttling us is not the user's keywords being wrong — say nothing
+  const emptyLabel = rateLimited ? "" : t("trends.noResults");
+  const rows = (list: QueryResult[]) => (
     <QueryRows
-      rows={kind === "top" ? data.top : data.rising}
-      emptyLabel={rateLimited ? "" : t("trends.noResults")}
+      rows={list}
+      emptyLabel={emptyLabel}
       onDrillDown={onDrillDown}
       relatedLabel={t("trends.related")}
     />
+  );
+
+  return (
+    <>
+      {groups.length > 1 && (
+        <div role="tablist" aria-label={t("trends.keywordTabsLabel")} className="mb-2 flex flex-wrap gap-1.5 px-1">
+          {groups.map((group, i) => (
+            <button
+              key={group.keyword}
+              role="tab"
+              type="button"
+              aria-selected={i === index}
+              onClick={() => setSelected({ identity, index: i })}
+              className={cn(
+                "cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                i === index
+                  ? "bg-ink text-paper"
+                  : "border border-line-strong bg-surface text-ink-soft hover:bg-hover hover:text-ink"
+              )}
+            >
+              {group.keyword}
+            </button>
+          ))}
+        </div>
+      )}
+      <QueryCards geo={geo} top={rows(active?.top ?? [])} rising={rows(active?.rising ?? [])} />
+    </>
   );
 }
 
@@ -330,6 +403,8 @@ export function TrendsExplorer({
   const t = useT();
   const [geo, setGeo] = useState(initialGeo);
   const [query, setQuery] = useState("");
+  /** Set when the box names more keywords than a comparison can hold. */
+  const [tooManyKeywords, setTooManyKeywords] = useState(false);
   const [timeframe, setTimeframe] = useState<ExploreTimeframe>("week");
   const [trendingTimeframe, setTrendingTimeframe] = useState<TrendingTimeframe>("24h");
 
@@ -356,10 +431,15 @@ export function TrendsExplorer({
   const trendingUnsupported = !supportsTrendingNow(geo);
 
   async function loadExplore(next: { q?: string; geo?: string; tf?: ExploreTimeframe; persist?: boolean }) {
+    // geo and timeline changes re-run whatever is in the box, cleaned up the
+    // same way a submit would — and say so if it holds more than fits
+    const typed = parseKeywords(query);
+    if (next.q === undefined) setTooManyKeywords(typed.overflow);
+
     const params = new URLSearchParams({
       projectId,
       mode: "explore",
-      q: next.q ?? query,
+      q: next.q ?? typed.keywords.join(", "),
       geo: next.geo ?? geo,
       timeframe: next.tf ?? timeframe,
     });
@@ -421,8 +501,21 @@ export function TrendsExplorer({
     loadTrending({ geo: g });
   }
 
+  /**
+   * Runs the typed comparison. Blanks and repeats are cleaned up silently, but
+   * naming more than the comparison holds is refused rather than quietly
+   * dropping keywords and answering a question nobody asked.
+   */
+  function search() {
+    const { keywords, overflow } = parseKeywords(query);
+    setTooManyKeywords(overflow);
+    if (overflow) return;
+    loadExplore({ q: keywords.join(", ") });
+  }
+
   function drillDown(term: string) {
     setQuery(term);
+    setTooManyKeywords(false);
     loadExplore({ q: term });
   }
 
@@ -433,19 +526,34 @@ export function TrendsExplorer({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            loadExplore({});
+            search();
           }}
           className="space-y-3"
         >
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("trends.searchPlaceholder")}
-              className="pl-8"
-              aria-label={t("common.search")}
-            />
+          <div>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
+              <Input
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setTooManyKeywords(false);
+                }}
+                placeholder={t("trends.searchPlaceholder", { max: MAX_EXPLORE_KEYWORDS })}
+                className="pl-8"
+                aria-label={t("common.search")}
+                aria-invalid={tooManyKeywords || undefined}
+                aria-describedby="tr-keyword-hint"
+              />
+            </div>
+            <p
+              id="tr-keyword-hint"
+              className={cn("mt-1 text-[11px]", tooManyKeywords ? "text-poor" : "text-ink-faint")}
+            >
+              {tooManyKeywords
+                ? t("trends.tooManyKeywords", { max: MAX_EXPLORE_KEYWORDS })
+                : t("trends.keywordLimitHint", { max: MAX_EXPLORE_KEYWORDS })}
+            </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
@@ -502,45 +610,26 @@ export function TrendsExplorer({
         />
       </Suspense>
 
-      {/* ── Explore: Top + Rising queries ─────────────────────── */}
+      {/* ── Explore: Top + Rising queries, per keyword ────────── */}
       <section>
         <h2 className="mb-2 px-1 text-sm font-semibold">{t("trends.explore")}</h2>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Card>
-            <CardHeader
-              title={t("trends.topQueries")}
-              hint={t("trends.topQueriesHint", { geo: label(geo) })}
+        <Suspense
+          fallback={
+            <QueryCards
+              geo={label(geo)}
+              top={<RowsSkeleton rows={EXPLORE_ROWS} />}
+              rising={<RowsSkeleton rows={EXPLORE_ROWS} />}
             />
-            <div className="px-5 pb-4">
-              <Suspense fallback={<RowsSkeleton />}>
-                <QueryPanel
-                  kind="top"
-                  promise={explorePromise}
-                  override={exploreOverride}
-                  failed={exploreFailed}
-                  onDrillDown={drillDown}
-                />
-              </Suspense>
-            </div>
-          </Card>
-          <Card>
-            <CardHeader
-              title={t("trends.risingQueriesTitle")}
-              hint={t("trends.risingQueries", { geo: label(geo) })}
-            />
-            <div className="px-5 pb-4">
-              <Suspense fallback={<RowsSkeleton />}>
-                <QueryPanel
-                  kind="rising"
-                  promise={explorePromise}
-                  override={exploreOverride}
-                  failed={exploreFailed}
-                  onDrillDown={drillDown}
-                />
-              </Suspense>
-            </div>
-          </Card>
-        </div>
+          }
+        >
+          <ExploreQueries
+            promise={explorePromise}
+            override={exploreOverride}
+            failed={exploreFailed}
+            geo={label(geo)}
+            onDrillDown={drillDown}
+          />
+        </Suspense>
       </section>
 
       {/* ── Trending now: independent, keyword-free ───────────── */}

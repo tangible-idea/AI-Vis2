@@ -1,6 +1,13 @@
 import { getAppContext } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
-import { planLimits } from "@/lib/plans";
+import {
+  contentAllowance,
+  periodStartIso,
+  planColumns,
+  planLimits,
+  planMatrix,
+  scanAllowance,
+} from "@/lib/plans";
 import { Card, CardHeader, PageHeader } from "@/components/ui";
 import { getT } from "@/lib/i18n/server";
 import { PlanSummary, type UsageMeter } from "./plan-summary";
@@ -18,13 +25,11 @@ export default async function BillingPage() {
   const t = await getT();
   const supabase = await createClient();
 
-  const monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
-  const monthIso = monthStart.toISOString();
-  const freePlan = limits.totalScans != null;
+  // the same allowances the enforcement paths apply, counted over the same
+  // window — so a meter can never read differently from what a scan is told
+  const scans = scanAllowance(limits);
+  const content = contentAllowance(limits);
 
-  // usage counts mirror the same queries the enforcement paths use
   const [{ count: activeProjects }, { count: scansUsed }, { count: contentUsed }] = await Promise.all([
     supabase
       .from("projects")
@@ -37,39 +42,45 @@ export default async function BillingPage() {
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
       .neq("trigger", "demo")
-      .gte("created_at", freePlan ? "1970-01-01" : monthIso),
+      .gte("created_at", periodStartIso(scans)),
     supabase
       .from("generated_content")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
-      .gte("created_at", monthIso),
+      .gte("created_at", periodStartIso(content)),
   ]);
 
-  const contentUnlimited = limits.contentGenerations >= UNLIMITED_THRESHOLD;
+  const contentUnlimited = content.limit >= UNLIMITED_THRESHOLD;
   const usage: UsageMeter[] = [
     {
       label: t("billing.usageProjects"),
       used: activeProjects ?? 0,
       limit: limits.maxProjects,
     },
-    freePlan
+    scans.lifetime
       ? {
           label: t("billing.usageScans"),
           used: scansUsed ?? 0,
-          limit: limits.totalScans,
+          limit: scans.limit,
           hint: t("billing.usageLifetime"),
         }
       : {
+          // paid scans are metered per project, so the owner-wide count here
+          // is context rather than a quota to fill
           label: t("billing.usageScans"),
           used: scansUsed ?? 0,
           limit: null,
-          hint: t("billing.perProjectHint", { count: limits.scansPerMonth }),
+          hint: t("billing.perProjectHint", { count: scans.limit }),
         },
     {
       label: t("billing.usageContent"),
       used: contentUsed ?? 0,
-      limit: contentUnlimited ? null : limits.contentGenerations,
-      hint: contentUnlimited ? t("billing.unlimitedNote") : t("billing.usageThisMonth"),
+      limit: contentUnlimited ? null : content.limit,
+      hint: contentUnlimited
+        ? t("billing.unlimitedNote")
+        : content.lifetime
+          ? t("billing.usageLifetime")
+          : t("billing.usageThisMonth"),
     },
   ];
 
@@ -90,7 +101,8 @@ export default async function BillingPage() {
         <Card>
           <CardHeader title={t("billing.comparePlans")} hint={t("billing.comparePlansHint")} />
           <div className="px-5 pb-5">
-            <BillingPlans currentPlan={profile.plan} />
+            {/* resolved here: the client cannot see PLAN_LIMITS_JSON */}
+            <BillingPlans currentPlan={profile.plan} columns={planColumns()} rows={planMatrix()} />
           </div>
         </Card>
 

@@ -158,18 +158,19 @@ export async function inviteMember(formData: FormData) {
   const requestedRole = String(formData.get("role")) === "viewer" ? "viewer" : "member";
   if (!email || !email.includes("@")) return;
 
-  const [{ data: profile }, { count }] = await Promise.all([
+  const [{ data: profile }, { data: seats }] = await Promise.all([
     supabase.from("profiles").select("plan").eq("id", user.id).single(),
-    supabase
-      .from("project_members")
-      .select("id", { count: "exact", head: true })
-      .eq("project_id", projectId),
+    supabase.from("project_members").select("role").eq("project_id", projectId),
   ]);
   const limits = planLimits(profile?.plan);
-  if (!limits.team || (count ?? 0) >= limits.maxTeamMembers) return;
+  const taken = seats ?? [];
+  if (!limits.team || taken.length >= limits.maxTeamMembers) return;
 
-  // plans without editing seats (e.g. Starter) can only invite viewers
-  const role = limits.memberSeats ? requestedRole : "viewer";
+  // seats split into editing members and read-only viewers: Starter has no
+  // member seats at all, Pro has one. Once they're taken the invite still
+  // goes out — as a viewer — rather than failing silently.
+  const membersUsed = taken.filter((m) => m.role === "member").length;
+  const role = requestedRole === "member" && membersUsed < limits.maxMemberSeats ? "member" : "viewer";
 
   // RLS restricts inserts to the workspace owner
   await supabase.from("project_members").insert({

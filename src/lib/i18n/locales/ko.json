@@ -82,15 +82,9 @@
     "step": "1/2단계 · 비즈니스 소개",
     "title": "스캔 설정하기",
     "subtitle": "첫 스캔에는 기본 정보만 있으면 됩니다 — 하지만 더 자세히 알려주실수록 프롬프트, 점수, 추천의 정확도가 높아집니다.",
-    "brandName": "브랜드명 *",
-    "domain": "도메인 *",
-    "industry": "업종 *",
-    "descriptionLabel": "어떤 비즈니스를 하시나요?",
     "optional": "(선택)",
-    "descriptionHint": "짧은 설명만으로도 구매자가 실제로 묻는 방식에 맞게 스캔 프롬프트를 다듬을 수 있습니다 — 자세할수록 결과가 좋아집니다.",
     "moreDetail": "세부 정보 추가 — 경쟁사, 시장, 언어",
     "moreDetailHint": "(선택, 정확도 향상)",
-    "competitors": "경쟁사 (최대 3개) — 도메인을 입력하세요",
     "creating": "프로젝트 생성 중…",
     "continue": "계속 → 첫 스캔 실행",
     "step2Hint": "2단계에서 ChatGPT, Claude, Gemini, Perplexity를 스캔합니다 — 1분 이내.",
@@ -225,7 +219,7 @@
     "title": "트렌드",
     "subtitle": "무엇을 써야 할까요? 검색 수요를 한 번의 클릭으로 콘텐츠로 만드세요",
     "locked": "Google 트렌드 인사이트는 Starter와 Pro에서 이용할 수 있습니다",
-    "searchPlaceholder": "키워드 검색 — 쉼표로 구분해 여러 개 비교 가능",
+    "searchPlaceholder": "키워드 검색 — 쉼표로 구분해 여러 개 비교 가능 (최대 {max}개)",
     "comparing": "{count}개 키워드 비교 중",
     "risingQueries": "{geo}에서 가장 빠르게 상승 중",
     "noResults": "결과 없음 — 다른 키워드를 시도해 보세요.",
@@ -248,7 +242,10 @@
     "searchVolume": "검색 {volume}",
     "lockedHint": "Google 트렌드의 인기·급상승 검색어",
     "dailyFeedNote": "구글 일간 피드 — 이 지역의 지난 24시간 기준입니다.",
-    "trendingNeedsRegion": "구글은 실시간 인기 급상승을 국가별로만 제공합니다 — 위에서 지역을 선택하세요."
+    "trendingNeedsRegion": "구글은 실시간 인기 급상승을 국가별로만 제공합니다 — 위에서 지역을 선택하세요.",
+    "keywordLimitHint": "쉼표로 구분해 최대 {max}개의 키워드를 비교할 수 있습니다.",
+    "tooManyKeywords": "최대 {max}개의 키워드만 비교할 수 있습니다 — 나머지는 삭제해 주세요.",
+    "keywordTabsLabel": "키워드별 결과"
   },
   "optimize": {
     "title": "최적화",
@@ -346,7 +343,7 @@
     "website": "웹사이트 / 앱 URL",
     "industry": "업종",
     "competitors": "경쟁사",
-    "competitorsHint": "{plan} 플랜 기준 {max}개 중 {count}개 — 도메인을 입력하면 이름과 로고를 가져옵니다. 드래그로 순서 변경.",
+    "competitorsHint": "{plan} 플랜 기준 {max}개 중 {count}개 — 도메인 또는 앱 URL을 입력하면 이름과 로고를 가져옵니다. 드래그로 순서 변경.",
     "competitorLimit": "경쟁사 한도에 도달했습니다 —",
     "upgradeToTrackMore": "업그레이드하고 더 추적하세요.",
     "prompts": "스캔 프롬프트",
@@ -395,7 +392,11 @@
     "viewerOnlyNote": "현재 플랜에서는 초대한 팀원이 뷰어(리포트 보기 전용)로 참여합니다. 편집 멤버를 추가하려면 Pro로 업그레이드하세요.",
     "businessDescription": "비즈니스 설명",
     "businessDescriptionHint": "AI 답변에서 이름이 비슷한 회사와 브랜드를 구분하는 데 사용됩니다.",
-    "websiteHint": "도메인(acme.com) 또는 App Store·Google Play 링크를 입력하세요. iOS와 Android 앱은 별도 프로젝트로 추적됩니다."
+    "websiteHint": "도메인(acme.com) 또는 App Store·Google Play 링크를 입력하세요. iOS와 Android 앱은 별도 프로젝트로 추적됩니다.",
+    "memberSeatsNote": "편집 멤버 좌석 {max}개 중 {used}개 사용 — 이후 팀원은 뷰어로 참여합니다.",
+    "competitorInputHint": "경쟁사 도메인 또는 앱 URL을 입력하세요.",
+    "competitorsLabel": "경쟁사 (최대 {max}개)",
+    "requiredMark": "*"
   },
   "summary": {
     "title": "마지막 스캔 요약",
@@ -596,7 +597,6 @@
     "improve": "결과 개선하기",
     "improveTitle": "브랜드 프로필 다듬기",
     "improveHint": "브랜드 매칭에 영향을 주는 항목만 표시됩니다. 나머지는 그대로 유지됩니다.",
-    "descriptionHint": "무엇을 하는지 한 문장이면 이름이 비슷한 회사를 걸러내는 데 도움이 됩니다.",
     "save": "저장하고 적용"
   }
 }

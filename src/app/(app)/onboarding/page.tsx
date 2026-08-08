@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, Sparkles } from "lucide-react";
 import { createProject, type OnboardingState } from "../actions";
 import { useScan } from "@/lib/use-scan";
-import { Button, Card, Input, Label, Select } from "@/components/ui";
-import { IndustrySelect } from "@/components/industry-select";
+import { Button, Card, Label, Select } from "@/components/ui";
+import { BrandProfileFields, CompetitorFields } from "@/components/brand-profile-fields";
 import { CONTENT_LANGUAGES, COUNTRIES, countryLabel } from "@/lib/types";
 import { PREVIEW_STORAGE_KEY, type PreviewInputs } from "@/lib/preview";
 import { useT } from "@/lib/i18n";
@@ -89,48 +89,17 @@ export default function OnboardingPage() {
 
       <Card className="mt-6 p-6">
         <form action={action} className="space-y-4" key={prefill ? "prefilled" : "blank"}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="name">{t("onboarding.brandName")}</Label>
-              <Input
-                id="name"
-                name="name"
-                required
-                placeholder="Acme Bookings"
-                defaultValue={prefill?.brand ?? ""}
-              />
-            </div>
-            <div>
-              <Label htmlFor="website">{t("onboarding.domain")}</Label>
-              <Input
-                id="website"
-                name="website"
-                required
-                placeholder="acme.com"
-                defaultValue={prefill?.domain ?? ""}
-              />
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="industry">{t("onboarding.industry")}</Label>
-            <IndustrySelect id="industry" name="industry" required defaultValue={prefill?.industry} />
-          </div>
-          <div>
-            <Label htmlFor="description">
-              {t("onboarding.descriptionLabel")}{" "}
-              <span className="font-normal text-ink-faint">{t("onboarding.optional")}</span>
-            </Label>
-            <textarea
-              id="description"
-              name="description"
-              rows={3}
-              maxLength={500}
-              defaultValue={prefill?.description ?? ""}
-              placeholder="e.g. Online reservation software for independent restaurants in Korea and Japan"
-              className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
-            />
-            <p className="mt-1 text-[11px] text-ink-faint">{t("onboarding.descriptionHint")}</p>
-          </div>
+          {/* the same Brand Profile fields Settings and "Refine your brand
+              profile" render — one definition, three places to edit it */}
+          <BrandProfileFields
+            idPrefix="ob"
+            values={{
+              name: prefill?.brand,
+              website: prefill?.domain,
+              industry: prefill?.industry,
+              description: prefill?.description,
+            }}
+          />
 
           <button
             type="button"
@@ -170,14 +139,7 @@ export default function OnboardingPage() {
                   </Select>
                 </div>
               </div>
-              <div>
-                <Label>{t("onboarding.competitors")}</Label>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <Input name="competitor1" placeholder="competitor1.com" />
-                  <Input name="competitor2" placeholder="competitor2.com" />
-                  <Input name="competitor3" placeholder="competitor3.com" />
-                </div>
-              </div>
+              <CompetitorFields />
             </div>
           )}
 

@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { industryPhrase } from "../types";
 import { ENGINES, engineInfo } from "../ai/engines";
-import { exploreTrends, resolveTrendsGeo } from "../trends";
+import { exploreTrends, resolveTrendsGeo, risingQueries } from "../trends";
 import type { Engine, Project, ScanResult, Snapshot } from "../types";
 
 /**
@@ -302,7 +302,7 @@ export async function buildTimeline(
       timeframe: "week",
       language: project.language,
     });
-    const top = data.rising[0];
+    const top = risingQueries(data)[0];
     if (top && (top.breakout || (top.change ?? 0) >= 80)) {
       events.push({
         id: `trend-${top.query}`,

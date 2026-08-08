@@ -11,11 +11,17 @@ export interface PlanLimits {
   scansPerMonth: number;
   /** Lifetime scan cap per user (free plan); null = monthly limit applies. */
   totalScans: number | null;
+  /** Content generations per calendar month. */
   contentGenerations: number;
+  /** Lifetime generation cap per user (free plan); null = monthly limit applies. */
+  totalContentGenerations: number | null;
   /** Team seats besides the owner (0 = no collaboration). */
   maxTeamMembers: number;
-  /** Whether invited teammates can be editing members (false = viewers only). */
-  memberSeats: boolean;
+  /**
+   * How many of those seats may be editing members; the rest are viewers.
+   * 0 = viewer-only plan.
+   */
+  maxMemberSeats: number;
   /** Days of history shown in trends/timeline; null = unlimited. */
   historyDays: number | null;
   trends: boolean;
@@ -34,13 +40,15 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     price: "$0",
     priceNote: "forever",
     maxProjects: 1,
-    maxPrompts: 5,
+    maxPrompts: 3,
     maxCompetitors: 2,
-    scansPerMonth: 5,
-    totalScans: 5,
-    contentGenerations: 5,
+    // free is a lifetime allowance, so the monthly figure only mirrors it
+    scansPerMonth: 3,
+    totalScans: 3,
+    contentGenerations: 3,
+    totalContentGenerations: 3,
     maxTeamMembers: 0,
-    memberSeats: false,
+    maxMemberSeats: 0,
     historyDays: null,
     trends: false,
     benchmarks: false,
@@ -55,14 +63,15 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     price: "$59",
     priceNote: "per month",
     maxProjects: 3,
-    maxPrompts: 20,
+    maxPrompts: 15,
     maxCompetitors: 10,
-    scansPerMonth: 30,
+    scansPerMonth: 10,
     totalScans: null,
-    contentGenerations: 30,
+    contentGenerations: 10,
+    totalContentGenerations: null,
     maxTeamMembers: 2,
     // Starter seats are viewer-only; editing collaborators start on Pro
-    memberSeats: false,
+    maxMemberSeats: 0,
     historyDays: null,
     trends: true,
     benchmarks: true,
@@ -79,11 +88,13 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     maxProjects: 8,
     maxPrompts: 50,
     maxCompetitors: 30,
-    scansPerMonth: 60,
+    scansPerMonth: 30,
     totalScans: null,
-    contentGenerations: 60,
+    contentGenerations: 30,
+    totalContentGenerations: null,
+    // 5 seats, of which one may edit — the rest are read-only viewers
     maxTeamMembers: 5,
-    memberSeats: true,
+    maxMemberSeats: 1,
     historyDays: null,
     trends: true,
     benchmarks: true,
@@ -107,8 +118,9 @@ const BASE_PLANS: Record<Plan, PlanLimits> = {
     scansPerMonth: 4,
     totalScans: null,
     contentGenerations: 15,
+    totalContentGenerations: null,
     maxTeamMembers: 2,
-    memberSeats: true,
+    maxMemberSeats: 2,
     historyDays: 180,
     trends: true,
     benchmarks: true,
@@ -148,6 +160,63 @@ export function planLimits(plan: Plan | null | undefined): PlanLimits {
   return PLANS[plan ?? "free"] ?? PLANS.free;
 }
 
+/**
+ * The allowance actually in force for a metered feature. Free plans meter a
+ * lifetime total; paid plans meter a calendar month. Every enforcement path,
+ * usage meter and pricing cell reads the answer from here, so the three can
+ * never disagree about what a plan includes.
+ */
+export interface Allowance {
+  limit: number;
+  /** True when `limit` is a lifetime cap rather than a monthly one. */
+  lifetime: boolean;
+}
+
+export function scanAllowance(limits: PlanLimits): Allowance {
+  return limits.totalScans != null
+    ? { limit: limits.totalScans, lifetime: true }
+    : { limit: limits.scansPerMonth, lifetime: false };
+}
+
+export function contentAllowance(limits: PlanLimits): Allowance {
+  return limits.totalContentGenerations != null
+    ? { limit: limits.totalContentGenerations, lifetime: true }
+    : { limit: limits.contentGenerations, lifetime: false };
+}
+
+/** Start of the current calendar month, ISO — the paid-plan metering window. */
+export function monthStartIso(): string {
+  const start = new Date();
+  start.setDate(1);
+  start.setHours(0, 0, 0, 0);
+  return start.toISOString();
+}
+
+/**
+ * The `created_at >= …` cutoff for counting usage against an allowance:
+ * everything ever for a lifetime cap, this calendar month otherwise. Sharing
+ * it keeps the enforcement queries and the billing meters counting the same
+ * rows.
+ */
+export function periodStartIso(allowance: Allowance): string {
+  return allowance.lifetime ? new Date(0).toISOString() : monthStartIso();
+}
+
+/** "3 total" / "10 / month" — the wording used on pricing and in billing. */
+export function allowanceLabel({ limit, lifetime }: Allowance): string {
+  return lifetime ? `${limit} total` : `${limit} / month`;
+}
+
+/** How a plan's seats split between editing members and read-only viewers. */
+export function seatsLabel(limits: PlanLimits): string {
+  if (!limits.team || limits.maxTeamMembers === 0) return "—";
+  const viewers = limits.maxTeamMembers - limits.maxMemberSeats;
+  if (limits.maxMemberSeats === 0) return `${limits.maxTeamMembers} (viewer)`;
+  return `${limits.maxTeamMembers} seats (${limits.maxMemberSeats} member, ${viewers} viewer${
+    viewers === 1 ? "" : "s"
+  })`;
+}
+
 /** ISO cutoff for history queries, or null when the plan has full history. */
 export function historyCutoffIso(limits: PlanLimits): string | null {
   if (limits.historyDays == null) return null;
@@ -158,30 +227,87 @@ export function historyCutoffIso(limits: PlanLimits): string | null {
  * Feature comparison rows — the single source of truth behind BOTH the public
  * pricing page and the in-app billing page (they must stay consistent to avoid
  * confusion). Ordered buyer-first: what you can do, then what's included.
- * `values` are [free, starter, pro]; `key` renders a check/dash from PLANS.
- * `note` renders as small italic sub-text under the feature name.
+ *
+ * Every number is read out of PLANS rather than written here, so the matrix
+ * cannot advertise an allowance the enforcement paths don't grant: changing a
+ * limit above changes the pricing table, the usage meters and the paywalls in
+ * one edit. `key` renders a check/dash straight from the plan's flag; `value`
+ * renders text. `note` renders as small italic sub-text under the label.
  */
 export const PLAN_FEATURES: {
   label: string;
-  key: keyof PlanLimits | null;
-  values?: [string, string, string];
+  key?: keyof PlanLimits;
+  value?: (limits: PlanLimits) => string;
   group?: string;
   note?: string;
 }[] = [
-  { group: "Usage", label: "Brand projects (websites)", key: null, values: ["1", "3", "8"] },
-  { label: "Tracked prompts", key: null, values: ["5", "20", "50"] },
-  { label: "AI visibility scans", key: null, values: ["5 total", "30 / month", "60 / month"] },
-  { label: "Competitors tracked", key: null, values: ["2", "10", "30"] },
-  { label: "Content generations (pages, schema, llms.txt, summaries)", key: null, values: ["5", "30 / month", "60 / month"] },
+  {
+    group: "Usage",
+    label: "Brand projects (websites / apps)",
+    value: (l) => String(l.maxProjects),
+  },
+  { label: "Tracked prompts", value: (l) => String(l.maxPrompts) },
+  { label: "AI visibility scans", value: (l) => allowanceLabel(scanAllowance(l)) },
+  { label: "Competitors tracked", value: (l) => String(l.maxCompetitors) },
+  {
+    label: "Content generations (pages, schema, llms.txt, summaries)",
+    value: (l) => allowanceLabel(contentAllowance(l)),
+  },
   { group: "Included", label: "Trending topics", key: "trends" },
   { label: "Market benchmarks", key: "benchmarks" },
   { label: "Weekly email reports", key: "weeklyReports" },
   { label: "Shareable report links", key: "shareLinks" },
   {
     label: "Team collaboration (seats)",
-    key: null,
-    values: ["—", "2 (viewer)", "5 seats"],
+    value: seatsLabel,
     note: "Members can run scans and generate content. Viewers have read-only access.",
   },
   { group: "Pro only", label: "White label reports", key: "whiteLabel" },
 ];
+
+// ── rendering the matrix ─────────────────────────────────────
+//
+// PLANS is resolved from PLAN_LIMITS_JSON, which only exists on the server —
+// a client component reading PLANS directly would render the un-overridden
+// defaults and hydrate over server HTML that says something else. So the
+// table is computed here, on the server, and handed to the UI as plain data.
+
+/** The plans offered publicly, in column order. Lifetime is never shown. */
+export const PUBLIC_PLANS = ["free", "starter", "pro"] as const;
+
+export type PublicPlan = (typeof PUBLIC_PLANS)[number];
+
+export interface PlanColumn {
+  plan: PublicPlan;
+  label: string;
+  price: string;
+  priceNote: string;
+}
+
+export interface PlanMatrixRow {
+  label: string;
+  group?: string;
+  note?: string;
+  /** One cell per column: text, or a boolean rendered as a check/dash. */
+  cells: (string | boolean)[];
+}
+
+export function planColumns(): PlanColumn[] {
+  return PUBLIC_PLANS.map((plan) => ({
+    plan,
+    label: PLANS[plan].label,
+    price: PLANS[plan].price,
+    priceNote: PLANS[plan].priceNote,
+  }));
+}
+
+export function planMatrix(): PlanMatrixRow[] {
+  return PLAN_FEATURES.map(({ label, group, note, key, value }) => ({
+    label,
+    group,
+    note,
+    cells: PUBLIC_PLANS.map((plan) =>
+      value ? value(PLANS[plan]) : Boolean(PLANS[plan][key as keyof PlanLimits])
+    ),
+  }));
+}

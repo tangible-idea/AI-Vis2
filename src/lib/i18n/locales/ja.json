@@ -82,15 +82,9 @@
     "step": "ステップ 1/2 · ビジネスについて",
     "title": "スキャンを設定",
     "subtitle": "初回スキャンに必要なのは基本情報だけです — ただし詳しく教えていただくほど、プロンプト・スコア・提案の精度が上がります。",
-    "brandName": "ブランド名 *",
-    "domain": "ドメイン *",
-    "industry": "業種 *",
-    "descriptionLabel": "どのようなビジネスですか？",
     "optional": "（任意）",
-    "descriptionHint": "短い説明があるだけで、買い手が実際に尋ねる言い回しに合わせてスキャンプロンプトを調整できます — 詳細なほど結果が良くなります。",
     "moreDetail": "詳細を追加 — 競合、市場、言語",
     "moreDetailHint": "（任意、精度向上）",
-    "competitors": "競合（最大3社）— ドメインを入力",
     "creating": "プロジェクト作成中…",
     "continue": "続行 → 初回スキャンを実行",
     "step2Hint": "ステップ2では ChatGPT、Claude、Gemini、Perplexity をスキャンします — 1分以内。",
@@ -225,7 +219,7 @@
     "title": "トレンド",
     "subtitle": "何を書くべき？ 検索需要をワンクリックでコンテンツに",
     "locked": "Google トレンドのインサイトは Starter と Pro でご利用いただけます",
-    "searchPlaceholder": "キーワードを検索 — カンマ区切りで複数比較も可能",
+    "searchPlaceholder": "キーワードを検索 — カンマ区切りで複数比較も可能（最大{max}件）",
     "comparing": "{count}件のキーワードを比較中",
     "risingQueries": "{geo} で最も伸びている",
     "noResults": "結果なし — 別のキーワードをお試しください。",
@@ -248,7 +242,10 @@
     "searchVolume": "{volume} 検索",
     "lockedHint": "Google トレンドの人気・急上昇クエリ",
     "dailyFeedNote": "Google のデイリーフィード — この地域の過去1日間が対象です。",
-    "trendingNeedsRegion": "Google の急上昇ワードは国別のみの提供です — 上でリージョンを選択してください。"
+    "trendingNeedsRegion": "Google の急上昇ワードは国別のみの提供です — 上でリージョンを選択してください。",
+    "keywordLimitHint": "カンマ区切りで最大{max}件のキーワードを比較できます。",
+    "tooManyKeywords": "比較できるキーワードは最大{max}件です — 余分なものを削除してください。",
+    "keywordTabsLabel": "キーワード別の結果"
   },
   "optimize": {
     "title": "最適化",
@@ -346,7 +343,7 @@
     "website": "ウェブサイト / アプリ URL",
     "industry": "業種",
     "competitors": "競合",
-    "competitorsHint": "{plan} プランで {max} 中 {count} — ドメインを入力すると名前とロゴを取得します。ドラッグで並べ替え。",
+    "competitorsHint": "{plan} プランで {max} 中 {count} — ドメインまたはアプリURLを入力すると名前とロゴを取得します。ドラッグで並べ替え。",
     "competitorLimit": "競合の上限に達しました —",
     "upgradeToTrackMore": "アップグレードしてさらに追跡。",
     "prompts": "スキャンプロンプト",
@@ -395,7 +392,11 @@
     "viewerOnlyNote": "現在のプランでは、招待したメンバーはビューア（レポート閲覧のみ）として参加します。編集メンバーを追加するにはProにアップグレードしてください。",
     "businessDescription": "事業内容",
     "businessDescriptionHint": "AI の回答で、似た名前の企業とブランドを区別するために使われます。",
-    "websiteHint": "ドメイン（acme.com）または App Store・Google Play のリンクを入力してください。iOS と Android のアプリは別プロジェクトとして計測されます。"
+    "websiteHint": "ドメイン（acme.com）または App Store・Google Play のリンクを入力してください。iOS と Android のアプリは別プロジェクトとして計測されます。",
+    "memberSeatsNote": "編集メンバー席 {max} 席中 {used} 席使用 — 以降のメンバーは閲覧者として参加します。",
+    "competitorInputHint": "競合のドメインまたはアプリURLを入力してください。",
+    "competitorsLabel": "競合（最大{max}社）",
+    "requiredMark": "*"
   },
   "summary": {
     "title": "最終スキャン概要",
@@ -596,7 +597,6 @@
     "improve": "結果を改善",
     "improveTitle": "ブランドプロフィールを調整",
     "improveHint": "ブランド判定に影響する項目のみです。それ以外はそのまま維持されます。",
-    "descriptionHint": "事業内容の一文が、似た名前の企業を除外する助けになります。",
     "save": "保存して適用"
   }
 }

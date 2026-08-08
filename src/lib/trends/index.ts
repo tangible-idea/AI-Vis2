@@ -26,6 +26,7 @@ import type { ExploreResult, TrendingNowResult } from "./types";
 
 export * from "./types";
 export * from "./urls";
+export * from "./keywords";
 export { TrendsUnavailableError, CACHE_TTL } from "./google";
 
 /** Result plus whether Google actually answered — drives the UI's empty state. */
@@ -62,8 +63,7 @@ export async function exploreTrends(
 ): Promise<TrendsOutcome<ExploreResult>> {
   const empty: ExploreResult = {
     keywords: [],
-    top: [],
-    rising: [],
+    byKeyword: [],
     sourceUrl: googleExploreUrl(params),
   };
   if (process.env.GOOGLE_TRENDS_DISABLED) return { data: empty, available: false };

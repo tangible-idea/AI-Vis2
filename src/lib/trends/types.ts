@@ -59,13 +59,42 @@ export interface TrendingResult {
   contentAngle: string;
 }
 
-/** Everything one Explore request yields — served from a single upstream call. */
-export interface ExploreResult {
-  keywords: KeywordInterest[];
+/**
+ * One keyword's related queries. Google ranks these per comparison item, and
+ * they are kept that way end to end: a comparison of two keywords yields two
+ * of these, and no row ever appears under a keyword it wasn't reported for.
+ */
+export interface KeywordQueries {
+  keyword: string;
   top: QueryResult[];
   rising: QueryResult[];
+}
+
+/** Everything one Explore request yields — served from a single token exchange. */
+export interface ExploreResult {
+  keywords: KeywordInterest[];
+  /** Top/rising queries per keyword, in the order they were requested. */
+  byKeyword: KeywordQueries[];
   /** Link to the same query on Google Trends. */
   sourceUrl: string;
+}
+
+/** Every keyword's rising rows, in keyword order. */
+export function risingQueries(result: ExploreResult): QueryResult[] {
+  return result.byKeyword.flatMap((k) => k.rising);
+}
+
+/** Every keyword's top rows, in keyword order. */
+export function topQueries(result: ExploreResult): QueryResult[] {
+  return result.byKeyword.flatMap((k) => k.top);
+}
+
+/**
+ * The compact "what's worth writing about" list the Dashboard, Monitor and
+ * Timeline cards show: what's growing first, then what's simply popular.
+ */
+export function highlightQueries(result: ExploreResult, limit: number): QueryResult[] {
+  return [...risingQueries(result), ...topQueries(result)].slice(0, limit);
 }
 
 /**

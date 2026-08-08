@@ -82,15 +82,9 @@
     "step": "Bước 1/2 · Về doanh nghiệp của bạn",
     "title": "Thiết lập lần quét",
     "subtitle": "Lần quét đầu chỉ cần thông tin cơ bản — nhưng bạn cung cấp càng chi tiết, prompt, điểm số và khuyến nghị càng chính xác.",
-    "brandName": "Tên thương hiệu *",
-    "domain": "Tên miền *",
-    "industry": "Ngành *",
-    "descriptionLabel": "Doanh nghiệp của bạn làm gì?",
     "optional": "(không bắt buộc)",
-    "descriptionHint": "Một mô tả ngắn giúp chúng tôi đặt câu hỏi quét đúng theo cách người mua thực sự hỏi — càng chi tiết, kết quả càng tốt.",
     "moreDetail": "Thêm chi tiết — đối thủ, thị trường, ngôn ngữ",
     "moreDetailHint": "(không bắt buộc, tăng độ chính xác)",
-    "competitors": "Đối thủ (tối đa 3) — nhập tên miền của họ",
     "creating": "Đang tạo dự án…",
     "continue": "Tiếp tục → chạy lần quét đầu",
     "step2Hint": "Bước 2 sẽ quét ChatGPT, Claude, Gemini và Perplexity — chưa đầy một phút.",
@@ -225,7 +219,7 @@
     "title": "Xu hướng",
     "subtitle": "Nên viết về điều gì? Biến nhu cầu tìm kiếm thành nội dung chỉ với một cú nhấp",
     "locked": "Thông tin Google Trends có ở gói Starter và Pro",
-    "searchPlaceholder": "Tìm một từ khóa — hoặc nhiều từ, cách nhau bằng dấu phẩy, để so sánh",
+    "searchPlaceholder": "Tìm một từ khóa — hoặc nhiều từ, cách nhau bằng dấu phẩy, để so sánh (tối đa {max} từ khóa)",
     "comparing": "Đang so sánh {count} từ khóa",
     "risingQueries": "Tăng nhanh nhất tại {geo}",
     "noResults": "Không có kết quả — thử từ khóa khác.",
@@ -248,7 +242,10 @@
     "searchVolume": "{volume} lượt tìm",
     "lockedHint": "Truy vấn hàng đầu và đang tăng từ Google Trends",
     "dailyFeedNote": "Nguồn cấp hằng ngày của Google — bao gồm một ngày qua ở khu vực này.",
-    "trendingNeedsRegion": "Google chỉ công bố Xu hướng hiện tại theo từng quốc gia — hãy chọn một khu vực ở trên."
+    "trendingNeedsRegion": "Google chỉ công bố Xu hướng hiện tại theo từng quốc gia — hãy chọn một khu vực ở trên.",
+    "keywordLimitHint": "So sánh tối đa {max} từ khóa, cách nhau bằng dấu phẩy.",
+    "tooManyKeywords": "Chỉ so sánh được tối đa {max} từ khóa — hãy xóa bớt.",
+    "keywordTabsLabel": "Kết quả theo từ khóa"
   },
   "optimize": {
     "title": "Tối ưu",
@@ -346,7 +343,7 @@
     "website": "Website / URL ứng dụng",
     "industry": "Ngành",
     "competitors": "Đối thủ",
-    "competitorsHint": "{count} / {max} theo gói {plan} — nhập tên miền, chúng tôi sẽ lấy tên và logo. Kéo để sắp xếp.",
+    "competitorsHint": "{count} / {max} theo gói {plan} — nhập tên miền hoặc URL ứng dụng, chúng tôi sẽ lấy tên và logo. Kéo để sắp xếp.",
     "competitorLimit": "Đã đạt giới hạn đối thủ —",
     "upgradeToTrackMore": "nâng cấp để theo dõi thêm.",
     "prompts": "Prompt quét",
@@ -395,7 +392,11 @@
     "viewerOnlyNote": "Ở gói của bạn, đồng đội được mời tham gia với vai trò người xem (chỉ xem báo cáo). Nâng cấp lên Pro để thêm thành viên có quyền chỉnh sửa.",
     "businessDescription": "Mô tả doanh nghiệp",
     "businessDescriptionHint": "Dùng để phân biệt thương hiệu của bạn với các công ty trùng tên trong câu trả lời của AI.",
-    "websiteHint": "Nhập tên miền (acme.com) hoặc liên kết App Store / Google Play. Ứng dụng iOS và Android được theo dõi như hai dự án riêng."
+    "websiteHint": "Nhập tên miền (acme.com) hoặc liên kết App Store / Google Play. Ứng dụng iOS và Android được theo dõi như hai dự án riêng.",
+    "memberSeatsNote": "Đã dùng {used}/{max} ghế thành viên chỉnh sửa — các thành viên sau sẽ tham gia với quyền xem.",
+    "competitorInputHint": "Nhập tên miền hoặc URL ứng dụng của đối thủ.",
+    "competitorsLabel": "Đối thủ (tối đa {max})",
+    "requiredMark": "*"
   },
   "summary": {
     "title": "Tóm tắt lần quét gần nhất",
@@ -596,7 +597,6 @@
     "improve": "Cải thiện kết quả",
     "improveTitle": "Tinh chỉnh hồ sơ thương hiệu",
     "improveHint": "Chỉ các trường ảnh hưởng đến việc nhận diện thương hiệu; phần còn lại giữ nguyên.",
-    "descriptionHint": "Một câu mô tả công việc giúp loại trừ các công ty trùng tên.",
     "save": "Lưu và áp dụng"
   }
 }

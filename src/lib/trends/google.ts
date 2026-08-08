@@ -14,11 +14,13 @@ import {
   suggestionFor,
   type ExploreResult,
   type KeywordInterest,
+  type KeywordQueries,
   type QueryResult,
   type TrendingNews,
   type TrendingNowResult,
   type TrendingResult,
 } from "./types";
+import { EXPLORE_ROWS } from "./keywords";
 
 /**
  * Google Trends client. Uses the same endpoints trends.google.com's own UI
@@ -92,36 +94,60 @@ interface ExplorePayload {
 }
 
 /**
- * One Explore request → interest comparison, top queries and rising queries.
- * They all come out of a single `explore` token exchange, so the three panels
- * the UI shows cost one upstream conversation, not three.
+ * One Explore request → the interest comparison plus each keyword's top and
+ * rising queries. A single `explore` token exchange yields every widget, and
+ * Google issues one related-queries widget per comparison item — which is
+ * what keeps a two-keyword search from mixing one keyword's queries into the
+ * other's. All widget reads run together and are cached for an hour, so a
+ * comparison costs one round of requests per hour however often it is viewed.
  */
 export async function fetchExplore(params: ExploreParams): Promise<ExploreResult> {
   const keywords = params.keywords.map((k) => k.trim()).filter(Boolean);
   const sourceUrl = googleExploreUrl({ ...params, keywords });
-  if (!keywords.length) return { keywords: [], top: [], rising: [], sourceUrl };
+  if (!keywords.length) return { keywords: [], byKeyword: [], sourceUrl };
 
   const explore = await getJson(exploreApiUrl({ ...params, keywords }));
   const widgets = explore.widgets ?? [];
 
   const timeseries = widgets.find((w) => w.id === "TIMESERIES");
-  const related = widgets.find((w) => w.id.startsWith("RELATED_QUERIES"));
+  const related = relatedWidgets(widgets, keywords.length);
 
-  // the two widget reads are independent — run them together
-  const [interest, ranked] = await Promise.all([
+  const [interest, ...ranked] = await Promise.all([
     timeseries
       ? getJson(widgetDataUrl("multiline", timeseries, params.language))
       : Promise.resolve<ExplorePayload>({}),
-    related
-      ? getJson(widgetDataUrl("relatedsearches", related, params.language))
-      : Promise.resolve<ExplorePayload>({}),
+    ...related.map((widget) =>
+      widget
+        ? getJson(widgetDataUrl("relatedsearches", widget, params.language))
+        : Promise.resolve<ExplorePayload>({})
+    ),
   ]);
 
   return {
     keywords: averageInterest(keywords, interest, params.geo),
-    ...rankedQueries(ranked, params.geo),
+    byKeyword: keywords.map((keyword, i) => ({
+      keyword,
+      ...rankedQueries(ranked[i] ?? {}, params.geo),
+    })),
     sourceUrl,
   };
+}
+
+/**
+ * The related-queries widget for each comparison item, by position.
+ *
+ * Google names them `RELATED_QUERIES_0`, `RELATED_QUERIES_1`, … in request
+ * order — the trailing index is the comparison item they belong to, so it is
+ * read rather than assumed. A keyword Google returns no widget for yields
+ * undefined, and that keyword's panels are simply empty.
+ */
+function relatedWidgets(widgets: Widget[], count: number): (Widget | undefined)[] {
+  const related = widgets.filter((w) => w.id.startsWith("RELATED_QUERIES"));
+  return Array.from({ length: count }, (_, i) => {
+    const byIndex = related.find((w) => w.id === `RELATED_QUERIES_${i}`);
+    // a single-keyword search comes back as a bare "RELATED_QUERIES"
+    return byIndex ?? (related.length === count ? related[i] : undefined);
+  });
 }
 
 /**
@@ -151,20 +177,21 @@ function averageInterest(
 }
 
 /**
- * Google returns two ranked lists: "top" (relative popularity 0–100) and
- * "rising" (percent change, or Breakout). They are kept separate — each panel
- * shows the metric Google actually reports for it.
+ * Google returns two ranked lists per keyword: "top" (relative popularity
+ * 0–100) and "rising" (percent change, or Breakout). They are kept separate —
+ * each panel shows the metric Google actually reports for it — and trimmed to
+ * the rows the UI shows, so nothing unused is carried to the client.
  */
 function rankedQueries(
   payload: ExplorePayload,
   geo: string
-): { top: QueryResult[]; rising: QueryResult[] } {
+): Omit<KeywordQueries, "keyword"> {
   const [topList, risingList] = payload.default?.rankedList ?? [];
 
   const rows = (items: RankedKeyword[] | undefined, kind: "top" | "rising"): QueryResult[] =>
     (items ?? [])
       .filter((i) => (i.query ?? "").trim())
-      .slice(0, 10)
+      .slice(0, EXPLORE_ROWS)
       .map((i) => {
         const query = (i.query as string).trim();
         const breakout = /breakout/i.test(i.formattedValue ?? "");

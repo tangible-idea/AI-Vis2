@@ -82,15 +82,9 @@
     "step": "Langkah 1 dari 2 · Tentang bisnis Anda",
     "title": "Siapkan pemindaian Anda",
     "subtitle": "Pemindaian pertama hanya butuh info dasar — tetapi semakin banyak yang Anda ceritakan, semakin tajam prompt, skor, dan rekomendasinya.",
-    "brandName": "Nama merek *",
-    "domain": "Domain *",
-    "industry": "Industri *",
-    "descriptionLabel": "Apa yang dilakukan bisnis Anda?",
     "optional": "(opsional)",
-    "descriptionHint": "Deskripsi singkat membantu kami menyusun prompt pemindaian sesuai cara pembeli benar-benar bertanya — semakin detail, semakin baik hasilnya.",
     "moreDetail": "Tambahkan detail — kompetitor, pasar, bahasa",
     "moreDetailHint": "(opsional, meningkatkan akurasi)",
-    "competitors": "Kompetitor (maks. 3) — masukkan domain mereka",
     "creating": "Membuat proyek…",
     "continue": "Lanjut → jalankan pemindaian pertama",
     "step2Hint": "Langkah 2 memindai ChatGPT, Claude, Gemini & Perplexity — kurang dari satu menit.",
@@ -225,7 +219,7 @@
     "title": "Tren",
     "subtitle": "Harus menulis tentang apa? Ubah permintaan pencarian jadi konten dalam satu klik",
     "locked": "Wawasan Google Trends tersedia di Starter dan Pro",
-    "searchPlaceholder": "Cari kata kunci — atau beberapa, dipisah koma, untuk membandingkan",
+    "searchPlaceholder": "Cari kata kunci — atau beberapa, dipisah koma, untuk membandingkan (maks. {max} kata kunci)",
     "comparing": "Membandingkan {count} kata kunci",
     "risingQueries": "Tumbuh tercepat di {geo}",
     "noResults": "Tidak ada hasil — coba kata kunci lain.",
@@ -248,7 +242,10 @@
     "searchVolume": "{volume} pencarian",
     "lockedHint": "Kueri teratas dan naik dari Google Trends",
     "dailyFeedNote": "Umpan harian Google — mencakup satu hari terakhir untuk wilayah ini.",
-    "trendingNeedsRegion": "Google hanya menerbitkan Tren saat ini per negara — pilih wilayah di atas."
+    "trendingNeedsRegion": "Google hanya menerbitkan Tren saat ini per negara — pilih wilayah di atas.",
+    "keywordLimitHint": "Bandingkan maksimal {max} kata kunci, dipisah dengan koma.",
+    "tooManyKeywords": "Maksimal {max} kata kunci dapat dibandingkan — hapus selebihnya.",
+    "keywordTabsLabel": "Hasil per kata kunci"
   },
   "optimize": {
     "title": "Optimalkan",
@@ -346,7 +343,7 @@
     "website": "Situs web / URL aplikasi",
     "industry": "Industri",
     "competitors": "Kompetitor",
-    "competitorsHint": "{count} dari {max} pada paket {plan} — masukkan domain, kami ambil nama dan logonya. Seret untuk mengurutkan.",
+    "competitorsHint": "{count} dari {max} pada paket {plan} — masukkan domain atau URL aplikasi, kami ambil nama dan logonya. Seret untuk mengurutkan.",
     "competitorLimit": "Batas kompetitor tercapai —",
     "upgradeToTrackMore": "upgrade untuk melacak lebih banyak.",
     "prompts": "Prompt pemindaian",
@@ -395,7 +392,11 @@
     "viewerOnlyNote": "Pada paket Anda, rekan tim yang diundang bergabung sebagai penonton (hanya laporan). Tingkatkan ke Pro untuk menambah anggota yang dapat mengedit.",
     "businessDescription": "Deskripsi bisnis",
     "businessDescriptionHint": "Digunakan untuk membedakan merek Anda dari perusahaan bernama serupa dalam jawaban AI.",
-    "websiteHint": "Masukkan domain (acme.com) atau tautan App Store / Google Play. Aplikasi iOS dan Android dilacak sebagai proyek terpisah."
+    "websiteHint": "Masukkan domain (acme.com) atau tautan App Store / Google Play. Aplikasi iOS dan Android dilacak sebagai proyek terpisah.",
+    "memberSeatsNote": "{used} dari {max} kursi anggota editor terpakai — rekan berikutnya bergabung sebagai viewer.",
+    "competitorInputHint": "Masukkan domain atau URL aplikasi kompetitor.",
+    "competitorsLabel": "Kompetitor (maksimal {max})",
+    "requiredMark": "*"
   },
   "summary": {
     "title": "Ringkasan pemindaian terakhir",
@@ -596,7 +597,6 @@
     "improve": "Tingkatkan hasil",
     "improveTitle": "Sempurnakan profil merek",
     "improveHint": "Hanya kolom yang memengaruhi pencocokan merek — sisanya tetap sama.",
-    "descriptionHint": "Satu kalimat tentang bisnis Anda membantu menyingkirkan perusahaan bernama serupa.",
     "save": "Simpan dan terapkan"
   }
 }

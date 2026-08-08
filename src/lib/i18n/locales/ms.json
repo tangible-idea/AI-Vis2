@@ -82,15 +82,9 @@
     "step": "Langkah 1 daripada 2 · Tentang perniagaan anda",
     "title": "Sediakan imbasan anda",
     "subtitle": "Imbasan pertama hanya memerlukan maklumat asas — tetapi semakin banyak anda kongsikan, semakin tepat prompt, skor dan cadangan anda.",
-    "brandName": "Nama jenama *",
-    "domain": "Domain *",
-    "industry": "Industri *",
-    "descriptionLabel": "Apakah yang perniagaan anda lakukan?",
     "optional": "(pilihan)",
-    "descriptionHint": "Penerangan ringkas membantu kami menyusun prompt imbasan mengikut cara pembeli benar-benar bertanya — lebih terperinci, lebih baik hasilnya.",
     "moreDetail": "Tambah butiran — pesaing, pasaran, bahasa",
     "moreDetailHint": "(pilihan, meningkatkan ketepatan)",
-    "competitors": "Pesaing (maksimum 3) — masukkan domain mereka",
     "creating": "Mencipta projek…",
     "continue": "Teruskan → jalankan imbasan pertama",
     "step2Hint": "Langkah 2 mengimbas ChatGPT, Claude, Gemini & Perplexity — kurang seminit.",
@@ -225,7 +219,7 @@
     "title": "Trend",
     "subtitle": "Apa patut ditulis? Tukar permintaan carian kepada kandungan dengan satu klik",
     "locked": "Cerapan Google Trends tersedia pada Starter dan Pro",
-    "searchPlaceholder": "Cari kata kunci — atau beberapa, dipisah koma, untuk membandingkan",
+    "searchPlaceholder": "Cari kata kunci — atau beberapa, dipisah koma, untuk membandingkan (maks. {max} kata kunci)",
     "comparing": "Membandingkan {count} kata kunci",
     "risingQueries": "Paling pantas meningkat di {geo}",
     "noResults": "Tiada hasil — cuba kata kunci lain.",
@@ -248,7 +242,10 @@
     "searchVolume": "{volume} carian",
     "lockedHint": "Carian teratas dan meningkat dari Google Trends",
     "dailyFeedNote": "Suapan harian Google — merangkumi sehari lepas bagi wilayah ini.",
-    "trendingNeedsRegion": "Google hanya menerbitkan Sohor kini mengikut negara — pilih wilayah di atas."
+    "trendingNeedsRegion": "Google hanya menerbitkan Sohor kini mengikut negara — pilih wilayah di atas.",
+    "keywordLimitHint": "Bandingkan sehingga {max} kata kunci, dipisahkan dengan koma.",
+    "tooManyKeywords": "Maksimum {max} kata kunci boleh dibandingkan — buang yang berlebihan.",
+    "keywordTabsLabel": "Keputusan mengikut kata kunci"
   },
   "optimize": {
     "title": "Optimum",
@@ -346,7 +343,7 @@
     "website": "Laman web / URL apl",
     "industry": "Industri",
     "competitors": "Pesaing",
-    "competitorsHint": "{count} daripada {max} pada pelan {plan} — masukkan domain, kami dapatkan nama dan logo. Seret untuk menyusun.",
+    "competitorsHint": "{count} daripada {max} pada pelan {plan} — masukkan domain atau URL aplikasi, kami dapatkan nama dan logo. Seret untuk menyusun.",
     "competitorLimit": "Had pesaing dicapai —",
     "upgradeToTrackMore": "naik taraf untuk menjejak lebih banyak.",
     "prompts": "Prompt imbasan",
@@ -395,7 +392,11 @@
     "viewerOnlyNote": "Pada pelan anda, rakan sepasukan yang dijemput menyertai sebagai penonton (laporan sahaja). Naik taraf ke Pro untuk menambah ahli yang boleh menyunting.",
     "businessDescription": "Penerangan perniagaan",
     "businessDescriptionHint": "Digunakan untuk membezakan jenama anda daripada syarikat bernama serupa dalam jawapan AI.",
-    "websiteHint": "Masukkan domain (acme.com) atau pautan App Store / Google Play. Apl iOS dan Android dijejaki sebagai projek berasingan."
+    "websiteHint": "Masukkan domain (acme.com) atau pautan App Store / Google Play. Apl iOS dan Android dijejaki sebagai projek berasingan.",
+    "memberSeatsNote": "{used} daripada {max} kerusi ahli penyunting digunakan — rakan seterusnya menyertai sebagai penonton.",
+    "competitorInputHint": "Masukkan domain atau URL aplikasi pesaing.",
+    "competitorsLabel": "Pesaing (sehingga {max})",
+    "requiredMark": "*"
   },
   "summary": {
     "title": "Ringkasan imbasan terakhir",
@@ -596,7 +597,6 @@
     "improve": "Tingkatkan keputusan",
     "improveTitle": "Perhalusi profil jenama",
     "improveHint": "Hanya medan yang mempengaruhi padanan jenama — selebihnya kekal sama.",
-    "descriptionHint": "Satu ayat tentang perniagaan anda membantu menyingkirkan syarikat bernama serupa.",
     "save": "Simpan dan guna"
   }
 }

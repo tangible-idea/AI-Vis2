@@ -1,4 +1,5 @@
 import { PlanComparison } from "@/components/plan-comparison";
+import { planColumns, planMatrix } from "@/lib/plans";
 
 export const metadata = {
   title: "Pricing",
@@ -19,7 +20,7 @@ export default function PricingPage() {
       </p>
 
       <div className="mt-12">
-        <PlanComparison />
+        <PlanComparison columns={planColumns()} rows={planMatrix()} />
       </div>
 
       <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink-faint">

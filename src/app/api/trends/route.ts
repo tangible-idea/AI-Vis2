@@ -7,6 +7,7 @@ import {
   isExploreTimeframe,
   isTrendingTimeframe,
   isValidTrendsGeo,
+  parseKeywords,
   requestKey,
   resolveTrendsGeo,
   trendingNow,
@@ -73,7 +74,8 @@ export async function GET(request: Request) {
 
   const tf = url.searchParams.get("timeframe") ?? "week";
   const timeframe: ExploreTimeframe = isExploreTimeframe(tf) ? tf : "week";
-  const keywords = splitKeywords(url.searchParams.get("q") ?? "");
+  // the input enforces the same rule; this is the server's own guard
+  const { keywords } = parseKeywords(url.searchParams.get("q") ?? "");
   const params = {
     // no keyword yet → show the brand's own category, still from Google
     keywords: keywords.length ? keywords : [brand.industryPhrase],
@@ -118,13 +120,4 @@ async function resolveGeo(
     if (error) console.warn("[trends] could not remember geo:", error.message);
   }
   return requestedGeo;
-}
-
-/** "computer software, saas" → ["computer software", "saas"] — one series each. */
-function splitKeywords(q: string): string[] {
-  return q
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .slice(0, 5);
 }

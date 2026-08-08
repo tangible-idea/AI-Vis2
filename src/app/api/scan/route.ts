@@ -1,7 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { runScan } from "@/lib/scan/runner";
-import { planLimits } from "@/lib/plans";
+import { periodStartIso, planLimits, scanAllowance } from "@/lib/plans";
 
 export const maxDuration = 300;
 
@@ -38,36 +38,27 @@ export async function POST(request: Request) {
     .single();
   const limits = planLimits(ownerProfile?.plan);
 
-  if (limits.totalScans != null) {
-    // free plan: lifetime cap across all of the owner's projects
-    const { count } = await admin
-      .from("scans")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", project.user_id)
-      .neq("trigger", "demo");
-    if ((count ?? 0) >= limits.totalScans) {
-      return NextResponse.json(
-        { error: `Your ${limits.label} plan includes ${limits.totalScans} scans total. Upgrade for weekly scans and trends.`, code: "limit" },
-        { status: 403 }
-      );
-    }
-  } else {
-    // paid plans: scans this calendar month
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0, 0, 0, 0);
-    const { count } = await admin
-      .from("scans")
-      .select("id", { count: "exact", head: true })
-      .eq("project_id", projectId)
-      .neq("trigger", "demo")
-      .gte("created_at", monthStart.toISOString());
-    if ((count ?? 0) >= limits.scansPerMonth) {
-      return NextResponse.json(
-        { error: `Your ${limits.label} plan includes ${limits.scansPerMonth} scans per month. Upgrade to run more.`, code: "limit" },
-        { status: 403 }
-      );
-    }
+  // free plans meter a lifetime total across every project the owner has;
+  // paid plans meter this calendar month, per project
+  const allowance = scanAllowance(limits);
+  const query = admin
+    .from("scans")
+    .select("id", { count: "exact", head: true })
+    .neq("trigger", "demo")
+    .gte("created_at", periodStartIso(allowance));
+  const { count } = await (allowance.lifetime
+    ? query.eq("user_id", project.user_id)
+    : query.eq("project_id", projectId));
+  if ((count ?? 0) >= allowance.limit) {
+    return NextResponse.json(
+      {
+        error: allowance.lifetime
+          ? `Your ${limits.label} plan includes ${allowance.limit} scans total. Upgrade for weekly scans and trends.`
+          : `Your ${limits.label} plan includes ${allowance.limit} scans per month. Upgrade to run more.`,
+        code: "limit",
+      },
+      { status: 403 }
+    );
   }
 
   const { data: scan, error } = await supabase

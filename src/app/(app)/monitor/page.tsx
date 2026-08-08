@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
-import { exploreTrends, resolveTrendsGeo } from "@/lib/trends";
+import { exploreTrends, highlightQueries, resolveTrendsGeo } from "@/lib/trends";
 import { planLimits } from "@/lib/plans";
 import { engineInfo, ENGINE_IDS } from "@/lib/ai/engines";
 import { formatDate, timeAgo, cn } from "@/lib/utils";
@@ -61,7 +61,7 @@ export default async function MonitorPage() {
     timeframe: "week",
     language: project.language,
   });
-  const trends = [...explore.data.rising, ...explore.data.top].slice(0, 5);
+  const trends = highlightQueries(explore.data, 5);
 
   return (
     <>

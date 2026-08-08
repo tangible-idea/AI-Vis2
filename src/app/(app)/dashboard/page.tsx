@@ -3,7 +3,7 @@ import { ArrowRight, Download, TrendingUp } from "lucide-react";
 import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { ENGINES } from "@/lib/ai/engines";
-import { exploreTrends, resolveTrendsGeo } from "@/lib/trends";
+import { exploreTrends, highlightQueries, resolveTrendsGeo } from "@/lib/trends";
 import { historyCutoffIso, planLimits } from "@/lib/plans";
 import { pct, timeAgo, formatDate } from "@/lib/utils";
 import { Card, CardHeader, EmptyState, PageHeader, Badge, ButtonLink } from "@/components/ui";
@@ -223,9 +223,7 @@ export default async function DashboardPage() {
         language: project.language,
       })
     : null;
-  const trends = exploreForCard
-    ? [...exploreForCard.data.rising, ...exploreForCard.data.top].slice(0, 3)
-    : [];
+  const trends = exploreForCard ? highlightQueries(exploreForCard.data, 3) : [];
 
   // weekly progress deltas
   const pp = (now: number, then: number | undefined) =>

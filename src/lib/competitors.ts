@@ -5,7 +5,7 @@
  * service (no API key) with a letter placeholder as final fallback.
  */
 
-import { canonicalDomain } from "./brand";
+import { canonicalDomain, parseAppUrl, type AppIdentity } from "./brand";
 
 export interface ResolvedCompetitor {
   name: string;
@@ -25,13 +25,32 @@ export function normalizeDomain(input: string): string | null {
   return host.includes(".") ? host : null;
 }
 
-/** "acme-corp.co.uk" → "Acme Corp" — the offline fallback name. */
-export function nameFromDomain(domain: string): string {
-  const base = domain.split(".")[0];
-  return base
+/** "acme-corp" → "Acme Corp". */
+function titleCase(slug: string): string {
+  return slug
     .split(/[-_]/)
+    .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+/** "acme-corp.co.uk" → "Acme Corp" — the offline fallback name. */
+export function nameFromDomain(domain: string): string {
+  return titleCase(domain.split(".")[0]);
+}
+
+/**
+ * A readable name from a store listing when its page can't be fetched:
+ * ".../app/acme-bookings/id123" → "Acme Bookings", "com.acme.bookings" →
+ * "Bookings".
+ */
+function nameFromAppUrl(app: AppIdentity): string {
+  if (app.platform === "android") return titleCase(app.id.split(".").pop() ?? app.id);
+  const slug = new URL(app.storeUrl).pathname
+    .split("/")
+    .filter(Boolean)
+    .find((part, i, parts) => parts[i + 1]?.startsWith("id"));
+  return slug ? titleCase(slug) : "App";
 }
 
 export function faviconUrl(website: string | null): string | null {
@@ -45,12 +64,24 @@ export function faviconUrl(website: string | null): string | null {
 }
 
 /**
- * Resolves free-form competitor input to { name, website }. Domain inputs
- * get a title fetch (short timeout, best-effort); plain names pass through.
+ * Resolves free-form competitor input to { name, website }. Domains and app
+ * store listings both get a title fetch (short timeout, best-effort); plain
+ * names pass through.
+ *
+ * A store listing keeps its full URL rather than being reduced to
+ * "apps.apple.com" — the store host identifies Apple, not the competitor, and
+ * the Brand Context already knows to match app entities by name instead of by
+ * hostname.
  */
 export async function resolveCompetitorInput(
   input: string
 ): Promise<{ name: string; website: string | null }> {
+  const app = parseAppUrl(input.trim());
+  if (app) {
+    const title = await fetchSiteTitle(app.storeUrl);
+    return { name: title ?? nameFromAppUrl(app), website: app.storeUrl };
+  }
+
   const domain = normalizeDomain(input);
   if (!domain) return { name: input.trim(), website: null };
 

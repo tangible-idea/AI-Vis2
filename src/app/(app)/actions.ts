@@ -42,9 +42,10 @@ export async function createProject(
   const country = String(formData.get("country") ?? "US");
   const language = String(formData.get("language") ?? "en");
   const description = String(formData.get("description") ?? "").trim() || null;
-  const competitorNames = [1, 2, 3]
-    .map((i) => String(formData.get(`competitor${i}`) ?? "").trim())
-    .filter(Boolean);
+  // the same positional slots the Brand Profile editor renders everywhere
+  const competitorNames = Array.from({ length: BRAND_PROFILE_COMPETITOR_SLOTS }, (_, i) =>
+    String(formData.get(`competitor${i}`) ?? "").trim()
+  ).filter(Boolean);
 
   if (!name || !website || !industry) return { error: "Please fill in the required fields." };
 

@@ -7,8 +7,8 @@ import {
   improveBrandProfile,
   type ImproveBrandState,
 } from "@/app/(app)/actions";
-import { Button, Input, Label } from "@/components/ui";
-import { IndustrySelect } from "@/components/industry-select";
+import { Button } from "@/components/ui";
+import { BrandProfileFields, CompetitorFields } from "@/components/brand-profile-fields";
 import { useT } from "@/lib/i18n";
 
 export interface BrandRelevanceFields {
@@ -86,56 +86,19 @@ export function BrandRelevance({ fields }: { fields: BrandRelevanceFields }) {
 
       <form action={action} className="mt-4 space-y-4">
         <input type="hidden" name="projectId" value={fields.projectId} />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="r-name">{t("settings.companyBrand")}</Label>
-            <Input id="r-name" name="name" defaultValue={fields.company} required />
-          </div>
-          <div>
-            <Label htmlFor="r-website">{t("settings.website")}</Label>
-            <Input
-              id="r-website"
-              name="website"
-              placeholder="acme.com"
-              defaultValue={fields.website}
-              required
-            />
-            <p className="mt-1 text-[11px] text-ink-faint">{t("settings.websiteHint")}</p>
-          </div>
-        </div>
-        <div>
-          <Label htmlFor="r-industry">{t("settings.industry")}</Label>
-          <IndustrySelect id="r-industry" name="industry" defaultValue={fields.industry} required />
-        </div>
-        <div>
-          <Label htmlFor="r-description">
-            {t("settings.businessDescription")}{" "}
-            <span className="font-normal text-ink-faint">{t("onboarding.optional")}</span>
-          </Label>
-          <textarea
-            id="r-description"
-            name="description"
-            rows={3}
-            maxLength={500}
-            defaultValue={fields.description}
-            className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
-          />
-          <p className="mt-1 text-[11px] text-ink-faint">{t("relevance.descriptionHint")}</p>
-        </div>
+        {/* the same Brand Profile fields as onboarding and Settings — this
+            panel simply pre-fills them and saves the ones that affect matching */}
+        <BrandProfileFields
+          idPrefix="r"
+          values={{
+            name: fields.company,
+            website: fields.website,
+            industry: fields.industry,
+            description: fields.description,
+          }}
+        />
         {fields.competitors.length > 0 && (
-          <div>
-            <Label>{t("onboarding.competitors")}</Label>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {fields.competitors.map((c, i) => (
-                <Input
-                  key={i}
-                  name={`competitor${i}`}
-                  defaultValue={c}
-                  placeholder={`competitor${i + 1}.com`}
-                />
-              ))}
-            </div>
-          </div>
+          <CompetitorFields slots={fields.competitors.length} values={fields.competitors} />
         )}
 
         {state?.error && <p className="text-sm text-poor">{state.error}</p>}

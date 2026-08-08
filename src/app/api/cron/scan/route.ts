@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { runScan } from "@/lib/scan/runner";
-import { planLimits } from "@/lib/plans";
+import { monthStartIso, planLimits } from "@/lib/plans";
 import type { Plan } from "@/lib/types";
 
 export const maxDuration = 300;
@@ -24,9 +24,7 @@ export async function GET(request: Request) {
 
   const db = createAdminClient();
   const startedAt = Date.now();
-  const monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
+  const monthStart = monthStartIso();
 
   const { data: profiles } = await db.from("profiles").select("id, plan");
 
@@ -59,7 +57,7 @@ export async function GET(request: Request) {
         .select("id", { count: "exact", head: true })
         .eq("project_id", project.id)
         .neq("trigger", "demo")
-        .gte("created_at", monthStart.toISOString());
+        .gte("created_at", monthStart);
       if ((count ?? 0) >= limits.scansPerMonth) {
         skipped++;
         continue;

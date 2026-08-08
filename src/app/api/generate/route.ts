@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getGenerationProvider } from "@/lib/ai/provider";
 import { WORKHORSE_MODEL } from "@/lib/ai/engines";
 import { buildContentMessages, CONTENT_TYPES, type ContentType } from "@/lib/content/templates";
-import { planLimits } from "@/lib/plans";
+import { contentAllowance, periodStartIso, planLimits } from "@/lib/plans";
 
 export const maxDuration = 120;
 
@@ -37,19 +37,22 @@ export async function POST(request: Request) {
   ]);
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-  // plan gating: generations this month
+  // plan gating: a lifetime allowance on free, a monthly one on paid plans
   const limits = planLimits(profile?.plan);
-  const monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
+  const allowance = contentAllowance(limits);
   const { count } = await supabase
     .from("generated_content")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
-    .gte("created_at", monthStart.toISOString());
-  if ((count ?? 0) >= limits.contentGenerations) {
+    .gte("created_at", periodStartIso(allowance));
+  if ((count ?? 0) >= allowance.limit) {
     return NextResponse.json(
-      { error: `Your ${limits.label} plan includes ${limits.contentGenerations} generations per month. Upgrade for more.`, code: "limit" },
+      {
+        error: `Your ${limits.label} plan includes ${allowance.limit} generations ${
+          allowance.lifetime ? "in total" : "per month"
+        }. Upgrade for more.`,
+        code: "limit",
+      },
       { status: 403 }
     );
   }

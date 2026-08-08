@@ -82,15 +82,9 @@
     "step": "第 1 步（共 2 步）· 关于你的业务",
     "title": "设置扫描",
     "subtitle": "首次扫描只需基本信息 — 但你提供的信息越详细，提示词、评分和建议就越精准。",
-    "brandName": "品牌名称 *",
-    "domain": "域名 *",
-    "industry": "行业 *",
-    "descriptionLabel": "你的业务是什么？",
     "optional": "（可选）",
-    "descriptionHint": "一段简短描述就能帮助我们按照买家真实的提问方式来组织扫描提示词 — 越详细，效果越好。",
     "moreDetail": "补充更多信息 — 竞品、市场、语言",
     "moreDetailHint": "（可选，提高准确度）",
-    "competitors": "竞品（最多 3 个）— 输入其域名",
     "creating": "创建项目中…",
     "continue": "继续 → 运行首次扫描",
     "step2Hint": "第 2 步将扫描 ChatGPT、Claude、Gemini 和 Perplexity — 不到一分钟。",
@@ -225,7 +219,7 @@
     "title": "趋势",
     "subtitle": "该写什么？一键把搜索需求变成内容",
     "locked": "Google 趋势洞察适用于 Starter 和 Pro",
-    "searchPlaceholder": "搜索关键词 — 用逗号分隔可比较多个",
+    "searchPlaceholder": "搜索关键词 — 用逗号分隔可比较多个（最多 {max} 个）",
     "comparing": "正在比较 {count} 个关键词",
     "risingQueries": "{geo} 增长最快",
     "noResults": "无结果 — 试试其他关键词。",
@@ -248,7 +242,10 @@
     "searchVolume": "{volume} 次搜索",
     "lockedHint": "来自 Google 趋势的热门与上升查询",
     "dailyFeedNote": "Google 每日趋势 — 涵盖该地区过去一天的数据。",
-    "trendingNeedsRegion": "Google 的实时热搜仅按国家/地区提供 — 请在上方选择一个区域。"
+    "trendingNeedsRegion": "Google 的实时热搜仅按国家/地区提供 — 请在上方选择一个区域。",
+    "keywordLimitHint": "用逗号分隔，最多可比较 {max} 个关键词。",
+    "tooManyKeywords": "最多可比较 {max} 个关键词 — 请删除多余的关键词。",
+    "keywordTabsLabel": "按关键词查看结果"
   },
   "optimize": {
     "title": "优化",
@@ -346,7 +343,7 @@
     "website": "网站 / 应用 URL",
     "industry": "行业",
     "competitors": "竞品",
-    "competitorsHint": "{plan} 方案 {max} 个中已用 {count} 个 — 输入域名，我们会获取名称和 Logo。拖动可排序。",
+    "competitorsHint": "{plan} 方案 {max} 个中已用 {count} 个 — 输入域名或应用链接，我们会获取名称和 Logo。拖动可排序。",
     "competitorLimit": "已达竞品上限 —",
     "upgradeToTrackMore": "升级以追踪更多。",
     "prompts": "扫描提示词",
@@ -395,7 +392,11 @@
     "viewerOnlyNote": "在您当前的套餐中，受邀成员以查看者身份加入（仅查看报告）。升级到 Pro 可添加可编辑成员。",
     "businessDescription": "业务描述",
     "businessDescriptionHint": "用于在 AI 回答中将您的品牌与同名公司区分开。",
-    "websiteHint": "填写域名（acme.com）或 App Store / Google Play 链接。iOS 与 Android 应用作为独立项目追踪。"
+    "websiteHint": "填写域名（acme.com）或 App Store / Google Play 链接。iOS 与 Android 应用作为独立项目追踪。",
+    "memberSeatsNote": "已使用 {max} 个编辑成员席位中的 {used} 个 — 之后的成员将以查看者身份加入。",
+    "competitorInputHint": "输入竞争对手的域名或应用链接。",
+    "competitorsLabel": "竞争对手（最多 {max} 个）",
+    "requiredMark": "*"
   },
   "summary": {
     "title": "上次扫描摘要",
@@ -596,7 +597,6 @@
     "improve": "改进结果",
     "improveTitle": "优化品牌资料",
     "improveHint": "仅显示影响品牌匹配的字段，其余保持不变。",
-    "descriptionHint": "一句业务说明有助于排除名称相似的公司。",
     "save": "保存并应用"
   }
 }

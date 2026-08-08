@@ -3,7 +3,7 @@ import { requireProject } from "@/lib/project";
 import { createClient } from "@/lib/supabase/server";
 import { planLimits } from "@/lib/plans";
 import { Button, Card, CardHeader, Input, Label, PageHeader, Select } from "@/components/ui";
-import { IndustrySelect } from "@/components/industry-select";
+import { BrandProfileFields } from "@/components/brand-profile-fields";
 import { CONTENT_LANGUAGES, COUNTRIES, countryLabel, type Competitor, type Prompt } from "@/lib/types";
 import { updateProject, addCompetitor, addPrompt, inviteMember, updateBranding } from "./actions";
 import { PromptRows } from "./prompt-list";
@@ -50,6 +50,11 @@ export default async function SettingsPage() {
   ]);
   const memberList = (members ?? []) as ProjectMember[];
 
+  // seats split between editing members and viewers — the invite form offers
+  // the member role only while one of those seats is still free
+  const memberSeatsUsed = memberList.filter((m) => m.role === "member").length;
+  const canInviteMember = memberSeatsUsed < limits.maxMemberSeats;
+
   const competitorList = (competitors ?? []) as Competitor[];
   const promptList = (prompts ?? []) as Prompt[];
   const activePrompts = promptList.filter((p) => p.is_active).length;
@@ -63,45 +68,17 @@ export default async function SettingsPage() {
           <CardHeader title={t("settings.project")} />
           <form action={updateProject} className="space-y-4 px-5 pb-5">
             <input type="hidden" name="projectId" value={project.id} />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="s-name">{t("settings.companyBrand")}</Label>
-                <Input id="s-name" name="name" defaultValue={project.name} required />
-              </div>
-              <div>
-                <Label htmlFor="s-website">{t("settings.website")}</Label>
-                {/* not type="url": a bare domain is valid input and is
-                    normalized server-side, same as the onboarding and
-                    Improve-results forms */}
-                <Input
-                  id="s-website"
-                  name="website"
-                  placeholder="acme.com"
-                  defaultValue={project.website}
-                  required
-                />
-                <p className="mt-1 text-[11px] text-ink-faint">{t("settings.websiteHint")}</p>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="s-industry">{t("settings.industry")}</Label>
-              <IndustrySelect id="s-industry" name="industry" defaultValue={project.industry} required />
-            </div>
-            <div>
-              <Label htmlFor="s-description">
-                {t("settings.businessDescription")}{" "}
-                <span className="font-normal text-ink-faint">{t("onboarding.optional")}</span>
-              </Label>
-              <textarea
-                id="s-description"
-                name="description"
-                rows={3}
-                maxLength={500}
-                defaultValue={project.description ?? ""}
-                className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
-              />
-              <p className="mt-1 text-[11px] text-ink-faint">{t("settings.businessDescriptionHint")}</p>
-            </div>
+            {/* identical to the onboarding and "Refine your brand profile"
+                forms — one Brand Profile, three places to edit it */}
+            <BrandProfileFields
+              idPrefix="s"
+              values={{
+                name: project.name,
+                website: project.website,
+                industry: project.industry,
+                description: project.description ?? "",
+              }}
+            />
             <div>
               <Label htmlFor="s-logo">{t("settings.brandLogo")}</Label>
               <Input
@@ -153,12 +130,16 @@ export default async function SettingsPage() {
           <div className="space-y-4 px-5 pb-5">
             <CompetitorList projectId={project.id} competitors={competitorList} />
             {competitorList.length < limits.maxCompetitors ? (
-              <form action={addCompetitor} className="flex gap-2">
+              <form action={addCompetitor} className="space-y-1">
                 <input type="hidden" name="projectId" value={project.id} />
-                <Input name="domain" placeholder="competitor.com" className="max-w-xs" />
-                <Button type="submit" variant="secondary" size="sm" className="h-9.5">
-                  {t("common.add")}
-                </Button>
+                <div className="flex gap-2">
+                  <Input name="domain" placeholder="competitor1.com" className="max-w-xs" />
+                  <Button type="submit" variant="secondary" size="sm" className="h-9.5">
+                    {t("common.add")}
+                  </Button>
+                </div>
+                {/* same wording as the competitor slots in the Brand Profile */}
+                <p className="text-[11px] text-ink-faint">{t("settings.competitorInputHint")}</p>
               </form>
             ) : (
               <p className="text-xs text-mid">
@@ -233,13 +214,14 @@ export default async function SettingsPage() {
                       className="max-w-xs"
                       required
                     />
-                    {limits.memberSeats ? (
+                    {canInviteMember ? (
                       <Select name="role" defaultValue="member" className="w-28">
                         <option value="member">{t("common.member")}</option>
                         <option value="viewer">{t("common.viewer")}</option>
                       </Select>
                     ) : (
-                      // Starter seats are viewer-only — enforced server-side too
+                      // no member seat left (Starter never has one) — enforced
+                      // server-side too
                       <input type="hidden" name="role" value="viewer" />
                     )}
                     <Button type="submit" variant="secondary" size="sm" className="h-9.5">
@@ -247,8 +229,15 @@ export default async function SettingsPage() {
                     </Button>
                   </form>
                 )}
-                {!limits.memberSeats && (
+                {limits.maxMemberSeats === 0 ? (
                   <p className="text-xs text-ink-faint">{t("settings.viewerOnlyNote")}</p>
+                ) : (
+                  <p className="text-xs text-ink-faint">
+                    {t("settings.memberSeatsNote", {
+                      used: memberSeatsUsed,
+                      max: limits.maxMemberSeats,
+                    })}
+                  </p>
                 )}
                 {memberList.some((m) => !m.accepted_at) && (
                   <p className="text-xs text-ink-faint">{t("settings.pendingInvites")}</p>
